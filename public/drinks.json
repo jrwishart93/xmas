@@ -1,0 +1,241 @@
+[
+  {
+    "category": "Tap Beers",
+    "items": [
+      { "name": "Staropramen", "price": 6.50 },
+      { "name": "Innis & Gunn Lager", "price": 6.50 },
+      { "name": "Stewart’s Lager", "price": 6.50 },
+      { "name": "Budvar", "price": 6.50 },
+      { "name": "Barney’s Volcano IPA", "price": 6.50 },
+      { "name": "Bitburger Pils", "price": 6.50 },
+      { "name": "Paulaner Helles", "price": 6.50 },
+      { "name": "Innis & Gunn Original", "price": 6.50 },
+      { "name": "Budvar Nealko", "price": 6.50 },
+      { "name": "Chieftain IPA", "price": 6.50 },
+      { "name": "Blue Moon", "price": 6.50 },
+      { "name": "Thistly Cross Cider (Traditional)", "price": 6.50 },
+      { "name": "Thistly Cross Cider (Scottish Fruits)", "price": 6.50 },
+      { "name": "Guinness", "price": 6.50 },
+      { "name": "Pravha", "price": 6.50 }
+    ]
+  },
+  {
+    "category": "Bottles & Cans",
+    "items": [
+      { "name": "Augustiner Helles", "price": 5.70 },
+      { "name": "Adnams Ghost Ship", "price": 5.70 },
+      { "name": "Barney’s Stones Throw Lager", "price": 5.70 },
+      { "name": "Flensburger Pilsner", "price": 5.70 },
+      { "name": "Pilot Leith Lager", "price": 5.70 },
+      { "name": "Pilot Peach Melba Sour", "price": 5.70 },
+      { "name": "Stewart’s Session IPA", "price": 5.70 },
+      { "name": "Thistly Cross Elderflower", "price": 5.70 },
+      { "name": "Thistly Cross Strawberry", "price": 5.70 },
+      { "name": "Vault City Iron Brew Sour", "price": 5.70 },
+      { "name": "Innis & Gunn Original", "price": 5.70 }
+    ]
+  },
+  {
+    "category": "Sparkling",
+    "items": [
+      { "name": "Haus Prosecco", "price": 8.40 },
+      { "name": "Sea Change Prosecco Rosé", "price": 8.40 },
+      { "name": "Prosecco Divici Organic", "price": 9.00 }
+    ]
+  },
+  {
+    "category": "White Wine",
+    "items": [
+      { "name": "Vitis Nostra Grillo", "price": 7.80 },
+      { "name": "Mooiplaas Sauvignon", "price": 8.70 },
+      { "name": "Los Gansos Viognier", "price": 8.70 },
+      { "name": "De Waal Chenin Blanc", "price": 8.30 },
+      { "name": "Miao Pinot Grigio", "price": 8.30 },
+      { "name": "Vignoble du Sud Chardonnay", "price": 8.30 },
+      { "name": "Boundary Hut Sauvignon Blanc", "price": 9.20 }
+    ]
+  },
+  {
+    "category": "Red Wine",
+    "items": [
+      { "name": "The Cove Merlot", "price": 7.80 },
+      { "name": "Vitis Nostra Nero d’Avola", "price": 8.30 },
+      { "name": "Le Versant Pinot Noir", "price": 8.30 },
+      { "name": "Benegas Malbec", "price": 8.50 }
+    ]
+  },
+  {
+    "category": "Rosé / Orange",
+    "items": [
+      { "name": "Chateau Routas Provence Rosé", "price": 8.70 },
+      { "name": "Campillo Rioja Rosé", "price": 9.60 },
+      { "name": "Cramele Recas Orange Wine", "price": 8.30 }
+    ]
+  },
+  {
+    "category": "Cocktails",
+    "items": [
+      { "name": "Pornstar Martini", "price": 13.50 },
+      { "name": "Alpenglühen Martini", "price": 13.50 },
+      { "name": "Espresso Martini", "price": 13.50 },
+      { "name": "Baileys Espresso Martini", "price": 13.50 },
+      { "name": "Mr Freeze", "price": 13.50 },
+      { "name": "Whisky Sour", "price": 13.00 },
+      { "name": "Honey & Lemon Whisky Sour", "price": 13.00 },
+      { "name": "Pink Velvet", "price": 13.00 },
+      { "name": "Basil Bramble", "price": 13.00 },
+      { "name": "Old Fashioned", "price": 12.50 },
+      { "name": "King’s Martini", "price": 12.50 },
+      { "name": "Negroni", "price": 12.50 },
+      { "name": "Margarita", "price": 12.50 },
+      { "name": "Hugo Spritz", "price": 12.50 },
+      { "name": "French Martini", "price": 12.00 },
+      { "name": "Coconut Lemon Daiquiri", "price": 12.00 },
+      { "name": "Mai Tai", "price": 12.00 },
+      { "name": "Cherry Mai Tai", "price": 12.00 },
+      { "name": "Bramble", "price": 12.00 },
+      { "name": "Elderflower & Lychee Spritz", "price": 12.00 },
+      { "name": "Figgy Spritz", "price": 11.50 },
+      { "name": "Daiquiri", "price": 11.50 },
+      { "name": "Limoncello Spritz", "price": 11.50 },
+      { "name": "Apfel Strudel Spritz", "price": 11.50 }
+    ]
+  },
+  {
+    "category": "Spirits",
+    "items": [
+      { "name": "Baileys", "price": 5.70 },
+      { "name": "Cointreau", "price": 5.70 },
+      { "name": "Disaronno Amaretto", "price": 5.70 },
+      { "name": "Disaronno Velvet", "price": 5.70 },
+      { "name": "Hennessy VS", "price": 5.70 },
+      { "name": "Absinthe", "price": 5.70 },
+      { "name": "Casamigos Blanco", "price": 6.50 },
+      { "name": "Patron Blanco", "price": 6.50 },
+      { "name": "Patron Café XO", "price": 6.50 },
+      { "name": "Patron Reposado", "price": 6.50 },
+      { "name": "Ciroc", "price": 6.20 },
+      { "name": "Ciroc Pineapple", "price": 6.20 },
+      { "name": "Grey Goose", "price": 6.20 },
+      { "name": "Ketel One", "price": 6.20 },
+      { "name": "Bacardi Ocho", "price": 6.50 },
+      { "name": "Diplomatico Reserva", "price": 6.50 },
+      { "name": "Havana 7", "price": 6.50 },
+      { "name": "Kraken", "price": 6.50 },
+      { "name": "Sailor Jerry", "price": 6.50 },
+      { "name": "Aberfeldy 12", "price": 6.50 },
+      { "name": "Ardbeg 10", "price": 6.50 },
+      { "name": "Arran 10", "price": 6.50 },
+      { "name": "Arran Bodega", "price": 6.50 },
+      { "name": "Caol Ila 12", "price": 6.50 },
+      { "name": "Glen Scotia Double Cask", "price": 6.50 },
+      { "name": "Glenkinchie 12", "price": 6.50 },
+      { "name": "Glenmorangie 12", "price": 6.50 },
+      { "name": "Lagg Kilmory", "price": 6.50 },
+      { "name": "Lagg Corriecravie", "price": 6.50 },
+      { "name": "Singleton", "price": 6.50 },
+      { "name": "Talisker 10", "price": 6.50 },
+      { "name": "Johnnie Walker Black", "price": 6.00 },
+      { "name": "Johnnie Walker Gold", "price": 6.00 },
+      { "name": "Monkey Shoulder", "price": 6.00 },
+      { "name": "The Guard Bridge", "price": 6.00 },
+      { "name": "Buffalo Trace", "price": 5.80 },
+      { "name": "Jack Daniels (Flavours)", "price": 5.80 },
+      { "name": "Woodford Reserve", "price": 5.80 }
+    ]
+  },
+  {
+    "category": "Schnapps",
+    "items": [
+      { "name": "Apfel Strudel", "price": 3.00 },
+      { "name": "Salted Caramel", "price": 3.00 },
+      { "name": "Limoncello", "price": 3.00 },
+      { "name": "Espresso Cold Brew", "price": 3.00 },
+      { "name": "Iron Brew", "price": 3.00 },
+      { "name": "Hazelnut", "price": 3.00 }
+    ]
+  },
+  {
+    "category": "No & Low",
+    "items": [
+      { "name": "Pornstar Martino", "price": 9.50 },
+      { "name": "Blanco Margarita", "price": 9.50 },
+      { "name": "Blanco Panoma", "price": 9.50 },
+      { "name": "Dark & Stormy", "price": 8.50 },
+      { "name": "Maple Rum Old Fashioned", "price": 8.50 },
+      { "name": "T & T", "price": 8.00 },
+      { "name": "French 0.5", "price": 8.00 },
+      { "name": "Espresso Martino", "price": 8.50 },
+      { "name": "Crodino Spritz", "price": 7.50 },
+      { "name": "Minosa", "price": 7.00 },
+      { "name": "Limoncello Spritz", "price": 7.00 }
+    ]
+  },
+  {
+    "category": "Alcohol-Free Beers",
+    "items": [
+      { "name": "Bitburger Drive", "price": 5.50 },
+      { "name": "Ghost Ship 0.5", "price": 5.50 },
+      { "name": "Bellfield IPA 0.5", "price": 5.50 },
+      { "name": "Brulo Gose", "price": 5.50 },
+      { "name": "Corona Cero", "price": 5.50 },
+      { "name": "Guinness 0.0", "price": 5.50 },
+      { "name": "Staropramen 0.0", "price": 5.50 },
+      { "name": "Paulaner Weissbier 0.0", "price": 5.50 },
+      { "name": "Old Mout AF", "price": 5.50 },
+      { "name": "Budvar Nealko", "price": 5.50 }
+    ]
+  },
+  {
+    "category": "Alcohol-Free Spirits",
+    "items": [
+      { "name": "Almave Blanco", "price": 5.50 },
+      { "name": "Dead Man’s Fingers 0.0", "price": 5.50 },
+      { "name": "Seedlip", "price": 5.50 },
+      { "name": "Tanqueray 0.0", "price": 5.50 }
+    ]
+  },
+  {
+    "category": "Alcohol-Free Wine",
+    "items": [
+      { "name": "McGuigan Zero Shiraz", "price": 5.60 },
+      { "name": "McGuigan Zero Sauvignon", "price": 5.60 },
+      { "name": "Sea Change AF Sparkling", "price": 7.00 }
+    ]
+  },
+  {
+    "category": "Soft Drinks",
+    "items": [
+      { "name": "Pepsi", "price": 3.50 },
+      { "name": "Pepsi Max", "price": 3.50 },
+      { "name": "Irn Bru", "price": 3.50 },
+      { "name": "Irn Bru Sugar Free", "price": 3.50 },
+      { "name": "Fever Tree Raspberry Lemonade", "price": 3.50 },
+      { "name": "Fever Tree Elderflower", "price": 3.50 },
+      { "name": "Red Bull", "price": 3.50 },
+      { "name": "San Pellegrino Limonata", "price": 3.50 },
+      { "name": "San Pellegrino Aranciata", "price": 3.50 }
+    ]
+  },
+  {
+    "category": "Bites",
+    "items": [
+      { "name": "Halloumi Schnitzel Strips", "price": 10.00 },
+      { "name": "Bangers (German wurst bites)", "price": 10.00 },
+      { "name": "Cauliflower Wings", "price": 10.00 },
+      { "name": "Reuben Croquettes", "price": 10.00 },
+      { "name": "Fried Pickles", "price": 10.00 },
+      { "name": "Chicken Schnitzel Strips", "price": 10.00 },
+      { "name": "Hummus & Flatbread", "price": 10.00 },
+      { "name": "Trio of Fries (Haus, Truffle & Munich)", "price": 10.00 },
+      { "name": "Pretzel Trio (classic, cheese & jalapeño)", "price": 10.00 }
+    ]
+  },
+  {
+    "category": "Sharers",
+    "items": [
+      { "name": "Camembert", "price": 24.00 },
+      { "name": "Charcuterie Board", "price": 28.00 }
+    ]
+  }
+]

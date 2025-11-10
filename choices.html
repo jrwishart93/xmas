@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make Your Choices</title>
+    <link rel="stylesheet" href="public/style.css">
+</head>
+<body>
+    <div class="snowfall"></div>
+    <div class="container">
+        <div class="header">
+            <h1>🎄 Make Your Choices</h1>
+            <div class="budget ok">
+                Budget: <span id="remaining-budget">£20.00</span>
+            </div>
+        </div>
+        <div id="menu-container">
+            <!-- Menu items will be dynamically inserted here -->
+        </div>
+        <button id="submit-choices" class="btn-green" disabled>Submit Choices</button>
+    </div>
+
+    <script>
+      // Create and append snow elements for the animation
+      const snowfallContainer = document.querySelector('.snowfall');
+      if (snowfallContainer) {
+        for (let i = 0; i < 150; i++) {
+          const snow = document.createElement('div');
+          snow.className = 'snow';
+          const size = Math.random() * 4 + 1;
+          snow.style.width = `${size}px`;
+          snow.style.height = `${size}px`;
+          snow.style.left = `${Math.random() * 100}%`;
+          snow.style.animationDuration = `${Math.random() * 5 + 5}s`;
+          snow.style.animationDelay = `${Math.random() * 5}s`;
+          snow.style.opacity = Math.random();
+          snowfallContainer.appendChild(snow);
+        }
+      }
+    </script>
+    <script type="module" src="choices.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work Xmas Night Out — Menu</title>
+  <link rel="stylesheet" href="public/style.css" />
+</head>
+<body>
+  <h1>Work Xmas Night Out — Pick Your Drinks & Snacks</h1>
+
+  <div class="card">
+    <h2>Menu</h2>
+    <div id="menuContainer"></div>
+  </div>
+
+  <div class="total-box">
+    Remaining Balance: £<span id="remaining">20.00</span>
+  </div>
+
+  <button id="submitBtn" disabled>Submit Choices</button>
+
+  <script type="module">
+    import { renderMenu } from "./src/ui/renderMenu.js";
+    import { attachTotalHandler } from "./src/ui/updateTotals.js";
+    import { saveChoices } from "./src/data/saveChoices.js";
+
+    const MAX_BUDGET = 20;
+    const menuContainer = document.getElementById("menuContainer");
+    const remainingSpan = document.getElementById("remaining");
+    const submitBtn = document.getElementById("submitBtn");
+
+    let menuData;
+
+    async function init() {
+      menuData = await renderMenu(menuContainer);
+      attachTotalHandler(menuData, remainingSpan, submitBtn, MAX_BUDGET);
+    }
+
+    init().catch(err => {
+      alert("Error loading menu: " + err.message);
+    });
+
+    submitBtn.onclick = async () => {
+      const inputs = document.querySelectorAll(".qty-input");
+      const selections = [];
+
+      inputs.forEach((input) => {
+        const qty = Number(input.value);
+        const index = Number(input.dataset.index);
+        if (qty > 0) {
+          selections.push({
+            name: menuData[index].name,
+            quantity: qty,
+            price: menuData[index].price
+          });
+        }
+      });
+
+      const username = localStorage.getItem("currentUser");
+      if (!username) {
+        alert("You are not logged in.");
+        return;
+      }
+
+      try {
+        await saveChoices(username, selections);
+        window.location.href = "complete.html";
+      } catch (err) {
+        alert("Failed to save choices: " + err.message);
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choices Saved!</title>
+    <link rel="stylesheet" href="public/style.css">
+</head>
+<body>
+    <div class="snowfall"></div>
+    <div class="container">
+        <div class="card complete-card">
+            <span class="xmas-emoji">✅</span>
+            <h1>Thanks!</h1>
+            <p>Your choices have been saved.</p>
+            <a href="index.html" class="button">Back to Login</a>
+        </div>
+    </div>
+
+    <script>
+      // Create and append snow elements for the animation
+      const snowfallContainer = document.querySelector('.snowfall');
+      if (snowfallContainer) {
+        for (let i = 0; i < 150; i++) {
+          const snow = document.createElement('div');
+          snow.className = 'snow';
+          const size = Math.random() * 4 + 1;
+          snow.style.width = `${size}px`;
+          snow.style.height = `${size}px`;
+          snow.style.left = `${Math.random() * 100}%`;
+          snow.style.animationDuration = `${Math.random() * 5 + 5}s`;
+          snow.style.animationDelay = `${Math.random() * 5}s`;
+          snow.style.opacity = Math.random();
+          snowfallContainer.appendChild(snow);
+        }
+      }
+    </script>
+</body>
+</html>

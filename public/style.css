@@ -1,0 +1,342 @@
+/* public/style.css */
+
+:root {
+  --snow: #ffffffd9;
+  --frost: rgba(255, 255, 255, 0.45);
+  --xmas-red: #e94040;
+  --xmas-green: #3cb371;
+  --ice-blue: #6ec8ff;
+  --night-sky: #0a0f1f;
+  --gold: #f9d57e;
+  --blue-gradient: linear-gradient(135deg, #77baff, #2f7dff);
+  --green-gradient: linear-gradient(135deg, #5dec98, #3cb371);
+
+  --blur-amount: 20px;
+  --card-radius: 24px;
+  --button-radius: 16px;
+  --input-radius: 12px;
+}
+
+/* --- BASE & LAYOUT --- */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--night-sky);
+  background-image: linear-gradient(175deg, #0a0f1f 0%, #1a2a4a 100%);
+  color: var(--snow);
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+  animation: fadeIn 1s ease-out;
+}
+
+.container {
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
+  text-align: center;
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* --- SNOWFALL ANIMATION --- */
+.snowfall {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.snow {
+  position: absolute;
+  background: var(--snow);
+  border-radius: 50%;
+  animation: snowfall linear infinite;
+}
+
+@keyframes snowfall {
+  0% { transform: translateY(-10vh); }
+  100% { transform: translateY(110vh); }
+}
+
+/* --- GLASS CARDS --- */
+.card {
+  background: var(--frost);
+  backdrop-filter: blur(var(--blur-amount));
+  -webkit-backdrop-filter: blur(var(--blur-amount));
+  border-radius: var(--card-radius);
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 
+              inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* --- TYPOGRAPHY --- */
+h1, h2, h3 {
+  color: var(--snow);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin: 0 0 16px 0;
+}
+
+h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+p, label {
+  color: var(--snow);
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--ice-blue);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--gold);
+}
+
+/* --- FORMS --- */
+select,
+input[type="password"],
+input[type="number"],
+input[type="text"] {
+  width: 100%;
+  padding: 14px 16px;
+  margin-top: 8px;
+  border-radius: var(--input-radius);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--snow);
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+select:focus,
+input:focus {
+  outline: none;
+  border-color: var(--ice-blue);
+  box-shadow: 0 0 15px rgba(110, 200, 255, 0.5), inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+select option {
+  background: var(--night-sky);
+  color: var(--snow);
+}
+
+::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --- BUTTONS --- */
+button {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 17px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--button-radius);
+  color: var(--snow);
+  cursor: pointer;
+  margin-top: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: var(--blue-gradient);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(47, 125, 255, 0.4);
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.97);
+  box-shadow: 0 2px 10px rgba(47, 125, 255, 0.3);
+}
+
+button:disabled {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+button.btn-green {
+  background: var(--green-gradient);
+}
+
+button.btn-green:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(60, 179, 113, 0.4);
+}
+
+/* --- PAGE-SPECIFIC STYLES --- */
+
+/* Login Page */
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+  animation: slideUp 0.6s ease-out;
+}
+
+.login-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.login-header p {
+  margin-top: 8px;
+  color: var(--ice-blue);
+  font-size: 1rem;
+}
+
+.xmas-emoji {
+  font-size: 48px;
+  display: block;
+  text-align: center;
+  margin-bottom: 16px;
+  animation: popIn 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+#loginError {
+  color: var(--xmas-red);
+  background: rgba(233, 64, 64, 0.15);
+  border: 1px solid var(--xmas-red);
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 16px;
+  text-align: center;
+  display: none; /* Hidden by default */
+  font-weight: 500;
+}
+
+/* Choices Page */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  background: rgba(0,0,0,0.2);
+  border-radius: var(--button-radius);
+}
+
+.budget {
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 12px;
+  transition: all 0.4s ease;
+}
+
+.budget.ok { background: var(--xmas-green); }
+.budget.warn { background: var(--gold); color: var(--night-sky); }
+.budget.over { background: var(--xmas-red); }
+
+.item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background-color 0.3s;
+}
+
+.item:last-child { border-bottom: none; }
+
+.item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.item-name { font-weight: 500; }
+.item-price { color: var(--gold); font-weight: 600; }
+
+.qty-input {
+  width: 65px;
+  padding: 8px;
+  text-align: center;
+  background: rgba(0,0,0,0.3);
+}
+
+/* Complete Page */
+.complete-card {
+  text-align: center;
+}
+
+.complete-card .xmas-emoji {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.complete-card p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  body {
+    padding: 10px;
+  }
+  .container {
+    padding: 0;
+  }
+  .card {
+    padding: 20px;
+    border-radius: 20px;
+  }
+  h1 {
+    font-size: 1.8rem;
+  }
+}
