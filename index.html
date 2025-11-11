@@ -2,57 +2,160 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0f1f" />
   <title>Work Xmas Night Out — Login</title>
   <link rel="stylesheet" href="public/style.css" />
+  <link rel="preload" href="public/style.css" as="style" />
+  <noscript><style>.js-only{display:none!important}</style></noscript>
 </head>
 
 <body>
-  <div class="snowfall"></div>
+  <!-- Decorative background -->
+  <div class="snowfall js-only" aria-hidden="true"></div>
 
-  <div class="container">
-    <div class="login-header">
-      <span class="xmas-emoji">🎄</span>
+  <main class="container" role="main">
+    <header class="login-header">
+      <span class="xmas-emoji" aria-hidden="true">🎄</span>
       <h1>Work Xmas Night Out</h1>
-      <p>Please log in to pick your drinks & snacks</p>
-    </div>
+      <p class="subtitle">Please log in to pick your drinks &amp; snacks</p>
+    </header>
 
-    <div class="card">
-      <label for="nameSelect">Your Name</label>
-      <select id="nameSelect">
-        <option value="">Select your name...</option>
-      </select>
+    <section class="card glass">
+      <form id="loginForm" novalidate>
+        <!-- Name -->
+        <label for="nameSelect">Your name</label>
+        <div class="field">
+          <select id="nameSelect" required aria-describedby="nameHelp">
+            <option value="">Loading names…</option>
+          </select>
+          <div id="nameHelp" class="hint">Select your name from the list.</div>
+        </div>
 
-      <br><br>
+        <!-- PIN -->
+        <label for="pinInput">Last 4 digits of your phone</label>
+        <div class="field field-inline">
+          <input
+            type="password"
+            id="pinInput"
+            inputmode="numeric"
+            pattern="\\d{4}"
+            maxlength="4"
+            autocomplete="one-time-code"
+            placeholder="••••"
+            required
+            aria-describedby="pinHelp"
+            aria-invalid="false"
+          />
+          <button type="button" id="togglePin" class="btn-ghost" aria-pressed="false" aria-label="Show PIN">Show</button>
+        </div>
+        <div id="pinHelp" class="hint">Exactly four digits.</div>
 
-      <label for="pinInput">Last 4 digits of your phone</label>
-      <input type="password" id="pinInput" maxlength="4" placeholder="••••">
+        <!-- Errors -->
+        <p id="loginError" class="error" role="alert" aria-live="polite"></p>
 
-      <div id="loginError"></div>
+        <!-- Actions -->
+        <div class="actions">
+          <button id="loginBtn" class="btn-primary" type="submit" disabled>
+            Continue
+            <span class="spinner" aria-hidden="true" hidden></span>
+          </button>
+        </div>
+      </form>
+    </section>
 
-      <button id="loginBtn">Continue</button>
-    </div>
-  </div>
+    <footer class="muted">
+      <small>Built for the team night at Brewhemia • Budget tracked on the next page</small>
+    </footer>
+  </main>
 
+  <!-- Snow generator (respects prefers-reduced-motion) -->
   <script>
-    // Create and append snow elements for the animation
-    const snowfallContainer = document.querySelector('.snowfall');
-    if (snowfallContainer) {
-      for (let i = 0; i < 150; i++) {
-        const snow = document.createElement('div');
-        snow.className = 'snow';
-        const size = Math.random() * 4 + 1;
-        snow.style.width = `${size}px`;
-        snow.style.height = `${size}px`;
-        snow.style.left = `${Math.random() * 100}%`;
-        snow.style.animationDuration = `${Math.random() * 5 + 5}s`; // 5-10 seconds
-        snow.style.animationDelay = `${Math.random() * 5}s`;
-        snow.style.opacity = Math.random();
-        snowfallContainer.appendChild(snow);
-      }
-    }
-  </script>
-  <script type="module" src="login.js"></script>
+    (function () {
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if (mq.matches) return; // respect reduced motion
 
+      const wrap = document.querySelector('.snowfall');
+      if (!wrap) return;
+
+      const flakeCount = 120;
+      const frag = document.createDocumentFragment();
+
+      for (let i = 0; i < flakeCount; i++) {
+        const s = document.createElement('div');
+        s.className = 'snow';
+        const size = 1 + Math.random() * 3.5;
+        s.style.width = size + 'px';
+        s.style.height = size + 'px';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.animationDuration = (6 + Math.random() * 6).toFixed(2) + 's';
+        s.style.animationDelay = (Math.random() * 6).toFixed(2) + 's';
+        s.style.opacity = (0.35 + Math.random() * 0.6).toFixed(2);
+        frag.appendChild(s);
+      }
+      wrap.appendChild(frag);
+    })();
+  </script>
+
+  <!-- Page logic -->
+  <script type="module">
+    // Small UX helpers that work alongside your existing login.js
+    const nameSelect = document.getElementById('nameSelect');
+    const pinInput   = document.getElementById('pinInput');
+    const btn        = document.getElementById('loginBtn');
+    const err        = document.getElementById('loginError');
+    const spinner    = btn.querySelector('.spinner');
+    const togglePin  = document.getElementById('togglePin');
+    const form       = document.getElementById('loginForm');
+
+    // Enable button only when both fields valid
+    const validate = () => {
+      const nameOk = nameSelect && nameSelect.value.trim() !== '';
+      const pinOk  = /^\d{4}$/.test(pinInput.value.trim());
+      btn.disabled = !(nameOk && pinOk);
+      pinInput.setAttribute('aria-invalid', pinOk ? 'false' : 'true');
+    };
+
+    nameSelect.addEventListener('change', validate);
+    pinInput.addEventListener('input', () => {
+      // strip non-digits, cap at 4
+      pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 4);
+      validate();
+    });
+
+    // Show/Hide PIN
+    togglePin.addEventListener('click', () => {
+      const showing = pinInput.type === 'text';
+      pinInput.type = showing ? 'password' : 'text';
+      togglePin.setAttribute('aria-pressed', String(!showing));
+      togglePin.textContent = showing ? 'Show' : 'Hide';
+      pinInput.focus();
+    });
+
+    // Hand off to your existing login.js submit handler
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      err.textContent = '';
+      spinner.hidden = false;
+      btn.disabled = true;
+      // Your login.js listens for #loginBtn click; trigger it for compatibility
+      document.getElementById('loginBtn').dispatchEvent(new Event('click'));
+      // login.js should handle navigation / error; re-enable if it throws
+      setTimeout(() => { spinner.hidden = true; validate(); }, 1200);
+    });
+
+    // Replace placeholder while names load (login.js should populate)
+    // If login.js fails to populate within 2.5s, show a friendly hint.
+    setTimeout(() => {
+      if (nameSelect.options.length <= 1) {
+        nameSelect.options[0].textContent = 'Select your name';
+        err.textContent = 'Still fetching names… if this persists, check Firestore rules and firebaseConfig.';
+      }
+      validate();
+    }, 2500);
+  </script>
+
+  <!-- Keep your existing module (must come after helpers above or vice-versa) -->
+  <script type="module" src="login.js"></script>
 </body>
 </html>
