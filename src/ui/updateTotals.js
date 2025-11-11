@@ -1,18 +1,36 @@
+// src/ui/updateTotals.js
+
 export function calculateTotals() {
   let total = 0;
-  let selections = {};
+  const selections = [];
 
+  // Loop over ALL rendered menu items
   document.querySelectorAll(".menu-item").forEach(item => {
     const name = item.dataset.name;
-    const price = parseFloat(item.dataset.price);
+    const price = Number(item.dataset.price);
     const qtyInput = item.querySelector(".qty-input");
-    const qty = Number(qtyInput.value || 0);
+
+    if (!name || isNaN(price) || !qtyInput) return;
+
+    const qty = Number(qtyInput.value) || 0;
 
     if (qty > 0) {
-      selections[name] = { qty, price };
-      total += qty * price;
+      const lineTotal = qty * price;
+      total += lineTotal;
+
+      selections.push({
+        name,
+        price,
+        qty
+      });
     }
   });
 
-  return { total, selections };
+  // Ensure totals never become invalid
+  if (isNaN(total)) total = 0;
+
+  return {
+    total: Number(total.toFixed(2)),
+    selections
+  };
 }
