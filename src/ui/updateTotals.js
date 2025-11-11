@@ -1,29 +1,18 @@
-// src/ui/updateTotals.js
-import { currency } from "../utils/currency.js";
+export function calculateTotals() {
+  let total = 0;
+  let selections = {};
 
-export function attachTotalHandler(menu, totalElement, submitButton, maxBudget) {
-  const inputs = document.querySelectorAll(".qty-input");
+  document.querySelectorAll(".menu-item").forEach(item => {
+    const name = item.dataset.name;
+    const price = parseFloat(item.dataset.price);
+    const qtyInput = item.querySelector(".qty-input");
+    const qty = Number(qtyInput.value || 0);
 
-  function update() {
-    let total = 0;
-
-    inputs.forEach((input) => {
-      const index = Number(input.dataset.index);
-      const qty = Number(input.value);
-      total += qty * menu[index].price;
-    });
-
-    const remaining = maxBudget - total;
-    totalElement.textContent = currency(remaining);
-
-    submitButton.disabled = remaining < 0;
-  }
-
-  inputs.forEach((input) => {
-    input.addEventListener("change", update);
-    input.addEventListener("input", update);
+    if (qty > 0) {
+      selections[name] = { qty, price };
+      total += qty * price;
+    }
   });
 
-  // Initialize with 0 totals
-  update();
+  return { total, selections };
 }

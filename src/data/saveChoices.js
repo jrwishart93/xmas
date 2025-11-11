@@ -1,15 +1,13 @@
-// src/data/saveChoices.js
-import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
-import { app } from "../firebase/firebaseConfig.js";
+import { db } from "../firebase/firebaseConfig.js";
+import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
-const db = getFirestore(app);
+export async function saveUserSelections(userId, selections, totalSpent) {
+  const userRef = doc(db, "users", userId);
 
-export async function saveChoices(username, selections) {
-  // selections: array of { name, quantity, price }
-  // Save under users/{username}/choices
-  const userChoicesRef = doc(collection(db, "users", username, "choices"));
-  await setDoc(userChoicesRef, {
-    selections,
-    submittedAt: Date.now()
+  await updateDoc(userRef, {
+    selections: selections,     // full map of selected items
+    totalSpent: totalSpent,
+    budget: 20 - totalSpent,
+    hasSubmitted: true
   });
 }
