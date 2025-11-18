@@ -1,4 +1,7 @@
-import { db } from "./firebase/firebaseConfig.js";
+// The firebase config lives under src/firebase. The previous import
+// pointed to a non-existent "./firebase" folder which caused the module
+// load to fail, preventing the menu from rendering for logged-in users.
+import { db } from "./src/firebase/firebaseConfig.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 import { saveUserSelections } from "./src/data/saveChoices.js";
 import { calculateTotals } from "./src/ui/updateTotals.js";
