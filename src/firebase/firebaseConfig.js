@@ -1,7 +1,10 @@
 // src/firebase/firebaseConfig.js
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// If you need additional Firebase SDKs (Firestore/Auth), import them here.
+// This project is served as plain ES modules without a bundler, so we need to
+// source Firebase directly from the gstatic CDN. The previous version imported
+// from the npm package names ("firebase/app" etc.), which throws in the browser
+// because there is no build step to rewrite those specifiers.
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDGG0aGrcm4xy0M5GK4PUOvSAX2XM3UncU",
@@ -13,6 +16,5 @@ const firebaseConfig = {
   measurementId: "G-WZZZTPBP44"
 };
 
-// Initialize Firebase
 export const app = initializeApp(firebaseConfig);
-export const analytics = getAnalytics(app);
+export const db = getFirestore(app);
