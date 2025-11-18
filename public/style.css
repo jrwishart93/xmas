@@ -283,6 +283,22 @@ button.btn-green:hover:not(:disabled) {
 .budget.warn { background: var(--gold); color: var(--night-sky); }
 .budget.over { background: var(--xmas-red); }
 
+.status-text {
+  margin: 10px 0 20px;
+  font-size: 0.95rem;
+  color: var(--snow);
+  opacity: 0.85;
+  min-height: 1.2em;
+}
+
+.status-text.error {
+  color: var(--xmas-red);
+}
+
+.status-text.success {
+  color: var(--xmas-green);
+}
+
 .item {
   display: grid;
   grid-template-columns: 1fr auto auto;

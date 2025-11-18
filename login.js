@@ -46,6 +46,8 @@ loginBtn.addEventListener('click', async () => {
 
         if (userSnap.exists() && userSnap.data().password === pin) {
             localStorage.setItem("xmasUser", userSnap.id);
+            // Keep a secondary key for compatibility with older pages/modules
+            localStorage.setItem("currentUser", userSnap.id);
             window.location.href = 'choices.html';
         } else {
             errorP.textContent = 'Invalid PIN.';
