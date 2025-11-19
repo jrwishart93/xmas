@@ -352,11 +352,42 @@ button.btn-green:hover:not(:disabled) {
 .item-name { font-weight: 500; }
 .item-price { color: var(--gold); font-weight: 600; }
 
-.qty-input {
-  width: 65px;
-  padding: 8px;
+.qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 8px;
+  border-radius: var(--button-radius);
+}
+
+.qty-display {
+  min-width: 32px;
   text-align: center;
-  background: rgba(0,0,0,0.3);
+  font-weight: 600;
+}
+
+.qty-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--snow);
+  font-size: 1rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.qty-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.qty-btn:active {
+  transform: scale(0.95);
 }
 
 /* Complete Page */
