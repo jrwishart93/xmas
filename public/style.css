@@ -402,6 +402,51 @@ button.btn-green:hover:not(:disabled) {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
+.dashboard-link-card {
+  text-align: center;
+  margin-top: 16px;
+  padding: 20px 18px;
+}
+
+.dashboard-link-title {
+  margin-bottom: 6px;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.dashboard-link-subtitle {
+  margin-bottom: 16px;
+  opacity: 0.85;
+  font-size: 0.95rem;
+}
+
+.dashboard-btn {
+  display: inline-block;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.dashboard-btn:hover {
+  box-shadow: 0 0 12px rgba(255,255,255,0.25);
+}
+
+@media (max-width: 480px) {
+  .dashboard-link-card {
+    margin-top: 12px;
+    padding: 16px;
+  }
+
+  .dashboard-link-title {
+    font-size: 1.15rem;
+  }
+
+  .dashboard-btn {
+    width: 100%;
+    padding: 14px 0;
+  }
+}
+
 .xmas-emoji {
   font-size: 48px;
   display: block;
