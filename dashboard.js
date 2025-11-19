@@ -2,9 +2,12 @@ import { db } from "./src/firebase/firebaseConfig.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
 
+const TOTAL_KITTY = 200;
+
 const submissionRows = document.getElementById("submissionRows");
 const peopleAccordion = document.getElementById("peopleAccordion");
 const itemTotalsList = document.getElementById("itemTotalsList");
+const kittyBar = document.getElementById("kittyBar");
 const kittyText = document.getElementById("kittyText");
 
 const currency = new Intl.NumberFormat("en-GB", {
@@ -218,10 +221,25 @@ function renderItemTotals(totalsMap) {
 
 function updateKittyBar(people) {
   if (!kittyText) return;
-  const kittyTotal = people.length * 20;
   const spent = people.reduce((sum, person) => sum + person.totalSpend, 0);
-  const remaining = Math.max(kittyTotal - spent, 0);
-  kittyText.textContent = `Kitty: ${currency.format(kittyTotal)} | Spent: ${currency.format(spent)} | Left: ${currency.format(remaining)}`;
+  const remaining = TOTAL_KITTY - spent;
+  const previousText = kittyText.innerText;
+
+  kittyText.innerText = `Kitty: £${TOTAL_KITTY.toFixed(2)} | Spent: £${spent.toFixed(2)} | Left: £${remaining.toFixed(2)}`;
+
+  kittyText.classList.remove("kitty-warn", "kitty-over");
+  if (remaining < 0) {
+    kittyText.classList.add("kitty-over");
+  } else if (remaining < TOTAL_KITTY * 0.25) {
+    kittyText.classList.add("kitty-warn");
+  }
+
+  if (kittyBar && kittyText.innerText !== previousText) {
+    kittyBar.classList.remove("updated");
+    // Force reflow to replay animation
+    void kittyBar.offsetWidth;
+    kittyBar.classList.add("updated");
+  }
 }
 
 async function loadDashboard() {
