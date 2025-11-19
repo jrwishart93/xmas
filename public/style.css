@@ -172,6 +172,40 @@ label {
   letter-spacing: 0.5px;
 }
 
+.field-inline {
+  position: relative;
+}
+
+#pinInput {
+  padding-right: 70px;
+}
+
+#togglePin {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  width: auto;
+  margin: 0;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  background: rgba(10, 15, 31, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  box-shadow: none;
+  opacity: 0.9;
+}
+
+#togglePin:hover,
+#togglePin:focus-visible {
+  background: rgba(10, 15, 31, 0.8);
+  border-color: var(--ice-blue);
+}
+
 /* --- BUTTONS --- */
 button {
   width: 100%;
