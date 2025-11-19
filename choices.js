@@ -7,7 +7,7 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-
 const MAX_BUDGET = 20;
 const remainingElement = document.getElementById("remaining-budget");
 const menuContainer = document.getElementById("menu-container");
-const submitButton = document.getElementById("submit-choices");
+const submitButton = document.getElementById("submitChoices");
 const budgetElement = document.querySelector(".budget");
 const statusElement = document.getElementById("menu-status");
 const defaultButtonText = submitButton.textContent;
