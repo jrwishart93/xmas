@@ -39,38 +39,29 @@ export function calculateTotals() {
   };
 }
 
-function formatCurrency(value) {
-  const formatter = new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    minimumFractionDigits: 2,
-  });
-  return formatter.format(value);
-}
-
 export function attachTotalHandler({
-  remainingElement,
+  budgetTextElement,
+  budgetBarElement,
   submitButton,
-  budgetElement,
   maxBudget = 20,
   onTotalsChange,
 } = {}) {
   const updateBudgetVisual = (remaining) => {
-    if (!budgetElement) return;
-    budgetElement.classList.remove('ok', 'warn', 'over');
+    if (!budgetBarElement) return;
+    budgetBarElement.classList.remove('ok', 'warn', 'over');
 
     if (remaining < 0) {
-      budgetElement.classList.add('over');
+      budgetBarElement.classList.add('over');
     } else if (remaining <= 5) {
-      budgetElement.classList.add('warn');
+      budgetBarElement.classList.add('warn');
     } else {
-      budgetElement.classList.add('ok');
+      budgetBarElement.classList.add('ok');
     }
   };
 
   const updateRemaining = (remaining) => {
-    if (remainingElement) {
-      remainingElement.textContent = formatCurrency(remaining);
+    if (budgetTextElement) {
+      budgetTextElement.innerText = `Budget: £${remaining.toFixed(2)}`;
     }
   };
 
