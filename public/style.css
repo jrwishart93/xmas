@@ -343,78 +343,34 @@ button.btn-green:hover:not(:disabled) {
   text-align: center;
 }
 
-.christmas-slideshow {
-  position: relative;
+.christmas-gallery {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.christmas-gallery::-webkit-scrollbar {
+  display: none;
+}
+
+.highlight-figure {
+  min-width: 85%;
+  max-width: 85%;
+  scroll-snap-align: center;
+  margin: 0 auto;
+}
+
+.highlight-figure img {
   width: 100%;
-  height: 260px;
-  overflow: hidden;
-  border-radius: 14px;
-  margin-top: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.christmas-slideshow .slides {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.christmas-slideshow .slide {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  animation: slideFade 12s infinite;
-}
-
-.christmas-slideshow .slide:nth-child(1) {
-  animation-delay: 0s;
-}
-
-.christmas-slideshow .slide:nth-child(2) {
-  animation-delay: 6s;
-}
-
-.christmas-slideshow img {
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
   object-fit: cover;
-  animation: kenburns 12s ease-in-out infinite;
-}
-
-@keyframes slideFade {
-  0% {
-    opacity: 0;
-  }
-  5% {
-    opacity: 1;
-  }
-  45% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes kenburns {
-  0% {
-    transform: scale(1) translate(0, 0);
-  }
-  50% {
-    transform: scale(1.1) translate(2%, 2%);
-  }
-  100% {
-    transform: scale(1) translate(0, 0);
-  }
-}
-
-@media (min-width: 600px) {
-  .christmas-slideshow {
-    height: 330px;
-  }
+  max-height: 280px;
+  display: block;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
 .xmas-emoji {
@@ -808,5 +764,36 @@ button.btn-green:hover:not(:disabled) {
   }
   h1 {
     font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .festive-title {
+    padding: 10px 0 16px;
+  }
+
+  .page-logo {
+    width: 200px;
+    max-width: 70%;
+  }
+
+  .festive-title::before {
+    width: 200px;
+    height: 200px;
+    filter: blur(14px);
+  }
+
+  .card {
+    margin: 12px 0;
+    padding: 18px;
+  }
+
+  .christmas-highlights {
+    margin-top: 12px;
+  }
+
+  .login-header {
+    margin-bottom: 8px;
+    text-align: center;
   }
 }
