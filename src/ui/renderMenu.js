@@ -42,10 +42,13 @@ export async function renderMenu(container) {
 
     cat.items.forEach((it) => {
       const row = document.createElement("div");
-      row.classList.add("item", "menu-item");
+      row.classList.add("item", "menu-item", "drink-item");
       row.dataset.name = it.name;
       row.dataset.price = String(it.price);
       row.dataset.quantity = "0";
+
+      const infoWrap = document.createElement("div");
+      infoWrap.className = "drink-info";
 
       const nameSpan = document.createElement("span");
       nameSpan.className = "item-name";
@@ -54,6 +57,9 @@ export async function renderMenu(container) {
       const priceSpan = document.createElement("span");
       priceSpan.className = "item-price";
       priceSpan.textContent = `£${Number(it.price).toFixed(2)}`;
+
+      infoWrap.appendChild(nameSpan);
+      infoWrap.appendChild(priceSpan);
 
       const createQuantityStepper = () => {
         const stepper = document.createElement("div");
@@ -118,8 +124,7 @@ export async function renderMenu(container) {
 
       const quantityStepper = createQuantityStepper();
 
-      row.appendChild(nameSpan);
-      row.appendChild(priceSpan);
+      row.appendChild(infoWrap);
       row.appendChild(quantityStepper);
       list.appendChild(row);
     });
