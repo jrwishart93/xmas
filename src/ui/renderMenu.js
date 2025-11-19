@@ -66,6 +66,17 @@ export async function renderMenu(container) {
         stepper.className = "qty-stepper";
         stepper.dataset.value = "0";
 
+        const toggleMinusState = (value) => {
+          const isDisabled = value === 0;
+          if (isDisabled) {
+            minusBtn.classList.add("is-disabled");
+            minusBtn.setAttribute("aria-disabled", "true");
+          } else {
+            minusBtn.classList.remove("is-disabled");
+            minusBtn.removeAttribute("aria-disabled");
+          }
+        };
+
         const updateQuantity = (nextValue) => {
           const safeValue = Math.max(0, Number(nextValue) || 0);
           stepper.dataset.value = String(safeValue);
@@ -81,6 +92,7 @@ export async function renderMenu(container) {
               detail: { value: safeValue },
             })
           );
+          toggleMinusState(safeValue);
         };
 
         const minusBtn = document.createElement("button");
@@ -119,6 +131,7 @@ export async function renderMenu(container) {
         stepper.appendChild(display);
         stepper.appendChild(plusBtn);
 
+        toggleMinusState(0);
         return stepper;
       };
 
