@@ -28,14 +28,19 @@ export async function renderMenu(container) {
   container.innerHTML = ""; // clear
   const categories = await fetchMenu(); // [{category, items:[{name,price}]}]
 
+  // Render each category inside an accordion-style container.
   categories.forEach((cat) => {
     const section = document.createElement("section");
-    section.className = "menu-section glass";
+    section.className = "menu-section glass category";
 
-    const title = document.createElement("h3");
-    title.className = "menu-title";
-    title.textContent = `${iconFor(cat.category)} ${cat.category}`;
-    section.appendChild(title);
+    const header = document.createElement("button");
+    header.type = "button";
+    header.className = "category-header";
+    header.setAttribute("aria-expanded", "false");
+    header.innerHTML = `<span class="menu-title">${iconFor(cat.category)} ${cat.category}</span>`;
+
+    const content = document.createElement("div");
+    content.className = "category-content";
 
     const list = document.createElement("div");
     list.className = "items";
@@ -142,8 +147,16 @@ export async function renderMenu(container) {
       list.appendChild(row);
     });
 
-    section.appendChild(list);
+    content.appendChild(list);
+    section.appendChild(header);
+    section.appendChild(content);
     container.appendChild(section);
+
+    header.addEventListener("click", () => {
+      const isOpen = section.classList.toggle("open");
+      header.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      content.style.maxHeight = isOpen ? `${content.scrollHeight}px` : null;
+    });
   });
 
   return categories;

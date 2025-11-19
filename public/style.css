@@ -412,10 +412,64 @@ button.btn-green:hover:not(:disabled) {
 }
 
 .menu-section {
-  margin-bottom: 28px;
+  margin-bottom: 16px;
 }
 
-.menu-section .items {
+.category {
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  background: rgba(8, 14, 28, 0.45);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.category-header {
+  width: 100%;
+  margin: 0;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(11, 18, 35, 0.65);
+  border: none;
+  border-radius: 0;
+  text-align: left;
+  letter-spacing: 0.3px;
+  text-transform: none;
+  box-shadow: none;
+}
+
+.category-header .menu-title {
+  margin: 0;
+  font-size: 1.06rem;
+  font-weight: 700;
+}
+
+.category-header::after {
+  content: "\25be";
+  font-size: 1rem;
+  color: var(--snow);
+  transition: transform 0.25s ease;
+}
+
+.category.open .category-header::after {
+  transform: rotate(-180deg);
+}
+
+.category-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+  padding: 0 12px;
+}
+
+.category.open .category-content {
+  padding: 12px;
+}
+
+.category-content .items {
   display: flex;
   flex-direction: column;
   gap: 12px;
