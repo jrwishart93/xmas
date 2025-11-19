@@ -611,6 +611,55 @@ button.btn-green:hover:not(:disabled) {
   color: var(--xmas-green);
 }
 
+.submission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.submission-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.submission-row .name {
+  font-weight: 700;
+  color: var(--snow);
+  letter-spacing: 0.2px;
+}
+
+.submission-row .status {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.submission-row .status.complete {
+  background: rgba(21, 128, 61, 0.25);
+  color: var(--xmas-green);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.submission-row .status.pending {
+  background: rgba(255, 193, 7, 0.18);
+  color: #ffd166;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.accordion-item {
+  margin-bottom: 10px;
+}
+
 .accordion-header {
   padding: 14px;
   background: rgba(255,255,255,0.1);
@@ -625,6 +674,14 @@ button.btn-green:hover:not(:disabled) {
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12);
 }
 
+.accordion-header .meta {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
 .accordion-content {
   max-height: 0;
   overflow: hidden;
@@ -635,6 +692,15 @@ button.btn-green:hover:not(:disabled) {
 .accordion-content.open {
   padding: 10px 2px 12px;
   max-height: 1200px;
+}
+
+.accordion-content .line {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .menu-section {
@@ -984,6 +1050,33 @@ button.btn-green:hover:not(:disabled) {
   margin: 10px 0 0 18px;
   padding: 0;
   line-height: 1.5;
+}
+
+.totals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.total-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.total-line .label {
+  font-weight: 700;
+}
+
+.total-line .count {
+  font-weight: 800;
+  letter-spacing: 0.4px;
 }
 
 .totals-grid {
