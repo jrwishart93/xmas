@@ -6,7 +6,7 @@
     <title>Make Your Choices</title>
     <link rel="stylesheet" href="public/style.css">
 </head>
-<body>
+<body class="choices-page">
     <div class="snowfall"></div>
     <div class="container">
         <div class="header">
@@ -19,7 +19,9 @@
         <div id="menu-container">
             <!-- Menu items will be dynamically inserted here -->
         </div>
-        <button id="submit-choices" class="btn-green" disabled>Submit Choices</button>
+        <div class="submit-sticky-wrapper">
+            <button id="submit-choices" class="btn-green" disabled>Submit Choices</button>
+        </div>
     </div>
 
     <script>
