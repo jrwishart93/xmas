@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Overview</title>
+  <link rel="stylesheet" href="public/style.css">
+</head>
+<body class="dashboard-page">
+  <div class="snowfall"></div>
+
+  <div id="kittyBar">
+    <span id="kittyText">Kitty: £0 | Spent: £0 | Left: £0</span>
+  </div>
+
+  <div class="dashboard-content">
+    <div class="container">
+      <div class="dashboard-header">
+        <h1>🎁 Dashboard Overview</h1>
+        <a class="ghost-link" href="choices.html">← Back to choices</a>
+      </div>
+
+      <section id="submissionOverview" class="card">
+        <h2>Submission Overview</h2>
+        <p class="muted-text">Track who has submitted their menu choices.</p>
+        <div class="pill-grid">
+          <span class="pill">Alice — Submitted</span>
+          <span class="pill">Bob — Pending</span>
+          <span class="pill">Charlie — Submitted</span>
+        </div>
+      </section>
+
+      <section id="peopleBreakdown" class="card accordion-section">
+        <h2>Individual Breakdown</h2>
+        <details class="accordion">
+          <summary>Alice</summary>
+          <ul>
+            <li>Starter: Tomato Soup</li>
+            <li>Main: Roast Turkey</li>
+            <li>Dessert: Christmas Pudding</li>
+          </ul>
+        </details>
+        <details class="accordion">
+          <summary>Bob</summary>
+          <ul>
+            <li>Starter: Prawn Cocktail</li>
+            <li>Main: Beef Wellington</li>
+            <li>Dessert: Yule Log</li>
+          </ul>
+        </details>
+      </section>
+
+      <section id="itemTotals" class="card">
+        <h2>Overall Order Totals</h2>
+        <div class="totals-grid">
+          <div class="total-card">
+            <div class="total-label">Starters</div>
+            <div class="total-value">6</div>
+          </div>
+          <div class="total-card">
+            <div class="total-label">Mains</div>
+            <div class="total-value">6</div>
+          </div>
+          <div class="total-card">
+            <div class="total-label">Desserts</div>
+            <div class="total-value">6</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const snowfallContainer = document.querySelector('.snowfall');
+    if (snowfallContainer) {
+      for (let i = 0; i < 150; i++) {
+        const snow = document.createElement('div');
+        snow.className = 'snow';
+        const size = Math.random() * 4 + 1;
+        snow.style.width = `${size}px`;
+        snow.style.height = `${size}px`;
+        snow.style.left = `${Math.random() * 100}%`;
+        snow.style.animationDuration = `${Math.random() * 5 + 5}s`;
+        snow.style.animationDelay = `${Math.random() * 5}s`;
+        snow.style.opacity = Math.random();
+        snowfallContainer.appendChild(snow);
+      }
+    }
+  </script>
+</body>
+</html>
