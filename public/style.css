@@ -269,6 +269,44 @@ button.btn-green:hover:not(:disabled) {
   font-size: 1rem;
 }
 
+.title-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 10px 0 20px;
+}
+
+/* Soft Christmas glow behind the PNG */
+.title-wrapper::before {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 210, 140, 0.55) 0%,
+    rgba(255, 150, 80, 0.35) 40%,
+    rgba(255, 90, 40, 0.12) 70%,
+    rgba(0,0,0,0) 100%
+  );
+  filter: blur(14px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-logo {
+  width: 260px;
+  max-width: 80%;
+  z-index: 2;
+  pointer-events: none;
+  user-select: none;
+}
+
 .christmas-highlights {
   text-align: center;
 }
