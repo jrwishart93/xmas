@@ -273,13 +273,6 @@ button.btn-green:hover:not(:disabled) {
   text-align: center;
 }
 
-.highlights-subtitle {
-  margin-top: -8px;
-  margin-bottom: 20px;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 1rem;
-}
-
 .christmas-slideshow {
   position: relative;
   width: 100%;
@@ -316,20 +309,6 @@ button.btn-green:hover:not(:disabled) {
   height: 100%;
   object-fit: cover;
   animation: kenburns 12s ease-in-out infinite;
-}
-
-.christmas-slideshow .caption {
-  position: absolute;
-  bottom: 10px;
-  left: 0;
-  width: 100%;
-  padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.45);
-  color: #fff;
-  font-size: 0.85rem;
-  text-align: left;
-  backdrop-filter: blur(4px);
-  border-radius: 0 0 14px 14px;
 }
 
 @keyframes slideFade {
