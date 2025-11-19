@@ -269,6 +269,55 @@ button.btn-green:hover:not(:disabled) {
   font-size: 1rem;
 }
 
+.christmas-highlights {
+  text-align: center;
+}
+
+.highlights-subtitle {
+  margin-top: -8px;
+  margin-bottom: 20px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1rem;
+}
+
+.christmas-gallery {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.highlight-figure {
+  margin: 0;
+}
+
+.highlight-figure img {
+  width: 100%;
+  height: auto;
+  border-radius: calc(var(--card-radius) - 8px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: block;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.highlight-figure img:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+.highlight-figure figcaption {
+  margin-top: 12px;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.02em;
+}
+
+@media (min-width: 640px) {
+  .christmas-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .xmas-emoji {
   font-size: 48px;
   display: block;
