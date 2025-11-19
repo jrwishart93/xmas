@@ -404,7 +404,9 @@ button.btn-green:hover:not(:disabled) {
 }
 
 .choices-page-content {
-  padding-top: 70px;
+  padding-top: 76px;
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
 #budgetBar {
@@ -586,6 +588,11 @@ button.btn-green:hover:not(:disabled) {
   font-weight: 700;
 }
 
+.category-header .menu-title {
+  line-height: 1.4;
+  word-break: break-word;
+}
+
 .category-header::after {
   content: "\25be";
   font-size: 1rem;
@@ -752,11 +759,51 @@ button.btn-green:hover:not(:disabled) {
 @media (max-width: 520px) {
   .drink-item {
     padding: 12px 14px;
-    gap: 10px;
+    gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .drink-info {
+    width: 100%;
+  }
+
+  .drink-info .item-name {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 
   .qty-stepper {
-    flex-shrink: 0;
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+  }
+
+  .qty-btn {
+    flex: 1;
+    min-width: 48px;
+  }
+
+  .qty-display {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .category-header {
+    padding: 12px 14px;
+    font-size: 1rem;
+  }
+
+  .drink-item {
+    padding: 12px;
+  }
+
+  .drink-info .item-price {
+    font-size: 0.92rem;
   }
 }
 
