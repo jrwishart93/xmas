@@ -33,6 +33,24 @@ body {
   animation: fadeIn 1s ease-out;
 }
 
+#kittyBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 5000;
+  padding: 12px 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.dashboard-content {
+  padding-top: 80px; /* prevents overlap with sticky bar */
+}
+
 .container {
   width: 100%;
   max-width: 650px;
@@ -92,6 +110,17 @@ body {
 .card:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.35);
+}
+
+.dashboard-card {
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  margin: 12px 0;
+  padding: 16px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.08);
 }
 
 /* --- TYPOGRAPHY --- */
@@ -547,6 +576,32 @@ button.btn-green:hover:not(:disabled) {
 
 .status-text.success {
   color: var(--xmas-green);
+}
+
+.accordion-header {
+  padding: 14px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  color: var(--snow);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12);
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.25s ease;
+  padding: 0;
+}
+
+.accordion-content.open {
+  padding: 10px 2px 12px;
+  max-height: 1200px;
 }
 
 .menu-section {
