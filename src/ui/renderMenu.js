@@ -30,8 +30,8 @@ export async function renderMenu(container) {
 
   // Render each category inside an accordion-style container.
   categories.forEach((cat) => {
-    const section = document.createElement("section");
-    section.className = "menu-section glass category";
+    const category = document.createElement("div");
+    category.className = "menu-section glass category";
 
     const header = document.createElement("button");
     header.type = "button";
@@ -148,14 +148,27 @@ export async function renderMenu(container) {
     });
 
     content.appendChild(list);
-    section.appendChild(header);
-    section.appendChild(content);
-    container.appendChild(section);
+    category.appendChild(header);
+    category.appendChild(content);
+    container.appendChild(category);
+  });
 
+  document.querySelectorAll(".category-header").forEach((header) => {
     header.addEventListener("click", () => {
-      const isOpen = section.classList.toggle("open");
-      header.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      content.style.maxHeight = isOpen ? `${content.scrollHeight}px` : null;
+      const content = header.nextElementSibling;
+      const isOpen = header.getAttribute("aria-expanded") === "true";
+
+      if (isOpen) {
+        // Close
+        content.style.maxHeight = "0px";
+        content.classList.remove("open");
+        header.setAttribute("aria-expanded", "false");
+      } else {
+        // Open (force reflow for mobile browsers)
+        content.classList.add("open");
+        content.style.maxHeight = content.scrollHeight + "px";
+        header.setAttribute("aria-expanded", "true");
+      }
     });
   });
 
