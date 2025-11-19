@@ -499,6 +499,24 @@ button.btn-green:hover:not(:disabled) {
   letter-spacing: 0.3px;
 }
 
+#kittyText.kitty-warn {
+  color: #f5c86d;
+}
+
+#kittyText.kitty-over {
+  color: #ff8a80;
+}
+
+#kittyBar.updated {
+  animation: glow 0.6s ease-out;
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 0 rgba(255, 255, 255, 0.6); }
+  50% { box-shadow: 0 0 24px rgba(255, 255, 255, 0.55); }
+  100% { box-shadow: 0 0 0 rgba(255, 255, 255, 0.3); }
+}
+
 .submit-sticky-wrapper {
   position: sticky;
   bottom: 0;
