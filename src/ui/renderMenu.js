@@ -45,6 +45,7 @@ export async function renderMenu(container) {
       row.classList.add("item", "menu-item");
       row.dataset.name = it.name;
       row.dataset.price = String(it.price);
+      row.dataset.quantity = "0";
 
       const nameSpan = document.createElement("span");
       nameSpan.className = "item-name";
@@ -54,21 +55,72 @@ export async function renderMenu(container) {
       priceSpan.className = "item-price";
       priceSpan.textContent = `£${Number(it.price).toFixed(2)}`;
 
-      const quantityInput = document.createElement("input");
-      quantityInput.type = "number";
-      quantityInput.className = "qty-input";
-      quantityInput.min = "0";
-      quantityInput.max = "5";
-      quantityInput.value = "0";
-      quantityInput.inputMode = "numeric";
-      quantityInput.setAttribute(
-        "aria-label",
-        `Quantity for ${it.name}`
-      );
+      const createQuantityStepper = () => {
+        const stepper = document.createElement("div");
+        stepper.className = "qty-stepper";
+        stepper.dataset.value = "0";
+
+        const updateQuantity = (nextValue) => {
+          const safeValue = Math.max(0, Number(nextValue) || 0);
+          stepper.dataset.value = String(safeValue);
+          row.dataset.quantity = String(safeValue);
+          display.textContent = String(safeValue);
+          display.setAttribute(
+            "aria-label",
+            `Quantity for ${it.name}: ${safeValue}`
+          );
+          stepper.dispatchEvent(
+            new CustomEvent("quantitychange", {
+              bubbles: true,
+              detail: { value: safeValue },
+            })
+          );
+        };
+
+        const minusBtn = document.createElement("button");
+        minusBtn.type = "button";
+        minusBtn.className = "qty-btn qty-btn--minus";
+        minusBtn.setAttribute(
+          "aria-label",
+          `Decrease quantity for ${it.name}`
+        );
+        minusBtn.textContent = "−";
+
+        const display = document.createElement("span");
+        display.className = "qty-display";
+        display.setAttribute("aria-live", "polite");
+        display.textContent = "0";
+        display.setAttribute("aria-label", `Quantity for ${it.name}: 0`);
+
+        const plusBtn = document.createElement("button");
+        plusBtn.type = "button";
+        plusBtn.className = "qty-btn qty-btn--plus";
+        plusBtn.setAttribute("aria-label", `Increase quantity for ${it.name}`);
+        plusBtn.textContent = "+";
+
+        minusBtn.addEventListener("click", () => {
+          const current = Number(stepper.dataset.value) || 0;
+          if (current === 0) return;
+          updateQuantity(current - 1);
+        });
+
+        plusBtn.addEventListener("click", () => {
+          const current = Number(stepper.dataset.value) || 0;
+          updateQuantity(current + 1);
+        });
+
+        stepper.appendChild(minusBtn);
+        stepper.appendChild(display);
+        stepper.appendChild(plusBtn);
+
+        return stepper;
+      };
+
+      const quantityStepper = createQuantityStepper();
 
       row.appendChild(nameSpan);
       row.appendChild(priceSpan);
-      row.appendChild(quantityInput);
+      row.appendChild(quantityStepper);
       list.appendChild(row);
     });
 

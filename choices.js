@@ -51,13 +51,41 @@ const normalizeSelections = (rawSelections) => {
   return [];
 };
 
+const setItemQuantity = (itemElement, qty) => {
+  const safeValue = Math.max(0, Number(qty) || 0);
+  const stepper = itemElement.querySelector(".qty-stepper");
+  if (stepper) {
+    const display = stepper.querySelector(".qty-display");
+    stepper.dataset.value = String(safeValue);
+    itemElement.dataset.quantity = String(safeValue);
+    if (display) {
+      display.textContent = String(safeValue);
+      const labelName = itemElement.dataset.name || "item";
+      display.setAttribute(
+        "aria-label",
+        `Quantity for ${labelName}: ${safeValue}`
+      );
+    }
+    stepper.dispatchEvent(
+      new CustomEvent("quantitychange", { bubbles: true, detail: { value: safeValue } })
+    );
+    return;
+  }
+
+  const legacyInput = itemElement.querySelector(".qty-input");
+  if (legacyInput) {
+    legacyInput.value = String(safeValue);
+    legacyInput.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+};
+
 const applyExistingSelections = (selections) => {
   selections.forEach(({ name, qty }) => {
     if (!name) return;
-    const selector = `.menu-item[data-name="${escapeSelector(name)}"] .qty-input`;
-    const input = document.querySelector(selector);
-    if (input) {
-      input.value = Number(qty) || 0;
+    const selector = `.menu-item[data-name="${escapeSelector(name)}"]`;
+    const itemElement = document.querySelector(selector);
+    if (itemElement) {
+      setItemQuantity(itemElement, qty);
     }
   });
 

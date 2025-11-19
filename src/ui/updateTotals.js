@@ -10,11 +10,14 @@ export function calculateTotals() {
   items.forEach((item) => {
     const name = item.dataset.name;
     const price = Number(item.dataset.price);
+    if (!name || isNaN(price)) return;
+
+    const qtyDisplay = item.querySelector('.qty-display');
     const qtyInput = item.querySelector('.qty-input');
-
-    if (!name || isNaN(price) || !qtyInput) return;
-
-    const qty = Number(qtyInput.value) || 0;
+    const qtyFromDataset = item.dataset.quantity;
+    const qty = Number(
+      qtyFromDataset ?? qtyDisplay?.textContent ?? qtyInput?.value ?? 0
+    ) || 0;
 
     if (qty > 0) {
       const lineTotal = qty * price;
@@ -92,8 +95,18 @@ export function attachTotalHandler({
   document.querySelectorAll('.qty-input').forEach((input) => {
     input.addEventListener('input', () => {
       const numeric = Number(input.value);
-      const safeValue = Number.isFinite(numeric) ? Math.min(5, Math.max(0, numeric)) : 0;
+      const safeValue = Number.isFinite(numeric) ? Math.max(0, numeric) : 0;
       input.value = safeValue;
+      recalc();
+    });
+  });
+
+  document.querySelectorAll('.qty-stepper').forEach((stepper) => {
+    stepper.addEventListener('quantitychange', () => {
+      const parentItem = stepper.closest('.menu-item, .item');
+      if (parentItem) {
+        parentItem.dataset.quantity = stepper.dataset.value || '0';
+      }
       recalc();
     });
   });
