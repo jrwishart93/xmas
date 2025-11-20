@@ -1,5 +1,5 @@
-import { db } from "./src/firebase/firebaseConfig.js";
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+import { db } from "./firebase.js";
+import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
 
 const TOTAL_KITTY = 200;
@@ -43,17 +43,23 @@ function buildCategoryMap(menu) {
 }
 
 function summarisePerson(data, docId, categoryMap) {
-  const selections = normalizeSelections(data?.selections || data?.choices);
+  const selections = normalizeSelections(data?.items || data?.selections || data?.choices);
   const name = data?.name || docId;
 
-  let totalSpend = 0;
+  let totalSpend = Number(data?.total);
+  const shouldRecalculateTotal = !Number.isFinite(totalSpend);
+  if (shouldRecalculateTotal) {
+    totalSpend = 0;
+  }
   let drinkCount = 0;
   let snackCount = 0;
 
   selections.forEach((item) => {
     const qty = Number(item.qty) || 0;
     const price = Number(item.price) || 0;
-    totalSpend += qty * price;
+    if (shouldRecalculateTotal) {
+      totalSpend += qty * price;
+    }
     const category = categoryMap.get(item.name);
     if (SNACK_CATEGORIES.has(category)) {
       snackCount += qty;
@@ -63,14 +69,14 @@ function summarisePerson(data, docId, categoryMap) {
   });
 
   const hasSubmitted = Boolean(
-    data?.hasSubmitted ?? selections.some((item) => (Number(item.qty) || 0) > 0)
+    data?.submitted ?? data?.hasSubmitted ?? selections.some((item) => (Number(item.qty) || 0) > 0)
   );
 
   return {
     id: docId,
     name,
     selections,
-    totalSpend,
+    totalSpend: Number.isFinite(totalSpend) ? totalSpend : 0,
     drinkCount,
     snackCount,
     hasSubmitted
@@ -219,9 +225,8 @@ function renderItemTotals(totalsMap) {
   });
 }
 
-function updateKittyBar(people) {
+function updateKittyBar(spent) {
   if (!kittyText) return;
-  const spent = people.reduce((sum, person) => sum + person.totalSpend, 0);
   const remaining = TOTAL_KITTY - spent;
   const previousText = kittyText.innerText;
 
@@ -242,34 +247,60 @@ function updateKittyBar(people) {
   }
 }
 
+function renderDashboard(allChoices, categoryMap) {
+  const people = allChoices.map((doc) =>
+    summarisePerson(doc, doc.id || doc.uid || "", categoryMap)
+  );
+
+  renderSubmissionOverview(people);
+  renderPeopleBreakdown(people);
+  renderItemTotals(aggregateItems(people));
+
+  const spent = allChoices
+    .filter((choice) => choice?.submitted)
+    .reduce((sum, choice) => sum + (Number(choice.total) || 0), 0);
+
+  const fallbackSpent = people.reduce((sum, person) => sum + person.totalSpend, 0);
+  updateKittyBar(Number.isFinite(spent) ? spent : fallbackSpent);
+}
+
 async function loadDashboard() {
+  let categoryMap = new Map();
+
   try {
-    const [menu, snapshot] = await Promise.all([
-      fetchMenu(),
-      getDocs(collection(db, "choices"))
-    ]);
-
-    const categoryMap = buildCategoryMap(menu);
-    const people = snapshot.docs.map((doc) =>
-      summarisePerson(doc.data(), doc.id, categoryMap)
-    );
-
-    renderSubmissionOverview(people);
-    renderPeopleBreakdown(people);
-    renderItemTotals(aggregateItems(people));
-    updateKittyBar(people);
+    const menu = await fetchMenu();
+    categoryMap = buildCategoryMap(menu);
   } catch (error) {
-    console.error("Unable to load dashboard", error);
-    if (submissionRows) {
-      submissionRows.innerHTML = '<p class="muted-text">Unable to load submissions.</p>';
-    }
-    if (peopleAccordion) {
-      peopleAccordion.innerHTML = '<p class="muted-text">Unable to load breakdown.</p>';
-    }
-    if (itemTotalsList) {
-      itemTotalsList.innerHTML = '<p class="muted-text">Unable to load item totals.</p>';
-    }
+    console.error("Unable to load menu for dashboard", error);
+  }
+
+  try {
+    onSnapshot(
+      collection(db, "choices"),
+      (snapshot) => {
+        const allChoices = [];
+        snapshot.forEach((docSnapshot) => {
+          allChoices.push({ id: docSnapshot.id, ...docSnapshot.data() });
+        });
+        renderDashboard(allChoices, categoryMap);
+      },
+      (error) => {
+        console.error("Unable to load dashboard", error);
+        if (submissionRows) {
+          submissionRows.innerHTML = '<p class="muted-text">Unable to load submissions.</p>';
+        }
+        if (peopleAccordion) {
+          peopleAccordion.innerHTML = '<p class="muted-text">Unable to load breakdown.</p>';
+        }
+        if (itemTotalsList) {
+          itemTotalsList.innerHTML = '<p class="muted-text">Unable to load item totals.</p>';
+        }
+      }
+    );
+  } catch (error) {
+    console.error("Unable to start dashboard listener", error);
   }
 }
 
 loadDashboard();
+
