@@ -608,6 +608,31 @@ button.btn-green:hover:not(:disabled) {
   margin: 0;
 }
 
+.btn-reset-secondary {
+  display: block;
+  margin: 12px auto 0;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.6);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  transition: opacity 0.2s ease, color 0.2s ease;
+  width: auto;
+  align-self: center;
+}
+
+.btn-reset-secondary:hover:not(:disabled) {
+  color: rgba(255, 255, 255, 0.75);
+  opacity: 0.8;
+}
+
+.btn-reset-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .ghost-reset-btn {
   width: 100%;
   max-width: 360px;
@@ -1069,6 +1094,13 @@ button.btn-green:hover:not(:disabled) {
 
   .drink-info .item-price {
     font-size: 0.92rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .btn-reset-secondary {
+    padding: 5px 10px;
+    font-size: 0.78rem;
   }
 }
 
