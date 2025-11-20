@@ -7,6 +7,7 @@ const pinInput = document.getElementById('pinInput');
 const loginBtn = document.getElementById('loginBtn');
 const errorP = document.getElementById('loginError');
 const successMsg = document.getElementById('successMsg');
+const spinner = document.getElementById('loginSpinner');
 const loginBtnDefaultText = loginBtn?.innerHTML || '';
 const selectedUserCard = document.getElementById('selectedUserCard');
 const selectedUserAnnouncement = document.getElementById('selectedUserAnnouncement');
@@ -126,9 +127,13 @@ function resetLoginUiWithError(message) {
         errorP.textContent = message;
     }
 
-    if (successMsg && !successMsg.classList.contains('hidden')) {
+    if (successMsg) {
         successMsg.classList.add('hidden');
         successMsg.classList.remove('glow-text');
+    }
+
+    if (spinner) {
+        spinner.hidden = true;
     }
 
     if (loginBtn) {
@@ -196,13 +201,45 @@ async function populateUsers() {
     }
 }
 
-loginBtn.addEventListener('click', async () => {
+function startLoginUiState() {
+    if (errorP) {
+        errorP.textContent = '';
+    }
+
+    if (spinner) {
+        spinner.hidden = false;
+    }
+
+    if (successMsg) {
+        successMsg.classList.add('hidden');
+        successMsg.classList.remove('glow-text');
+    }
+
+    if (loginBtn) {
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<span class="flicker-fast">VERIFYING...</span>';
+    }
+}
+
+function handleAccessDenied() {
+    resetLoginUiWithError('Access denied. Hint: your PIN is the last 4 digits of your mobile number.');
+
+    if (pinInput) {
+        pinInput.classList.add('input-error');
+        setTimeout(() => pinInput.classList.remove('input-error'), 450);
+        pinInput.focus({ preventScroll: true });
+    }
+}
+
+loginBtn.addEventListener('click', async (event) => {
+    event.preventDefault();
+    startLoginUiState();
+
     const userId = loginForm?.dataset.selectedUserId || selectedUserId;
-    const pin = pinInput.value;
-    errorP.textContent = '';
+    const pin = pinInput.value.trim();
 
     if (!userId) {
-        errorP.textContent = 'Please select your name.';
+        resetLoginUiWithError('Please select your name.');
         return;
     }
 
@@ -210,17 +247,25 @@ loginBtn.addEventListener('click', async () => {
         const userRef = doc(db, "users", userId);
         const userSnap = await getDoc(userRef);
 
-        if (userSnap.exists() && userSnap.data().password === pin) {
-            localStorage.setItem("xmasUser", userSnap.id);
-            // Keep a secondary key for compatibility with older pages/modules
-            localStorage.setItem("currentUser", userSnap.id);
-            window.location.href = 'choices.html';
-        } else {
-            resetLoginUiWithError('Access denied. Hint: your PIN is the last 4 digits of your mobile number.');
+        if (!userSnap.exists()) {
+            handleAccessDenied();
+            return;
         }
+
+        const expectedPin = userSnap.data().password;
+
+        if (pin !== expectedPin) {
+            handleAccessDenied();
+            return;
+        }
+
+        localStorage.setItem("xmasUser", userSnap.id);
+        // Keep a secondary key for compatibility with older pages/modules
+        localStorage.setItem("currentUser", userSnap.id);
+        window.location.href = 'choices.html';
     } catch (err) {
-        console.error(err);
-        resetLoginUiWithError('An error occurred during login.');
+        console.error('Login failed:', err);
+        resetLoginUiWithError('Something went wrong verifying your details. Please check your PIN and try again.');
     }
 });
 
