@@ -345,7 +345,24 @@ label {
   font-weight: 700;
   margin: 0;
   background-clip: padding-box;
+  opacity: 1;
+  transform: translateY(0);
+  animation: avatarFadeUp 0.65s ease-out both;
+  animation-delay: var(--avatar-delay, 0s);
 }
+
+.avatar-card:nth-child(1) { --avatar-delay: 0s; }
+.avatar-card:nth-child(2) { --avatar-delay: 0.06s; }
+.avatar-card:nth-child(3) { --avatar-delay: 0.12s; }
+.avatar-card:nth-child(4) { --avatar-delay: 0.18s; }
+.avatar-card:nth-child(5) { --avatar-delay: 0.24s; }
+.avatar-card:nth-child(6) { --avatar-delay: 0.3s; }
+.avatar-card:nth-child(7) { --avatar-delay: 0.36s; }
+.avatar-card:nth-child(8) { --avatar-delay: 0.42s; }
+.avatar-card:nth-child(9) { --avatar-delay: 0.48s; }
+.avatar-card:nth-child(10) { --avatar-delay: 0.54s; }
+.avatar-card:nth-child(11) { --avatar-delay: 0.6s; }
+.avatar-card:nth-child(12) { --avatar-delay: 0.66s; }
 
 .avatar-card:hover,
 .avatar-card:focus-visible {
@@ -416,6 +433,17 @@ label {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
   letter-spacing: 0.04em;
   margin: 0;
+}
+
+@keyframes avatarFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (min-width: 540px) {
@@ -1887,6 +1915,14 @@ body {
 
 .neon-header { text-align: center; margin: 2rem 0; }
 
+.neon-title {
+  display: inline-block;
+  padding: 6px;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.12))
+    drop-shadow(0 0 18px rgba(0, 255, 255, 0.12));
+  animation: neonGlow 2.8s ease-in-out infinite alternate;
+}
+
 .neon-sign {
   font-family: 'Courier New', monospace;
   font-weight: 900;
@@ -1910,6 +1946,17 @@ body {
   text-shadow: 0 0 10px var(--neon-blue), 0 0 40px var(--neon-blue);
   display: block;
   font-size: 1.5rem;
+}
+
+@keyframes neonGlow {
+  0% {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.1))
+      drop-shadow(0 0 14px rgba(0, 255, 255, 0.12));
+  }
+  100% {
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.18))
+      drop-shadow(0 0 20px rgba(255, 0, 255, 0.16));
+  }
 }
 
 .vip-subtitle { color: #888; letter-spacing: 3px; font-size: 0.8rem; margin-top: 1rem; text-transform: uppercase; }
@@ -2060,6 +2107,13 @@ body {
 
 .glow-text {
   text-shadow: 0 0 10px var(--gold), 0 0 20px rgba(255, 215, 0, 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neon-title,
+  .avatar-card {
+    animation: none !important;
+  }
 }
 
 .flicker-slow { animation: flicker 3s infinite; }
