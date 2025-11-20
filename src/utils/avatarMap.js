@@ -1,6 +1,6 @@
 export const AVATAR_MAP = {
   "Paul E": "public/IMG_2510.png",
-  "James W": "public/IMG_2514.png",
+  "Jamie W": "public/IMG_2514.png",
   "Adam J": "public/IMG_2515.png",
   "Adam B": "public/IMG_2517.png",
   "Derek N": "public/IMG_2518.png",
