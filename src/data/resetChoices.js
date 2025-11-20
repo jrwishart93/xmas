@@ -10,18 +10,35 @@ import {
  * Clears a user's saved selections in Firestore.
  *
  * @param {string} userId
+ * @param {Array} zeroSelections - List of items to reset with zero quantities
  */
-export async function resetUserSelections(userId) {
+export async function resetUserSelections(userId, zeroSelections = []) {
   if (!userId) throw new Error("Missing userId in resetUserSelections()");
+
+  const sanitizedSelections = Array.isArray(zeroSelections)
+    ? zeroSelections
+        .filter((item) => Boolean(item?.name))
+        .map((item) => ({
+          name: item.name,
+          price: Number(item.price) || 0,
+          qty: 0,
+        }))
+    : [];
+
+  const zeroChoiceMap = sanitizedSelections.reduce((acc, item) => {
+    acc[item.name] = { qty: 0, price: Number(item.price) || 0 };
+    return acc;
+  }, {});
 
   const userRef = doc(db, "users", userId);
   await setDoc(
     userRef,
     {
       hasSubmitted: false,
-      choices: {},
-      selections: [],
+      choices: zeroChoiceMap,
+      selections: sanitizedSelections,
       total: 0,
+      totalSpend: 0,
       updatedAt: serverTimestamp(),
     },
     { merge: true }
