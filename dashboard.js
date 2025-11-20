@@ -21,11 +21,17 @@ function normalizeSelections(rawSelections) {
   if (!rawSelections) return [];
   if (Array.isArray(rawSelections)) return rawSelections;
   if (typeof rawSelections === "object") {
-    return Object.entries(rawSelections).map(([name, data]) => ({
-      name,
-      price: Number(data?.price) || 0,
-      qty: Number(data?.qty) || 0
-    }));
+    return Object.entries(rawSelections).map(([name, data]) => {
+      const qtyValue =
+        typeof data === "number" ? data : Number(data?.qty ?? data) || 0;
+      const priceValue = typeof data === "object" ? Number(data?.price) || 0 : 0;
+
+      return {
+        name,
+        price: priceValue,
+        qty: Number(qtyValue) || 0
+      };
+    });
   }
   return [];
 }
@@ -257,7 +263,7 @@ function renderDashboard(allChoices, categoryMap) {
   renderItemTotals(aggregateItems(people));
 
   const spent = allChoices
-    .filter((choice) => choice?.submitted)
+    .filter((choice) => choice?.submitted || choice?.hasSubmitted)
     .reduce((sum, choice) => sum + (Number(choice.total) || 0), 0);
 
   const fallbackSpent = people.reduce((sum, person) => sum + person.totalSpend, 0);
@@ -276,7 +282,7 @@ async function loadDashboard() {
 
   try {
     onSnapshot(
-      collection(db, "choices"),
+      collection(db, "users"),
       (snapshot) => {
         const allChoices = [];
         snapshot.forEach((docSnapshot) => {
