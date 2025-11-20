@@ -2,6 +2,7 @@ import { renderMenu } from "./src/ui/renderMenu.js";
 import { attachTotalHandler } from "./src/ui/updateTotals.js";
 import { saveUserSelections } from "./src/data/saveChoices.js";
 import { resetUserSelections } from "./src/data/resetChoices.js";
+import { createAvatarName } from "./src/utils/avatarMap.js";
 import { db } from "./firebase.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
@@ -17,6 +18,7 @@ const resetDialog = document.getElementById("resetDialog");
 const confirmResetButton = document.getElementById("confirmReset");
 const cancelResetButton = document.getElementById("cancelReset");
 const defaultButtonText = submitButton.textContent;
+const userBadge = document.getElementById("userBadge");
 
 const storedUser = localStorage.getItem("xmasUser") || localStorage.getItem("currentUser");
 if (!storedUser) {
@@ -26,6 +28,28 @@ if (!storedUser) {
 let latestTotals = { total: 0, selections: [], remaining: MAX_BUDGET };
 let recalcTotals = () => {};
 let currentUserName = storedUser;
+
+const renderUserBadge = (name) => {
+  if (!userBadge) return;
+  userBadge.innerHTML = "";
+
+  if (!name) {
+    userBadge.classList.add("hidden");
+    return;
+  }
+
+  const label = document.createElement("p");
+  label.className = "badge-label";
+  label.textContent = "Logged in as";
+
+  const nameRow = createAvatarName(name, 42);
+  nameRow.classList.add("user-badge__name");
+
+  userBadge.append(label, nameRow);
+  userBadge.classList.remove("hidden");
+};
+
+renderUserBadge(currentUserName);
 
 const setStatus = (message, tone = "info") => {
   if (!statusElement) return;
@@ -189,6 +213,7 @@ async function init() {
       existing?.choices || existing?.items || existing?.selections
     );
     currentUserName = existing?.name || (await fetchUserName(storedUser));
+    renderUserBadge(currentUserName);
     if (selections.length) {
       applyExistingSelections(selections);
       setStatus("We restored your previous picks. Update them if you like and hit save.", "success");
