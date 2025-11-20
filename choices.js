@@ -1,6 +1,7 @@
 import { renderMenu } from "./src/ui/renderMenu.js";
 import { attachTotalHandler } from "./src/ui/updateTotals.js";
 import { saveUserSelections } from "./src/data/saveChoices.js";
+import { resetUserSelections } from "./src/data/resetChoices.js";
 import { db } from "./firebase.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
@@ -10,6 +11,11 @@ const budgetBarElement = document.getElementById("budgetBar");
 const menuContainer = document.getElementById("menu-container");
 const submitButton = document.getElementById("submitChoices");
 const statusElement = document.getElementById("menu-status");
+const resetButton = document.getElementById("resetChoices");
+const resetStatusElement = document.getElementById("reset-status");
+const resetDialog = document.getElementById("resetDialog");
+const confirmResetButton = document.getElementById("confirmReset");
+const cancelResetButton = document.getElementById("cancelReset");
 const defaultButtonText = submitButton.textContent;
 
 const storedUser = localStorage.getItem("xmasUser") || localStorage.getItem("currentUser");
@@ -32,11 +38,36 @@ const setStatus = (message, tone = "info") => {
   }
 };
 
+const resyncSelections = async () => {
+  try {
+    const existing = await fetchExistingSelections(storedUser);
+    const selections = normalizeSelections(
+      existing?.choices || existing?.items || existing?.selections
+    );
+    applyExistingSelections(selections);
+  } catch (error) {
+    console.warn("Unable to re-sync selections", error);
+  }
+};
+
 const escapeSelector = (value) => {
   if (window.CSS && typeof window.CSS.escape === "function") {
     return window.CSS.escape(value);
   }
   return value.replace(/["\\]/g, "\\$&");
+};
+
+const setResetStatus = (message, tone = "info") => {
+  if (!resetStatusElement) return;
+  resetStatusElement.textContent = message;
+  resetStatusElement.classList.remove("error", "success");
+  if (!message) return;
+
+  if (tone === "error") {
+    resetStatusElement.classList.add("error");
+  } else if (tone === "success") {
+    resetStatusElement.classList.add("success");
+  }
 };
 
 const normalizeSelections = (rawSelections) => {
@@ -83,6 +114,23 @@ const setItemQuantity = (itemElement, qty) => {
   if (legacyInput) {
     legacyInput.value = String(safeValue);
     legacyInput.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+};
+
+const resetAllQuantities = () => {
+  const items = document.querySelectorAll(".menu-item");
+  items.forEach((item) => setItemQuantity(item, 0));
+
+  if (typeof recalcTotals === "function") {
+    recalcTotals();
+  }
+};
+
+const toggleResetDialog = (show) => {
+  if (!resetDialog) return;
+  resetDialog.hidden = !show;
+  if (show) {
+    confirmResetButton?.focus();
   }
 };
 
@@ -178,6 +226,40 @@ submitButton.addEventListener("click", async () => {
     setStatus("Unable to save your choices. Please try again.", "error");
     submitButton.disabled = false;
     submitButton.textContent = defaultButtonText;
+  }
+});
+
+resetButton?.addEventListener("click", () => {
+  setResetStatus("");
+  toggleResetDialog(true);
+});
+
+cancelResetButton?.addEventListener("click", () => {
+  toggleResetDialog(false);
+});
+
+confirmResetButton?.addEventListener("click", async () => {
+  setResetStatus("Resetting your choices…");
+  confirmResetButton.disabled = true;
+  cancelResetButton.disabled = true;
+  resetButton.disabled = true;
+  confirmResetButton.textContent = "Resetting…";
+
+  try {
+    await resetUserSelections(storedUser);
+    resetAllQuantities();
+    setResetStatus("Your selections were reset.", "success");
+    setStatus("All choices cleared. Pick again if you like.", "success");
+  } catch (err) {
+    console.error(err);
+    setResetStatus("Unable to reset your choices. Please try again.", "error");
+    await resyncSelections();
+  } finally {
+    confirmResetButton.disabled = false;
+    cancelResetButton.disabled = false;
+    resetButton.disabled = false;
+    confirmResetButton.textContent = "Reset choices";
+    toggleResetDialog(false);
   }
 });
 

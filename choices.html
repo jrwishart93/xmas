@@ -24,9 +24,24 @@
                 <!-- Menu items will be dynamically inserted here -->
             </div>
             <div class="submit-sticky-wrapper">
-                <button id="submitChoices" class="submit-xmas-btn" disabled>Submit Choices</button>
+                <div class="submit-actions">
+                    <button id="submitChoices" class="submit-xmas-btn" disabled>Submit Choices</button>
+                    <button id="resetChoices" class="ghost-reset-btn" type="button">Reset my choices</button>
+                    <p id="reset-status" class="status-text reset-status" role="status" aria-live="polite"></p>
+                </div>
             </div>
         </div>
+    </div>
+
+    <div id="resetDialog" class="modal" role="dialog" aria-modal="true" aria-labelledby="resetDialogTitle" aria-describedby="resetDialogDescription" hidden>
+      <div class="modal-content glass">
+        <h2 id="resetDialogTitle">Reset your selections?</h2>
+        <p id="resetDialogDescription">This will clear all the drinks and snacks you have chosen for this night. You can pick again afterwards.</p>
+        <div class="modal-actions">
+          <button id="cancelReset" class="ghost-reset-btn" type="button">Cancel</button>
+          <button id="confirmReset" class="danger-btn" type="button">Reset choices</button>
+        </div>
+      </div>
     </div>
 
     <script>
