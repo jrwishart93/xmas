@@ -55,16 +55,16 @@ async function populateUsers() {
         userList.forEach(user => {
             const card = document.createElement('button');
             card.type = 'button';
-            card.className = 'avatar-card';
+            card.className = 'user-avatar-card';
             card.dataset.userId = user.id;
             card.dataset.userName = user.name;
             card.setAttribute('role', 'listitem');
             card.setAttribute('aria-pressed', 'false');
             card.setAttribute('aria-label', `Select ${user.name}`);
 
-            const avatar = createAvatarElement(user.name, 84);
+            const avatar = createAvatarElement(user.name, 88);
             const nameLabel = document.createElement('span');
-            nameLabel.className = 'avatar-card__name';
+            nameLabel.className = 'user-avatar-card__name';
             nameLabel.textContent = user.name;
 
             card.append(avatar, nameLabel);
@@ -107,16 +107,16 @@ loginBtn.addEventListener('click', async () => {
 });
 
 avatarGrid?.addEventListener('click', (event) => {
-    const card = event.target.closest('.avatar-card');
+    const card = event.target.closest('.user-avatar-card');
     if (!card) return;
 
     if (activeCard) {
-        activeCard.classList.remove('avatar-card--selected');
+        activeCard.classList.remove('user-avatar-card--selected');
         activeCard.setAttribute('aria-pressed', 'false');
     }
 
     activeCard = card;
-    activeCard.classList.add('avatar-card--selected');
+    activeCard.classList.add('user-avatar-card--selected');
     activeCard.setAttribute('aria-pressed', 'true');
 
     selectedUserId = card.dataset.userId;
