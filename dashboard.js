@@ -1,6 +1,7 @@
 import { db } from "./firebase.js";
 import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
+import { createAvatarName } from "./src/utils/avatarMap.js";
 
 const TOTAL_KITTY = 200;
 
@@ -103,9 +104,8 @@ function renderSubmissionOverview(people) {
     const row = document.createElement("div");
     row.className = "submission-row";
 
-    const nameEl = document.createElement("span");
-    nameEl.className = "name";
-    nameEl.textContent = person.name;
+    const nameEl = createAvatarName(person.name, 34);
+    nameEl.classList.add("name");
 
     const status = document.createElement("span");
     status.className = `status ${person.hasSubmitted ? "complete" : "pending"}`;
@@ -153,8 +153,17 @@ function renderPeopleBreakdown(people) {
     header.className = "accordion-header";
     header.type = "button";
 
-    const title = document.createElement("span");
-    title.textContent = `${person.name} — ${currency.format(person.totalSpend)}`;
+    const title = document.createElement("div");
+    title.className = "accordion-title";
+
+    const personLabel = createAvatarName(person.name, 36);
+    personLabel.classList.add("name");
+
+    const total = document.createElement("span");
+    total.className = "person-total";
+    total.textContent = currency.format(person.totalSpend);
+
+    title.append(personLabel, total);
 
     const meta = document.createElement("span");
     meta.className = "meta";

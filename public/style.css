@@ -190,6 +190,52 @@ select option {
   color: var(--snow);
 }
 
+/* --- AVATARS --- */
+.avatar {
+  --avatar-size: 36px;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.35),
+    inset 0 1px 2px rgba(255, 255, 255, 0.25);
+  background-size: cover;
+  background-position: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--snow);
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.avatar--image {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.avatar--initials {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+}
+
+.avatar-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.avatar-name__label {
+  font-weight: 700;
+  color: var(--snow);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 ::placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
@@ -747,6 +793,37 @@ button.btn-green:hover:not(:disabled) {
   color: var(--xmas-green);
 }
 
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 12px 14px;
+  margin: 0 0 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+}
+
+.badge-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0;
+}
+
+.user-badge__name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
 .submission-list {
   display: flex;
   flex-direction: column;
@@ -765,9 +842,17 @@ button.btn-green:hover:not(:disabled) {
 }
 
 .submission-row .name {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-weight: 700;
   color: var(--snow);
   letter-spacing: 0.2px;
+  min-width: 0;
+}
+
+.submission-row .name .avatar-name__label {
+  font-weight: 700;
 }
 
 .submission-row .status {
@@ -808,6 +893,20 @@ button.btn-green:hover:not(:disabled) {
   color: var(--snow);
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12);
+}
+
+.accordion-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.accordion-title .person-total {
+  color: var(--gold);
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .accordion-header .meta {
@@ -1479,6 +1578,34 @@ body {
 
 .field {
   margin-bottom: 1.25rem;
+}
+
+.selected-user-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  margin-bottom: 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--input-radius);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+.selected-user-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.selected-user-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .field-inline {

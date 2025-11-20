@@ -1,17 +1,39 @@
 import { db } from './firebase.js';
 import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+import { createAvatarName } from './src/utils/avatarMap.js';
 
 const nameSelect = document.getElementById('nameSelect');
 const pinInput = document.getElementById('pinInput');
 const loginBtn = document.getElementById('loginBtn');
 const errorP = document.getElementById('loginError');
+const selectedUserCard = document.getElementById('selectedUserCard');
+
+function renderSelectedUser(name) {
+    if (!selectedUserCard) return;
+    selectedUserCard.innerHTML = '';
+
+    if (!name) {
+        selectedUserCard.classList.add('hidden');
+        return;
+    }
+
+    const intro = document.createElement('p');
+    intro.className = 'muted-text selected-user-subtitle';
+    intro.textContent = 'You are logging in as';
+
+    const avatarRow = createAvatarName(name, 46);
+    avatarRow.classList.add('selected-user-row');
+
+    selectedUserCard.append(intro, avatarRow);
+    selectedUserCard.classList.remove('hidden');
+}
 
 async function populateUsers() {
     try {
         const usersCol = collection(db, 'users');
         const userSnapshot = await getDocs(usersCol);
         const userList = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
+
         if (userList.length === 0) {
             errorP.textContent = 'No users found in the database.';
             return;
@@ -24,6 +46,8 @@ async function populateUsers() {
             option.textContent = user.name;
             nameSelect.appendChild(option);
         });
+
+        renderSelectedUser('');
     } catch (err) {
         console.error(err);
         errorP.textContent = 'Failed to load users from Firestore.';
@@ -56,6 +80,11 @@ loginBtn.addEventListener('click', async () => {
         console.error(err);
         errorP.textContent = 'An error occurred during login.';
     }
+});
+
+nameSelect?.addEventListener('change', (event) => {
+    const selectedName = event.target.options[event.target.selectedIndex]?.textContent || '';
+    renderSelectedUser(selectedName);
 });
 
 populateUsers();
