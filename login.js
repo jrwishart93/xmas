@@ -15,6 +15,53 @@ let activeCard = null;
 let selectedUserId = '';
 let selectedUserName = '';
 
+function highlightPinArea() {
+    if (!pinSection) return;
+    pinSection.classList.remove('hidden');
+    pinSection.classList.add('pin-section--highlight');
+
+    pinSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    setTimeout(() => {
+        pinSection.classList.remove('pin-section--highlight');
+    }, 900);
+}
+
+function selectAvatarCard(card) {
+    if (!card) return;
+
+    if (activeCard) {
+        activeCard.classList.remove('selected', 'avatar-card--selected');
+        activeCard.setAttribute('aria-pressed', 'false');
+    }
+
+    activeCard = card;
+    activeCard.classList.add('selected');
+    activeCard.setAttribute('aria-pressed', 'true');
+
+    selectedUserId = card.dataset.userId;
+    selectedUserName = card.dataset.userName;
+
+    if (loginForm) {
+        loginForm.dataset.selectedUserId = selectedUserId;
+        loginForm.dataset.selectedUserName = selectedUserName;
+    }
+
+    highlightPinArea();
+
+    errorP.textContent = '';
+    renderSelectedUser(selectedUserName);
+
+    if (selectedUserAnnouncement) {
+        selectedUserAnnouncement.textContent = selectedUserName
+            ? `Selected user: ${selectedUserName}`
+            : '';
+    }
+
+    document.dispatchEvent(new CustomEvent('userSelectionChanged'));
+    pinInput?.focus({ preventScroll: true });
+}
+
 function renderSelectedUser(name) {
     if (!selectedUserCard) return;
     selectedUserCard.innerHTML = '';
@@ -120,40 +167,15 @@ loginBtn.addEventListener('click', async () => {
 
 avatarGrid?.addEventListener('click', (event) => {
     const card = event.target.closest('.avatar-card');
+    selectAvatarCard(card);
+});
+
+avatarGrid?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const card = event.target.closest('.avatar-card');
     if (!card) return;
-
-    if (activeCard) {
-        activeCard.classList.remove('avatar-card--selected');
-        activeCard.setAttribute('aria-pressed', 'false');
-    }
-
-    activeCard = card;
-    activeCard.classList.add('avatar-card--selected');
-    activeCard.setAttribute('aria-pressed', 'true');
-
-    selectedUserId = card.dataset.userId;
-    selectedUserName = card.dataset.userName;
-
-    if (loginForm) {
-        loginForm.dataset.selectedUserId = selectedUserId;
-        loginForm.dataset.selectedUserName = selectedUserName;
-    }
-
-    if (pinSection) {
-        pinSection.classList.remove('hidden');
-    }
-
-    errorP.textContent = '';
-    renderSelectedUser(selectedUserName);
-
-    if (selectedUserAnnouncement) {
-        selectedUserAnnouncement.textContent = selectedUserName
-            ? `Selected user: ${selectedUserName}`
-            : '';
-    }
-
-    document.dispatchEvent(new CustomEvent('userSelectionChanged'));
-    pinInput?.focus();
+    event.preventDefault();
+    selectAvatarCard(card);
 });
 
 populateUsers();

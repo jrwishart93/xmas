@@ -333,7 +333,11 @@ label {
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.25s ease;
   cursor: pointer;
   text-transform: none;
   letter-spacing: 0.02em;
@@ -343,33 +347,42 @@ label {
   background-clip: padding-box;
 }
 
+.avatar-card:hover,
 .avatar-card:focus-visible {
   outline: none;
   border-color: var(--ice-blue);
   box-shadow:
     0 0 0 2px rgba(110, 200, 255, 0.28),
-    0 12px 28px rgba(0, 0, 0, 0.45);
+    0 12px 28px rgba(0, 0, 0, 0.45),
+    0 0 35px rgba(110, 200, 255, 0.18);
+  transform: translateY(-2px) scale(1.03);
 }
 
 .avatar-card:hover .avatar-image,
 .avatar-card:focus-visible .avatar-image {
   transform: scale(1.04);
   box-shadow:
-    0 0 0 3px rgba(110, 200, 255, 0.35),
-    0 12px 26px rgba(0, 0, 0, 0.45);
+    0 0 0 3px rgba(110, 200, 255, 0.45),
+    0 12px 26px rgba(0, 0, 0, 0.45),
+    0 0 28px rgba(110, 200, 255, 0.2);
 }
 
+.avatar-card.selected,
 .avatar-card--selected {
   border-color: var(--gold);
   box-shadow:
     0 0 0 2px rgba(255, 198, 109, 0.32),
-    0 14px 30px rgba(0, 0, 0, 0.48);
+    0 14px 30px rgba(0, 0, 0, 0.48),
+    0 0 40px rgba(255, 198, 109, 0.28);
   transform: translateY(-2px);
+  background: radial-gradient(circle at 50% 15%, rgba(255, 198, 109, 0.08), rgba(255, 255, 255, 0));
 }
 
+.avatar-card.selected .avatar-image,
 .avatar-card--selected .avatar-image {
   box-shadow:
-    0 0 0 3px rgba(255, 198, 109, 0.5),
+    0 0 0 3px rgba(255, 198, 109, 0.65),
+    0 0 0 6px rgba(255, 198, 109, 0.22),
     0 12px 26px rgba(0, 0, 0, 0.48);
 }
 
@@ -421,6 +434,22 @@ label {
   margin-top: 0.5rem;
   display: flex;
   flex-direction: column;
+}
+
+.pin-section--highlight {
+  animation: pinPulse 0.8s ease;
+}
+
+@keyframes pinPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 198, 109, 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(255, 198, 109, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 198, 109, 0);
+  }
 }
 
 .field-inline {
