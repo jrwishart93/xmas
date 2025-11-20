@@ -11,186 +11,129 @@
 </head>
 
 <body>
-  <!-- Decorative background -->
-  <div class="snowfall js-only" aria-hidden="true"></div>
+  <div class="gold-dust js-only" aria-hidden="true"></div>
 
   <main class="container" role="main">
-    <header class="login-header">
-      <span class="xmas-emoji" aria-hidden="true">🎄</span>
-      <div class="title-wrapper festive-title">
-        <div class="title-effects">
-          <div class="twinkle-layer"></div>
-          <div class="twinkle-layer delay"></div>
-        </div>
-
-        <img
-          class="page-logo"
-          src="public/bozy_brews_xmas_bash.png"
-          alt="Bozzy Brews Xmas Bash Logo"
-        />
+    
+    <header class="neon-header">
+      <div class="neon-sign flicker-slow">
+        <span class="neon-text-pink">BREWHEMIA</span>
+        <span class="neon-text-blue">XMAS BASH</span>
       </div>
-      <p class="subtitle">Please log in to pick your drinks &amp; snacks</p>
+      <p class="vip-subtitle">VIP GUEST LIST CHECK-IN</p>
     </header>
 
-    <section class="card glass">
+    <section class="card glass vip-card">
       <form id="loginForm" novalidate>
-        <!-- Name -->
-        <label for="nameSelect">Your name</label>
+        <label for="nameSelect" class="vip-label">Guest Name</label>
         <div class="field">
-          <select id="nameSelect" required aria-describedby="nameHelp">
-            <option value="">Loading names…</option>
+          <select id="nameSelect" required class="vip-input">
+            <option value="">Scanning Guest List...</option>
           </select>
-          <div id="nameHelp" class="hint">Select your name from the list.</div>
         </div>
 
-        <!-- PIN -->
-        <label for="pinInput">Last 4 digits of your phone</label>
+        <label for="pinInput" class="vip-label">Passcode</label>
         <div class="field field-inline">
           <input
             type="password"
             id="pinInput"
+            class="vip-input"
             inputmode="numeric"
-            pattern="\\d{4}"
+            pattern="\d{4}"
             maxlength="4"
-            autocomplete="one-time-code"
             placeholder="••••"
             required
-            aria-describedby="pinHelp"
-            aria-invalid="false"
           />
-          <button type="button" id="togglePin" class="btn-ghost" aria-pressed="false" aria-label="Show PIN">Show</button>
+          <button type="button" id="togglePin" class="btn-text-gold">Reveal</button>
         </div>
-        <div id="pinHelp" class="hint">Exactly four digits.</div>
 
-        <!-- Errors -->
-        <p id="loginError" class="error" role="alert" aria-live="polite"></p>
+        <div class="bouncer-status">
+          <p id="loginError" class="error-msg"></p>
+          <p id="successMsg" class="success-msg hidden">ACCESS GRANTED</p>
+        </div>
 
-        <!-- Actions -->
         <div class="actions">
-          <button id="loginBtn" class="btn-primary" type="submit" disabled>
-            Continue
-            <span class="spinner" aria-hidden="true" hidden></span>
+          <button id="loginBtn" class="btn-neon" type="submit" disabled>
+            CHECK LIST
           </button>
         </div>
       </form>
     </section>
 
-    <section class="card glass christmas-highlights">
-      <div class="christmas-gallery" aria-label="Brewhemia Christmas highlights">
-        <figure class="highlight-figure">
-          <img src="https://i.ibb.co/jvTQhxTW/IMG-2483.jpg" alt="Brewhemia Christmas Entrance" />
-        </figure>
-
-        <figure class="highlight-figure">
-          <img src="https://i.ibb.co/3yHLhmLQ/IMG-2482.webp" alt="Brewhemia Christmas Party" />
-        </figure>
-      </div>
-    </section>
-
-    <section class="card glass dashboard-link-card">
-      <h2 class="dashboard-link-title">See Everyone’s Choices</h2>
-
-      <p class="dashboard-link-subtitle">
-        View the full order list and check the kitty total.
-      </p>
-
-      <a href="dashboard.html" class="btn-primary dashboard-btn">
-        Open Dashboard
-      </a>
-    </section>
-
-    <footer class="muted">
-      <small>Built for the team night at Brewhemia • Budget tracked on the next page</small>
+    <footer class="muted footer-minimal">
+      <small>Strictly Invite Only • 18+ • No Scrooges</small>
     </footer>
   </main>
 
-  <!-- Snow generator (respects prefers-reduced-motion) -->
   <script>
     (function () {
-      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-      if (mq.matches) return; // respect reduced motion
-
-      const wrap = document.querySelector('.snowfall');
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const wrap = document.querySelector('.gold-dust');
       if (!wrap) return;
-
-      const flakeCount = 120;
+      const count = 50; 
       const frag = document.createDocumentFragment();
-
-      for (let i = 0; i < flakeCount; i++) {
+      for (let i = 0; i < count; i++) {
         const s = document.createElement('div');
-        s.className = 'snow';
-        const size = 1 + Math.random() * 3.5;
+        s.className = 'dust-particle';
+        const size = 2 + Math.random() * 4;
         s.style.width = size + 'px';
         s.style.height = size + 'px';
         s.style.left = Math.random() * 100 + '%';
-        s.style.animationDuration = (6 + Math.random() * 6).toFixed(2) + 's';
-        s.style.animationDelay = (Math.random() * 6).toFixed(2) + 's';
-        s.style.opacity = (0.35 + Math.random() * 0.6).toFixed(2);
+        s.style.animationDuration = (5 + Math.random() * 10).toFixed(2) + 's';
+        s.style.animationDelay = (Math.random() * 5).toFixed(2) + 's';
         frag.appendChild(s);
       }
       wrap.appendChild(frag);
     })();
   </script>
 
-  <!-- Page logic -->
   <script type="module">
-    // Small UX helpers that work alongside your existing login.js
     const nameSelect = document.getElementById('nameSelect');
-    const pinInput   = document.getElementById('pinInput');
-    const btn        = document.getElementById('loginBtn');
-    const err        = document.getElementById('loginError');
-    const spinner    = btn.querySelector('.spinner');
-    const togglePin  = document.getElementById('togglePin');
-    const form       = document.getElementById('loginForm');
+    const pinInput = document.getElementById('pinInput');
+    const btn = document.getElementById('loginBtn');
+    const successMsg = document.getElementById('successMsg');
+    const togglePin = document.getElementById('togglePin');
 
-    // Enable button only when both fields valid
+    // UI Validation
     const validate = () => {
-      const nameOk = nameSelect && nameSelect.value.trim() !== '';
-      const pinOk  = /^\d{4}$/.test(pinInput.value.trim());
-      btn.disabled = !(nameOk && pinOk);
-      pinInput.setAttribute('aria-invalid', pinOk ? 'false' : 'true');
+      const isValid = nameSelect.value && /^\d{4}$/.test(pinInput.value);
+      btn.disabled = !isValid;
+      btn.classList.toggle('btn-neon-active', isValid); 
     };
 
     nameSelect.addEventListener('change', validate);
     pinInput.addEventListener('input', () => {
-      // strip non-digits, cap at 4
       pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 4);
       validate();
     });
 
-    // Show/Hide PIN
     togglePin.addEventListener('click', () => {
-      const showing = pinInput.type === 'text';
-      pinInput.type = showing ? 'password' : 'text';
-      togglePin.setAttribute('aria-pressed', String(!showing));
-      togglePin.textContent = showing ? 'Show' : 'Hide';
-      pinInput.focus();
+      const isPass = pinInput.type === 'password';
+      pinInput.type = isPass ? 'text' : 'password';
+      togglePin.textContent = isPass ? 'Hide' : 'Reveal';
     });
 
-    // Hand off to your existing login.js submit handler
-    form.addEventListener('submit', (e) => {
+    // Submit Animation Wrapper
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      err.textContent = '';
-      spinner.hidden = false;
       btn.disabled = true;
-      // Your login.js listens for #loginBtn click; trigger it for compatibility
-      document.getElementById('loginBtn').dispatchEvent(new Event('click'));
-      // login.js should handle navigation / error; re-enable if it throws
-      setTimeout(() => { spinner.hidden = true; validate(); }, 1200);
+      btn.innerHTML = '<span class="flicker-fast">VERIFYING...</span>';
+      
+      // Visual delay before triggering actual login logic
+      setTimeout(() => {
+        successMsg.classList.remove('hidden');
+        successMsg.classList.add('glow-text');
+        // Dispatches event to existing login.js
+        document.getElementById('loginBtn').dispatchEvent(new Event('click', {bubbles:true}));
+      }, 800);
     });
 
-    // Replace placeholder while names load (login.js should populate)
-    // If login.js fails to populate within 2.5s, show a friendly hint.
+    // Placeholder logic (Keep this or rely on login.js)
     setTimeout(() => {
-      if (nameSelect.options.length <= 1) {
-        nameSelect.options[0].textContent = 'Select your name';
-        err.textContent = 'Still fetching names… if this persists, check Firestore rules and firebaseConfig.';
-      }
-      validate();
-    }, 2500);
+        if (nameSelect.options.length <= 1) nameSelect.options[0].textContent = 'Select Guest Name';
+    }, 1500);
   </script>
 
-  <!-- Keep your existing module (must come after helpers above or vice-versa) -->
   <script type="module" src="login.js"></script>
 </body>
 </html>
