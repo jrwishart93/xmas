@@ -1525,6 +1525,105 @@ button.btn-green:hover:not(:disabled) {
   box-shadow: 0 8px 22px rgba(255, 111, 97, 0.45);
 }
 
+.admin-reset {
+  margin-top: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.reset-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.reset-copy h3 {
+  margin: 0 0 4px 0;
+}
+
+.hard-reset-btn {
+  padding: 8px 14px;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.82);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.hard-reset-btn:hover,
+.hard-reset-btn:focus-visible {
+  color: #ffc1c1;
+  border-color: rgba(255, 138, 128, 0.75);
+  transform: translateY(-1px);
+}
+
+.hard-reset-btn:active {
+  transform: translateY(0);
+}
+
+.hard-reset-btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.reset-error {
+  margin-top: 10px;
+  color: #ff8a80;
+  min-height: 18px;
+}
+
+.reset-confirm-field {
+  margin: 14px 0;
+}
+
+.reset-confirm-field input {
+  margin-top: 6px;
+  font-size: 0.98rem;
+}
+
+.reset-progress {
+  min-height: 20px;
+  font-weight: 600;
+  color: #ffd9a0;
+}
+
+.toast {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  z-index: 11000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (max-width: 640px) {
+  .hard-reset-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .modal-content {
+    max-height: 90vh;
+    overflow: auto;
+  }
+}
+
 .danger-btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
