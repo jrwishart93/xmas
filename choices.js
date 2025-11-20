@@ -43,11 +43,17 @@ const normalizeSelections = (rawSelections) => {
   if (!rawSelections) return [];
   if (Array.isArray(rawSelections)) return rawSelections;
   if (typeof rawSelections === "object") {
-    return Object.entries(rawSelections).map(([name, data]) => ({
-      name,
-      price: Number(data.price) || 0,
-      qty: Number(data.qty) || 0,
-    }));
+    return Object.entries(rawSelections).map(([name, data]) => {
+      const qtyValue =
+        typeof data === "number" ? data : Number(data?.qty ?? data) || 0;
+      const priceValue = typeof data === "object" ? Number(data?.price) || 0 : 0;
+
+      return {
+        name,
+        price: priceValue,
+        qty: Number(qtyValue) || 0,
+      };
+    });
   }
   return [];
 };
@@ -96,7 +102,7 @@ const applyExistingSelections = (selections) => {
 };
 
 async function fetchExistingSelections(userId) {
-  const choiceRef = doc(db, "choices", userId);
+  const choiceRef = doc(db, "users", userId);
   const snap = await getDoc(choiceRef);
   if (!snap.exists()) return null;
   return snap.data();
@@ -131,7 +137,9 @@ async function init() {
     });
 
     const existing = await fetchExistingSelections(storedUser);
-    const selections = normalizeSelections(existing?.items || existing?.selections);
+    const selections = normalizeSelections(
+      existing?.choices || existing?.items || existing?.selections
+    );
     currentUserName = existing?.name || (await fetchUserName(storedUser));
     if (selections.length) {
       applyExistingSelections(selections);
@@ -163,6 +171,7 @@ submitButton.addEventListener("click", async () => {
 
   try {
     await saveUserSelections(storedUser, currentUserName, selections, total);
+    setStatus("Choices saved!", "success");
     window.location.href = "complete.html";
   } catch (err) {
     console.error(err);
