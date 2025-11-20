@@ -231,8 +231,8 @@ function handleAccessDenied() {
     }
 }
 
-loginBtn.addEventListener('click', async (event) => {
-    event.preventDefault();
+async function handleLogin(event) {
+    event?.preventDefault();
     startLoginUiState();
 
     const userId = loginForm?.dataset.selectedUserId || selectedUserId;
@@ -267,7 +267,10 @@ loginBtn.addEventListener('click', async (event) => {
         console.error('Login failed:', err);
         resetLoginUiWithError('Something went wrong verifying your details. Please check your PIN and try again.');
     }
-});
+}
+
+loginForm?.addEventListener('submit', handleLogin);
+loginBtn?.addEventListener('click', handleLogin);
 
 avatarGrid?.addEventListener('click', (event) => {
     const card = event.target.closest('.avatar-card');
