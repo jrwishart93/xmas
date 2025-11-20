@@ -25,39 +25,42 @@
 
     <section class="card glass vip-card">
       <form id="loginForm" novalidate>
-        <label for="nameSelect" class="vip-label">Guest Name</label>
-        <div class="field">
-          <select id="nameSelect" required class="vip-input">
-            <option value="">Scanning Guest List...</option>
-          </select>
+        <div class="avatar-picker">
+          <p class="vip-label">Who's checking in?</p>
+          <p class="muted-text">Tap your face to continue.</p>
+          <div id="avatarGrid" class="avatar-grid" role="list" aria-label="Guest list"></div>
         </div>
 
-        <div id="selectedUserCard" class="selected-user-card hidden" aria-live="polite"></div>
+        <div id="selectedUserAnnouncement" class="sr-only" aria-live="polite"></div>
 
-        <label for="pinInput" class="vip-label">Passcode</label>
-        <div class="field field-inline">
-          <input
-            type="password"
-            id="pinInput"
-            class="vip-input"
-            inputmode="numeric"
-            pattern="\d{4}"
-            maxlength="4"
-            placeholder="••••"
-            required
-          />
-          <button type="button" id="togglePin" class="btn-text-gold">Reveal</button>
-        </div>
+        <div id="pinSection" class="pin-section hidden">
+          <div id="selectedUserCard" class="selected-user-card hidden" aria-live="polite"></div>
 
-        <div class="bouncer-status">
-          <p id="loginError" class="error-msg"></p>
-          <p id="successMsg" class="success-msg hidden">ACCESS GRANTED</p>
-        </div>
+          <label for="pinInput" class="vip-label">Passcode</label>
+          <div class="field field-inline">
+            <input
+              type="password"
+              id="pinInput"
+              class="vip-input"
+              inputmode="numeric"
+              pattern="\d{4}"
+              maxlength="4"
+              placeholder="••••"
+              required
+            />
+            <button type="button" id="togglePin" class="btn-text-gold">Reveal</button>
+          </div>
 
-        <div class="actions">
-          <button id="loginBtn" class="btn-neon" type="submit" disabled>
-            CHECK LIST
-          </button>
+          <div class="bouncer-status">
+            <p id="loginError" class="error-msg"></p>
+            <p id="successMsg" class="success-msg hidden">ACCESS GRANTED</p>
+          </div>
+
+          <div class="actions">
+            <button id="loginBtn" class="btn-neon" type="submit" disabled>
+              CHECK LIST
+            </button>
+          </div>
         </div>
       </form>
     </section>
@@ -90,20 +93,25 @@
   </script>
 
   <script type="module">
-    const nameSelect = document.getElementById('nameSelect');
+    const loginForm = document.getElementById('loginForm');
     const pinInput = document.getElementById('pinInput');
     const btn = document.getElementById('loginBtn');
     const successMsg = document.getElementById('successMsg');
     const togglePin = document.getElementById('togglePin');
+    const pinSection = document.getElementById('pinSection');
 
     // UI Validation
     const validate = () => {
-      const isValid = nameSelect.value && /^\d{4}$/.test(pinInput.value);
+      const hasUser = Boolean(loginForm?.dataset.selectedUserId);
+      if (hasUser) {
+        pinSection?.classList.remove('hidden');
+      }
+
+      const isValid = hasUser && /^\d{4}$/.test(pinInput.value);
       btn.disabled = !isValid;
-      btn.classList.toggle('btn-neon-active', isValid); 
+      btn.classList.toggle('btn-neon-active', isValid);
     };
 
-    nameSelect.addEventListener('change', validate);
     pinInput.addEventListener('input', () => {
       pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 4);
       validate();
@@ -130,10 +138,7 @@
       }, 800);
     });
 
-    // Placeholder logic (Keep this or rely on login.js)
-    setTimeout(() => {
-        if (nameSelect.options.length <= 1) nameSelect.options[0].textContent = 'Select Guest Name';
-    }, 1500);
+    document.addEventListener('userSelectionChanged', validate);
   </script>
 
   <script type="module" src="login.js"></script>

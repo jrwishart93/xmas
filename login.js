@@ -1,12 +1,19 @@
 import { db } from './firebase.js';
 import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
-import { createAvatarName } from './src/utils/avatarMap.js';
+import { createAvatarElement, createAvatarName } from './src/utils/avatarMap.js';
 
-const nameSelect = document.getElementById('nameSelect');
+const avatarGrid = document.getElementById('avatarGrid');
 const pinInput = document.getElementById('pinInput');
 const loginBtn = document.getElementById('loginBtn');
 const errorP = document.getElementById('loginError');
 const selectedUserCard = document.getElementById('selectedUserCard');
+const selectedUserAnnouncement = document.getElementById('selectedUserAnnouncement');
+const pinSection = document.getElementById('pinSection');
+const loginForm = document.getElementById('loginForm');
+
+let activeCard = null;
+let selectedUserId = '';
+let selectedUserName = '';
 
 function renderSelectedUser(name) {
     if (!selectedUserCard) return;
@@ -39,12 +46,29 @@ async function populateUsers() {
             return;
         }
 
-        nameSelect.innerHTML = '<option value="">Select your name</option>';
+        if (!avatarGrid) {
+            errorP.textContent = 'Unable to load avatars.';
+            return;
+        }
+
+        avatarGrid.innerHTML = '';
         userList.forEach(user => {
-            const option = document.createElement('option');
-            option.value = user.id;
-            option.textContent = user.name;
-            nameSelect.appendChild(option);
+            const card = document.createElement('button');
+            card.type = 'button';
+            card.className = 'avatar-card';
+            card.dataset.userId = user.id;
+            card.dataset.userName = user.name;
+            card.setAttribute('role', 'listitem');
+            card.setAttribute('aria-pressed', 'false');
+            card.setAttribute('aria-label', `Select ${user.name}`);
+
+            const avatar = createAvatarElement(user.name, 84);
+            const nameLabel = document.createElement('span');
+            nameLabel.className = 'avatar-card__name';
+            nameLabel.textContent = user.name;
+
+            card.append(avatar, nameLabel);
+            avatarGrid.appendChild(card);
         });
 
         renderSelectedUser('');
@@ -55,7 +79,7 @@ async function populateUsers() {
 }
 
 loginBtn.addEventListener('click', async () => {
-    const userId = nameSelect.value;
+    const userId = loginForm?.dataset.selectedUserId || selectedUserId;
     const pin = pinInput.value;
     errorP.textContent = '';
 
@@ -82,9 +106,42 @@ loginBtn.addEventListener('click', async () => {
     }
 });
 
-nameSelect?.addEventListener('change', (event) => {
-    const selectedName = event.target.options[event.target.selectedIndex]?.textContent || '';
-    renderSelectedUser(selectedName);
+avatarGrid?.addEventListener('click', (event) => {
+    const card = event.target.closest('.avatar-card');
+    if (!card) return;
+
+    if (activeCard) {
+        activeCard.classList.remove('avatar-card--selected');
+        activeCard.setAttribute('aria-pressed', 'false');
+    }
+
+    activeCard = card;
+    activeCard.classList.add('avatar-card--selected');
+    activeCard.setAttribute('aria-pressed', 'true');
+
+    selectedUserId = card.dataset.userId;
+    selectedUserName = card.dataset.userName;
+
+    if (loginForm) {
+        loginForm.dataset.selectedUserId = selectedUserId;
+        loginForm.dataset.selectedUserName = selectedUserName;
+    }
+
+    if (pinSection) {
+        pinSection.classList.remove('hidden');
+    }
+
+    errorP.textContent = '';
+    renderSelectedUser(selectedUserName);
+
+    if (selectedUserAnnouncement) {
+        selectedUserAnnouncement.textContent = selectedUserName
+            ? `Selected user: ${selectedUserName}`
+            : '';
+    }
+
+    document.dispatchEvent(new CustomEvent('userSelectionChanged'));
+    pinInput?.focus();
 });
 
 populateUsers();
