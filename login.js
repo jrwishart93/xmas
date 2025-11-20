@@ -1,6 +1,6 @@
 import { db } from './firebase.js';
 import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
-import { createAvatarElement, createAvatarName } from './src/utils/avatarMap.js';
+import { createAvatarElement, createAvatarName, getAvatarUrl } from './src/utils/avatarMap.js';
 
 const avatarGrid = document.getElementById('avatarGrid');
 const pinInput = document.getElementById('pinInput');
@@ -55,19 +55,31 @@ async function populateUsers() {
         userList.forEach(user => {
             const card = document.createElement('button');
             card.type = 'button';
-            card.className = 'user-avatar-card';
+            card.className = 'avatar-card';
             card.dataset.userId = user.id;
             card.dataset.userName = user.name;
             card.setAttribute('role', 'listitem');
             card.setAttribute('aria-pressed', 'false');
             card.setAttribute('aria-label', `Select ${user.name}`);
 
-            const avatar = createAvatarElement(user.name, 88);
+            const avatarUrl = getAvatarUrl(user.name);
+            let avatarVisual;
+
+            if (avatarUrl) {
+                avatarVisual = document.createElement('img');
+                avatarVisual.src = avatarUrl;
+                avatarVisual.alt = user.name;
+                avatarVisual.className = 'avatar-image';
+            } else {
+                avatarVisual = createAvatarElement(user.name, 84);
+                avatarVisual.classList.add('avatar-image', 'avatar-image--fallback');
+            }
+
             const nameLabel = document.createElement('span');
-            nameLabel.className = 'user-avatar-card__name';
+            nameLabel.className = 'avatar-name';
             nameLabel.textContent = user.name;
 
-            card.append(avatar, nameLabel);
+            card.append(avatarVisual, nameLabel);
             avatarGrid.appendChild(card);
         });
 
@@ -107,16 +119,16 @@ loginBtn.addEventListener('click', async () => {
 });
 
 avatarGrid?.addEventListener('click', (event) => {
-    const card = event.target.closest('.user-avatar-card');
+    const card = event.target.closest('.avatar-card');
     if (!card) return;
 
     if (activeCard) {
-        activeCard.classList.remove('user-avatar-card--selected');
+        activeCard.classList.remove('avatar-card--selected');
         activeCard.setAttribute('aria-pressed', 'false');
     }
 
     activeCard = card;
-    activeCard.classList.add('user-avatar-card--selected');
+    activeCard.classList.add('avatar-card--selected');
     activeCard.setAttribute('aria-pressed', 'true');
 
     selectedUserId = card.dataset.userId;
