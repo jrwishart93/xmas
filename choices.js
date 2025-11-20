@@ -1,7 +1,7 @@
 import { renderMenu } from "./src/ui/renderMenu.js";
 import { attachTotalHandler } from "./src/ui/updateTotals.js";
 import { saveUserSelections } from "./src/data/saveChoices.js";
-import { db } from "./src/firebase/firebaseConfig.js";
+import { db } from "./firebase.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
 const MAX_BUDGET = 20;
@@ -19,6 +19,7 @@ if (!storedUser) {
 
 let latestTotals = { total: 0, selections: [], remaining: MAX_BUDGET };
 let recalcTotals = () => {};
+let currentUserName = storedUser;
 
 const setStatus = (message, tone = "info") => {
   if (!statusElement) return;
@@ -95,10 +96,23 @@ const applyExistingSelections = (selections) => {
 };
 
 async function fetchExistingSelections(userId) {
-  const userRef = doc(db, "users", userId);
-  const snap = await getDoc(userRef);
+  const choiceRef = doc(db, "choices", userId);
+  const snap = await getDoc(choiceRef);
   if (!snap.exists()) return null;
   return snap.data();
+}
+
+async function fetchUserName(userId) {
+  try {
+    const userRef = doc(db, "users", userId);
+    const snap = await getDoc(userRef);
+    if (snap.exists() && snap.data()?.name) {
+      return snap.data().name;
+    }
+  } catch (error) {
+    console.warn("Unable to fetch user profile", error);
+  }
+  return userId;
 }
 
 async function init() {
@@ -117,7 +131,8 @@ async function init() {
     });
 
     const existing = await fetchExistingSelections(storedUser);
-    const selections = normalizeSelections(existing?.selections);
+    const selections = normalizeSelections(existing?.items || existing?.selections);
+    currentUserName = existing?.name || (await fetchUserName(storedUser));
     if (selections.length) {
       applyExistingSelections(selections);
       setStatus("We restored your previous picks. Update them if you like and hit save.", "success");
@@ -147,7 +162,7 @@ submitButton.addEventListener("click", async () => {
   setStatus("Saving your choices…");
 
   try {
-    await saveUserSelections(storedUser, selections, total);
+    await saveUserSelections(storedUser, currentUserName, selections, total);
     window.location.href = "complete.html";
   } catch (err) {
     console.error(err);
