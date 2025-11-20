@@ -3,6 +3,7 @@ import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.5.
 import { fetchMenu } from "./src/data/loadMenu.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
 
+const MAX_BUDGET_PER_PERSON = 20;
 const TOTAL_KITTY = 200;
 
 const submissionRows = document.getElementById("submissionRows");
@@ -79,6 +80,8 @@ function summarisePerson(data, docId, categoryMap) {
     data?.submitted ?? data?.hasSubmitted ?? selections.some((item) => (Number(item.qty) || 0) > 0)
   );
 
+  const isOverBudget = Number.isFinite(totalSpend) && totalSpend > MAX_BUDGET_PER_PERSON;
+
   return {
     id: docId,
     name,
@@ -86,7 +89,8 @@ function summarisePerson(data, docId, categoryMap) {
     totalSpend: Number.isFinite(totalSpend) ? totalSpend : 0,
     drinkCount,
     snackCount,
-    hasSubmitted
+    hasSubmitted,
+    isOverBudget
   };
 }
 
@@ -104,12 +108,15 @@ function renderSubmissionOverview(people) {
     const row = document.createElement("div");
     row.className = "submission-row";
 
-    const nameEl = createAvatarName(person.name, 34);
+    const nameEl = createAvatarName(person.name, 34, {
+      status: person.hasSubmitted ? "submitted" : "pending",
+      overBudget: person.isOverBudget
+    });
     nameEl.classList.add("name");
 
     const status = document.createElement("span");
-    status.className = `status ${person.hasSubmitted ? "complete" : "pending"}`;
-    status.textContent = person.hasSubmitted ? "Submitted" : "Pending";
+    status.className = `status-pill ${person.hasSubmitted ? "submitted" : "pending"}`;
+    status.textContent = person.hasSubmitted ? "Submitted" : "Not submitted yet";
 
     row.append(nameEl, status);
     submissionRows.append(row);
@@ -147,7 +154,7 @@ function renderPeopleBreakdown(people) {
   const sorted = [...people].sort((a, b) => a.name.localeCompare(b.name));
   sorted.forEach((person) => {
     const item = document.createElement("div");
-    item.className = "accordion-item";
+    item.className = `accordion-item ${person.hasSubmitted ? "is-submitted" : "is-pending"}`;
 
     const header = document.createElement("button");
     header.className = "accordion-header";
@@ -156,20 +163,31 @@ function renderPeopleBreakdown(people) {
     const title = document.createElement("div");
     title.className = "accordion-title";
 
-    const personLabel = createAvatarName(person.name, 36);
+    const personLabel = createAvatarName(person.name, 42, {
+      status: person.hasSubmitted ? "submitted" : "pending",
+      overBudget: person.isOverBudget
+    });
     personLabel.classList.add("name");
 
     const total = document.createElement("span");
     total.className = "person-total";
     total.textContent = currency.format(person.totalSpend);
 
-    title.append(personLabel, total);
+    const statusBadge = document.createElement("span");
+    statusBadge.className = `status-pill ${person.hasSubmitted ? "submitted" : "pending"}`;
+    statusBadge.textContent = person.hasSubmitted ? "Submitted" : "Not submitted yet";
 
-    const meta = document.createElement("span");
-    meta.className = "meta";
-    meta.textContent = `${person.drinkCount} drinks • ${person.snackCount} snacks`;
+    const headerMeta = document.createElement("div");
+    headerMeta.className = "meta";
+    headerMeta.textContent = `${person.drinkCount} drinks • ${person.snackCount} snacks`;
 
-    header.append(title, meta);
+    const headerGrid = document.createElement("div");
+    headerGrid.className = "accordion-header__grid";
+    headerGrid.append(personLabel, total, statusBadge);
+
+    title.append(headerGrid, headerMeta);
+
+    header.append(title);
 
     const content = document.createElement("div");
     content.className = "accordion-content";
@@ -185,7 +203,16 @@ function renderPeopleBreakdown(people) {
         const line = document.createElement("div");
         line.className = "line";
         const lineTotal = (Number(sel.qty) || 0) * (Number(sel.price) || 0);
-        line.textContent = `${sel.name} ×${sel.qty} (${currency.format(lineTotal)})`;
+
+        const itemLabel = document.createElement("span");
+        itemLabel.className = "line__label";
+        itemLabel.textContent = `${sel.name} ×${sel.qty}`;
+
+        const itemTotal = document.createElement("span");
+        itemTotal.className = "line__total";
+        itemTotal.textContent = currency.format(lineTotal);
+
+        line.append(itemLabel, itemTotal);
         content.append(line);
       });
     }
