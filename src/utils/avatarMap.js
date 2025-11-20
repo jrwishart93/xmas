@@ -27,10 +27,15 @@ export function getInitials(name) {
   return parts.join("") || "?";
 }
 
-export function createAvatarElement(name, size = 36) {
+export function createAvatarElement(name, size = 36, options = {}) {
   const avatar = document.createElement("div");
   avatar.className = "avatar";
-  avatar.style.setProperty("--avatar-size", `${size}px`);
+  avatar.style.setProperty("--avatar-size-base", `${size}px`);
+
+  const status = options?.status;
+  const isSubmitted = status === "submitted";
+  const isPending = status === "pending";
+  const isOverBudget = Boolean(options?.overBudget);
 
   const url = getAvatarUrl(name);
   if (url) {
@@ -41,15 +46,25 @@ export function createAvatarElement(name, size = 36) {
     avatar.textContent = getInitials(name);
   }
 
+  if (isSubmitted) {
+    avatar.classList.add("avatar--submitted");
+  } else if (isPending) {
+    avatar.classList.add("avatar--pending");
+  }
+
+  if (isOverBudget) {
+    avatar.classList.add("avatar--over-budget");
+  }
+
   avatar.setAttribute("aria-hidden", "true");
   return avatar;
 }
 
-export function createAvatarName(name, size = 36) {
+export function createAvatarName(name, size = 36, options = {}) {
   const wrapper = document.createElement("div");
   wrapper.className = "avatar-name";
 
-  const avatar = createAvatarElement(name, size);
+  const avatar = createAvatarElement(name, size, options);
   const label = document.createElement("span");
   label.className = "avatar-name__label";
   label.textContent = name || "Unknown guest";
