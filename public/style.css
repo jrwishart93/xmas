@@ -467,6 +467,64 @@ label {
   flex-direction: column;
 }
 
+.pin-label-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  margin-bottom: 0.25rem;
+}
+
+.pin-hint-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 0.75rem;
+  line-height: 0;
+  color: rgba(255, 255, 255, 0.7);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 6px;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.pin-hint-btn:hover,
+.pin-hint-btn:focus-visible {
+  outline: none;
+  border-color: var(--ice-blue);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.pin-hint {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: rgba(10, 15, 31, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  width: min(260px, 78vw);
+  z-index: 10;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@media (max-width: 480px) {
+  .pin-hint {
+    top: calc(100% + 12px);
+    right: 4px;
+  }
+}
+
 .pin-section--highlight {
   animation: pinPulse 0.8s ease;
 }

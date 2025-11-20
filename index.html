@@ -38,7 +38,26 @@
         <div id="pinSection" class="pin-section hidden">
           <div id="selectedUserCard" class="selected-user-card hidden" aria-live="polite"></div>
 
-          <label for="pinInput" class="vip-label">Passcode</label>
+          <div class="pin-label-row">
+            <label for="pinInput" class="vip-label">Passcode</label>
+            <button
+              type="button"
+              id="pinHintBtn"
+              class="pin-hint-btn"
+              aria-label="PIN hint"
+              aria-expanded="false"
+            >
+              ?
+            </button>
+            <div
+              id="pinHintMessage"
+              class="pin-hint hidden"
+              role="alert"
+              aria-live="polite"
+            >
+              Your PIN is the last four digits of your mobile number.
+            </div>
+          </div>
           <div class="field field-inline">
             <input
               type="password"
@@ -101,6 +120,8 @@
     const successMsg = document.getElementById('successMsg');
     const togglePin = document.getElementById('togglePin');
     const pinSection = document.getElementById('pinSection');
+    const pinHintBtn = document.getElementById('pinHintBtn');
+    const pinHintMessage = document.getElementById('pinHintMessage');
 
     // UI Validation
     const validate = () => {
@@ -123,6 +144,40 @@
       const isPass = pinInput.type === 'password';
       pinInput.type = isPass ? 'text' : 'password';
       togglePin.textContent = isPass ? 'Hide' : 'Reveal';
+    });
+
+    const hideHint = () => {
+      pinHintMessage?.classList.add('hidden');
+      pinHintBtn?.setAttribute('aria-expanded', 'false');
+    };
+
+    const toggleHint = () => {
+      if (!pinHintMessage) return;
+      const isHidden = pinHintMessage.classList.contains('hidden');
+      if (isHidden) {
+        pinHintMessage.classList.remove('hidden');
+        pinHintBtn?.setAttribute('aria-expanded', 'true');
+      } else {
+        hideHint();
+      }
+    };
+
+    pinHintBtn?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      toggleHint();
+    });
+
+    pinHintBtn?.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleHint();
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!pinHintMessage || pinHintMessage.classList.contains('hidden')) return;
+      if (pinHintMessage.contains(event.target) || pinHintBtn?.contains(event.target)) return;
+      hideHint();
     });
 
     // Submit Animation Wrapper
