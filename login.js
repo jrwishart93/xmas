@@ -6,6 +6,8 @@ const avatarGrid = document.getElementById('avatarGrid');
 const pinInput = document.getElementById('pinInput');
 const loginBtn = document.getElementById('loginBtn');
 const errorP = document.getElementById('loginError');
+const successMsg = document.getElementById('successMsg');
+const loginBtnDefaultText = loginBtn?.innerHTML || '';
 const selectedUserCard = document.getElementById('selectedUserCard');
 const selectedUserAnnouncement = document.getElementById('selectedUserAnnouncement');
 const pinSection = document.getElementById('pinSection');
@@ -119,6 +121,26 @@ function renderSelectedUser(name) {
     selectedUserCard.classList.remove('hidden');
 }
 
+function resetLoginUiWithError(message) {
+    if (errorP) {
+        errorP.textContent = message;
+    }
+
+    if (successMsg && !successMsg.classList.contains('hidden')) {
+        successMsg.classList.add('hidden');
+        successMsg.classList.remove('glow-text');
+    }
+
+    if (loginBtn) {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = loginBtnDefaultText || 'CHECK LIST';
+    }
+
+    if (pinInput) {
+        pinInput.focus({ preventScroll: true });
+    }
+}
+
 async function populateUsers() {
     try {
         const usersCol = collection(db, 'users');
@@ -194,11 +216,11 @@ loginBtn.addEventListener('click', async () => {
             localStorage.setItem("currentUser", userSnap.id);
             window.location.href = 'choices.html';
         } else {
-            errorP.textContent = 'Invalid PIN.';
+            resetLoginUiWithError('Access denied. Hint: your PIN is the last 4 digits of your mobile number.');
         }
     } catch (err) {
         console.error(err);
-        errorP.textContent = 'An error occurred during login.';
+        resetLoginUiWithError('An error occurred during login.');
     }
 });
 
