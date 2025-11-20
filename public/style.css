@@ -1217,3 +1217,177 @@ button.btn-green:hover:not(:disabled) {
     text-align: center;
   }
 }
+
+/* --- VIP SPEAKEASY THEME --- */
+:root {
+  --bg-dark: #050505;
+  --neon-pink: #ff00ff;
+  --neon-blue: #00ffff;
+  --gold: #ffd700;
+  --glass-black: rgba(10, 10, 10, 0.85);
+}
+
+body {
+  background-color: var(--bg-dark);
+  background-image: radial-gradient(circle at 50% 30%, #1a1a2e 0%, #000000 80%);
+  color: #fff;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+.neon-header { text-align: center; margin: 2rem 0; }
+
+.neon-sign {
+  font-family: 'Courier New', monospace;
+  font-weight: 900;
+  border: 4px solid #222;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #000;
+  box-shadow: 0 0 20px rgba(0,0,0,0.8);
+  display: inline-block;
+}
+
+.neon-text-pink {
+  color: #fff;
+  text-shadow: 0 0 10px var(--neon-pink), 0 0 40px var(--neon-pink);
+  display: block;
+  font-size: 2rem;
+}
+
+.neon-text-blue {
+  color: #fff;
+  text-shadow: 0 0 10px var(--neon-blue), 0 0 40px var(--neon-blue);
+  display: block;
+  font-size: 1.5rem;
+}
+
+.vip-subtitle { color: #888; letter-spacing: 3px; font-size: 0.8rem; margin-top: 1rem; text-transform: uppercase; }
+
+.vip-card {
+  background: var(--glass-black);
+  border: 1px solid #333;
+  border-top: 2px solid var(--gold);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+}
+
+.vip-label { color: var(--gold); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+
+.vip-input {
+  background: transparent !important;
+  border: none;
+  border-bottom: 1px solid #444;
+  color: white;
+  border-radius: 0;
+  font-size: 1.1rem;
+}
+.vip-input:focus { outline: none; border-bottom: 1px solid var(--neon-blue); }
+
+.btn-text-gold { background: none; border: none; color: #888; text-transform: uppercase; cursor: pointer; }
+.btn-text-gold:hover { color: var(--gold); }
+
+.btn-neon {
+  background: transparent;
+  border: 2px solid #444;
+  color: #444;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 1rem;
+  width: 100%;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.btn-neon:disabled {
+  background: transparent;
+  color: #444;
+  border-color: #444;
+  box-shadow: none;
+}
+
+.btn-neon-active {
+  border-color: var(--neon-blue);
+  color: #fff;
+  box-shadow: 0 0 15px var(--neon-blue);
+  text-shadow: 0 0 8px var(--neon-blue);
+}
+
+/* Particle Animation */
+.gold-dust { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+.dust-particle {
+  position: absolute;
+  background: radial-gradient(white, #ffd700);
+  border-radius: 50%;
+  opacity: 0;
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  0% { transform: translateY(-10vh); opacity: 0; }
+  20% { opacity: 0.6; }
+  100% { transform: translateY(110vh); opacity: 0; }
+}
+
+.hidden { display: none; }
+
+/* Additional VIP layout polish */
+.glass {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.actions {
+  margin-top: 1.5rem;
+}
+
+.field {
+  margin-bottom: 1.25rem;
+}
+
+.field-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bouncer-status {
+  min-height: 32px;
+  margin-top: 0.5rem;
+}
+
+.error-msg {
+  color: #ff7b7b;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.success-msg {
+  color: var(--gold);
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.footer-minimal {
+  margin-top: 2rem;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.muted {
+  text-align: center;
+}
+
+.glow-text {
+  text-shadow: 0 0 10px var(--gold), 0 0 20px rgba(255, 215, 0, 0.6);
+}
+
+.flicker-slow { animation: flicker 3s infinite; }
+.flicker-fast { animation: flicker 0.9s infinite; }
+
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+  20%, 24%, 55% { opacity: 0.5; }
+  22%, 26% { opacity: 0.2; }
+}
