@@ -78,6 +78,7 @@
           </div>
 
           <div class="actions">
+            <div id="loginSpinner" class="spinner hidden" aria-hidden="true"></div>
             <button id="loginBtn" class="btn-neon" type="submit" disabled>
               CHECK LIST
             </button>
@@ -183,16 +184,9 @@
     // Submit Animation Wrapper
     document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      btn.disabled = true;
-      btn.innerHTML = '<span class="flicker-fast">VERIFYING...</span>';
-      
-      // Visual delay before triggering actual login logic
-      setTimeout(() => {
-        successMsg.classList.remove('hidden');
-        successMsg.classList.add('glow-text');
-        // Dispatches event to existing login.js
-        document.getElementById('loginBtn').dispatchEvent(new Event('click', {bubbles:true}));
-      }, 800);
+      document
+        .getElementById('loginBtn')
+        .dispatchEvent(new Event('click', { bubbles: true }));
     });
 
     document.addEventListener('userSelectionChanged', validate);
