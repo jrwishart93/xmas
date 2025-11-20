@@ -35,6 +35,40 @@
         <h2>Overall Order Totals</h2>
         <div id="itemTotalsList" class="totals-list" aria-live="polite"></div>
       </section>
+
+      <section class="card admin-reset" aria-live="polite">
+        <div class="reset-row">
+          <div class="reset-copy">
+            <h3>Admin tools</h3>
+            <p class="muted-text">Danger zone: wiping data cannot be undone.</p>
+          </div>
+          <button id="hardResetTrigger" class="ghost-reset hard-reset-btn" type="button" aria-haspopup="dialog">
+            Hard reset everything
+          </button>
+        </div>
+        <p id="hardResetError" class="reset-error muted-text" role="alert"></p>
+      </section>
+    </div>
+  </div>
+
+  <div id="dashboardToast" class="toast" role="status" aria-live="polite"></div>
+
+  <div class="modal" id="hardResetModal" hidden role="dialog" aria-modal="true" aria-labelledby="hardResetTitle">
+    <div class="modal-content">
+      <h2 id="hardResetTitle">Reset all choices and kitty?</h2>
+      <p class="muted-text">
+        This will erase every user's drink and snack selections, mark everyone as not submitted, and reset the shared kitty totals back to their starting values. This cannot be undone.
+      </p>
+      <div class="reset-confirm-field">
+        <label for="confirmResetInput">Type <strong>RESET</strong> to confirm</label>
+        <input id="confirmResetInput" type="text" autocomplete="off" placeholder="RESET" />
+      </div>
+      <p id="hardResetModalError" class="reset-error muted-text" role="alert"></p>
+      <div class="reset-progress" id="hardResetProgress" aria-live="assertive"></div>
+      <div class="modal-actions">
+        <button id="cancelHardReset" type="button" class="ghost-link">Cancel</button>
+        <button id="confirmHardReset" type="button" class="danger-btn" disabled>Yes, reset everything</button>
+      </div>
     </div>
   </div>
 

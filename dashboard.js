@@ -1,5 +1,13 @@
 import { db } from "./firebase.js";
-import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  serverTimestamp,
+  writeBatch
+} from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
 
@@ -11,6 +19,15 @@ const peopleAccordion = document.getElementById("peopleAccordion");
 const itemTotalsList = document.getElementById("itemTotalsList");
 const kittyBar = document.getElementById("kittyBar");
 const kittyText = document.getElementById("kittyText");
+const hardResetTrigger = document.getElementById("hardResetTrigger");
+const hardResetModal = document.getElementById("hardResetModal");
+const confirmHardResetButton = document.getElementById("confirmHardReset");
+const cancelHardResetButton = document.getElementById("cancelHardReset");
+const confirmResetInput = document.getElementById("confirmResetInput");
+const hardResetError = document.getElementById("hardResetError");
+const hardResetModalError = document.getElementById("hardResetModalError");
+const hardResetProgress = document.getElementById("hardResetProgress");
+const dashboardToast = document.getElementById("dashboardToast");
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -18,6 +35,12 @@ const currency = new Intl.NumberFormat("en-GB", {
 });
 
 const SNACK_CATEGORIES = new Set(["Bites", "Sharers"]);
+const ADMIN_IDS = new Set(["derek", "lawrie", "admin"]);
+const RESET_TOKEN = "RESET";
+
+let isAdminUser = false;
+const currentUserId =
+  localStorage.getItem("xmasUser") || localStorage.getItem("currentUser") || "";
 
 function normalizeSelections(rawSelections) {
   if (!rawSelections) return [];
@@ -36,6 +59,16 @@ function normalizeSelections(rawSelections) {
     });
   }
   return [];
+}
+
+function showToast(message) {
+  if (!dashboardToast) return;
+  dashboardToast.textContent = message;
+  dashboardToast.classList.add("show");
+
+  window.setTimeout(() => {
+    dashboardToast?.classList.remove("show");
+  }, 2800);
 }
 
 function buildCategoryMap(menu) {
@@ -289,6 +322,124 @@ function updateKittyBar(spent) {
   }
 }
 
+function toggleResetModal(show) {
+  if (!hardResetModal) return;
+  hardResetModal.hidden = !show;
+  hardResetModalError && (hardResetModalError.textContent = "");
+  hardResetProgress && (hardResetProgress.textContent = "");
+  confirmHardResetButton && (confirmHardResetButton.disabled = true);
+  confirmResetInput && (confirmResetInput.value = "");
+
+  if (show) {
+    confirmResetInput?.focus();
+  }
+}
+
+function setResetAvailability(isAllowed) {
+  if (!hardResetTrigger) return;
+  hardResetTrigger.disabled = !isAllowed;
+  hardResetTrigger.setAttribute("aria-disabled", String(!isAllowed));
+}
+
+async function evaluateAdminAccess() {
+  if (!hardResetTrigger) return;
+  if (!currentUserId) {
+    hardResetError && (hardResetError.textContent = "Log in as an admin to reset.");
+    setResetAvailability(false);
+    return;
+  }
+
+  try {
+    const docRef = doc(db, "users", currentUserId);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data();
+    isAdminUser = Boolean(data?.admin) || ADMIN_IDS.has(currentUserId);
+    setResetAvailability(isAdminUser);
+    if (!isAdminUser && hardResetError) {
+      hardResetError.textContent = "You must be an admin to hard reset.";
+    }
+  } catch (error) {
+    console.error("Unable to verify admin access", error);
+    hardResetError && (hardResetError.textContent = "Unable to check admin access.");
+    setResetAvailability(false);
+  }
+}
+
+function updateConfirmButtonState() {
+  if (!confirmHardResetButton) return;
+  const inputMatches = confirmResetInput?.value?.trim().toUpperCase() === RESET_TOKEN;
+  confirmHardResetButton.disabled = !inputMatches;
+}
+
+async function performHardReset() {
+  const usersSnapshot = await getDocs(collection(db, "users"));
+  const batch = writeBatch(db);
+
+  usersSnapshot.forEach((userDoc) => {
+    const userRef = doc(db, "users", userDoc.id);
+    batch.set(
+      userRef,
+      {
+        hasSubmitted: false,
+        choices: {},
+        selections: [],
+        total: 0,
+        totalSpend: 0,
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+  });
+
+  const kittyRef = doc(db, "kitty", "shared");
+  batch.set(
+    kittyRef,
+    {
+      totalSpent: 0,
+      kittyBudget: TOTAL_KITTY,
+      remainingBudget: TOTAL_KITTY,
+      itemTotals: {},
+      updatedAt: serverTimestamp()
+    },
+    { merge: true }
+  );
+
+  await batch.commit();
+}
+
+async function handleHardReset() {
+  if (!isAdminUser) {
+    hardResetModalError && (hardResetModalError.textContent = "Only admins can reset data.");
+    hardResetError && (hardResetError.textContent = "Only admins can reset data.");
+    return;
+  }
+
+  if (confirmHardResetButton) {
+    confirmHardResetButton.disabled = true;
+  }
+  if (hardResetProgress) {
+    hardResetProgress.textContent = "Resetting…";
+  }
+  hardResetModalError && (hardResetModalError.textContent = "");
+
+  try {
+    await performHardReset();
+    toggleResetModal(false);
+    showToast("All choices and kitty totals have been reset.");
+  } catch (error) {
+    console.error("Unable to hard reset", error);
+    hardResetModalError &&
+      (hardResetModalError.textContent = "Could not reset data. Please try again.");
+  } finally {
+    if (confirmHardResetButton) {
+      confirmHardResetButton.disabled = false;
+    }
+    if (hardResetProgress) {
+      hardResetProgress.textContent = "";
+    }
+  }
+}
+
 function renderDashboard(allChoices, categoryMap) {
   const people = allChoices.map((doc) =>
     summarisePerson(doc, doc.id || doc.uid || "", categoryMap)
@@ -344,5 +495,23 @@ async function loadDashboard() {
   }
 }
 
+hardResetTrigger?.addEventListener("click", () => {
+  toggleResetModal(true);
+  if (!isAdminUser && hardResetModalError) {
+    hardResetModalError.textContent = "Only admins can reset data.";
+  }
+});
+
+confirmResetInput?.addEventListener("input", updateConfirmButtonState);
+cancelHardResetButton?.addEventListener("click", () => toggleResetModal(false));
+confirmHardResetButton?.addEventListener("click", handleHardReset);
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && hardResetModal && !hardResetModal.hidden) {
+    toggleResetModal(false);
+  }
+});
+
+evaluateAdminAccess();
 loadDashboard();
 
