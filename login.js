@@ -10,21 +10,52 @@ const selectedUserCard = document.getElementById('selectedUserCard');
 const selectedUserAnnouncement = document.getElementById('selectedUserAnnouncement');
 const pinSection = document.getElementById('pinSection');
 const loginForm = document.getElementById('loginForm');
+const pinLabel = document.querySelector('label[for="pinInput"]');
 
 let activeCard = null;
 let selectedUserId = '';
 let selectedUserName = '';
+let lastSelectedUserId = '';
+let focusTimeoutId;
+let highlightTimeoutId;
 
-function highlightPinArea() {
+function highlightPinArea(shouldScroll) {
     if (!pinSection) return;
     pinSection.classList.remove('hidden');
     pinSection.classList.add('pin-section--highlight');
 
-    pinSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (shouldScroll) {
+        pinSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
-    setTimeout(() => {
+    if (highlightTimeoutId) {
+        clearTimeout(highlightTimeoutId);
+    }
+
+    highlightTimeoutId = setTimeout(() => {
         pinSection.classList.remove('pin-section--highlight');
     }, 900);
+}
+
+function focusPinLabelAfterScroll() {
+    const focusTarget = pinLabel || pinInput;
+    if (!focusTarget) return;
+
+    if (pinInput && !pinInput.hasAttribute('tabindex')) {
+        pinInput.setAttribute('tabindex', '-1');
+    }
+
+    if (!focusTarget.hasAttribute('tabindex')) {
+        focusTarget.setAttribute('tabindex', '-1');
+    }
+
+    if (focusTimeoutId) {
+        clearTimeout(focusTimeoutId);
+    }
+
+    focusTimeoutId = setTimeout(() => {
+        focusTarget.focus({ preventScroll: true });
+    }, 450);
 }
 
 function selectAvatarCard(card) {
@@ -39,7 +70,8 @@ function selectAvatarCard(card) {
     activeCard.classList.add('selected');
     activeCard.setAttribute('aria-pressed', 'true');
 
-    selectedUserId = card.dataset.userId;
+    const userId = card.dataset.userId;
+    selectedUserId = userId;
     selectedUserName = card.dataset.userName;
 
     if (loginForm) {
@@ -47,7 +79,13 @@ function selectAvatarCard(card) {
         loginForm.dataset.selectedUserName = selectedUserName;
     }
 
-    highlightPinArea();
+    const isNewSelection = userId !== lastSelectedUserId;
+    lastSelectedUserId = userId;
+
+    highlightPinArea(isNewSelection);
+    if (isNewSelection) {
+        focusPinLabelAfterScroll();
+    }
 
     errorP.textContent = '';
     renderSelectedUser(selectedUserName);
@@ -59,7 +97,6 @@ function selectAvatarCard(card) {
     }
 
     document.dispatchEvent(new CustomEvent('userSelectionChanged'));
-    pinInput?.focus({ preventScroll: true });
 }
 
 function renderSelectedUser(name) {
