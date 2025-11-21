@@ -22,6 +22,29 @@ let lastSelectedUserId = '';
 let focusTimeoutId;
 let highlightTimeoutId;
 
+function setSpinnerVisible(isVisible) {
+    if (!spinner) return;
+    spinner.hidden = !isVisible;
+    spinner.setAttribute('aria-hidden', (!isVisible).toString());
+    spinner.classList.toggle('hidden', !isVisible);
+}
+
+function setLoginError(message) {
+    if (!errorP) return;
+
+    errorP.textContent = message;
+    const hasMessage = Boolean(message);
+    errorP.style.display = hasMessage ? 'block' : 'none';
+    errorP.classList.toggle('hidden', !hasMessage);
+}
+
+function setPinErrorState(isError) {
+    if (!pinInput) return;
+
+    pinInput.setAttribute('aria-invalid', isError ? 'true' : 'false');
+    pinInput.classList.toggle('input-error', isError);
+}
+
 function highlightPinArea(shouldScroll) {
     if (!pinSection) return;
     pinSection.classList.remove('hidden');
@@ -90,7 +113,8 @@ function selectAvatarCard(card) {
         focusPinLabelAfterScroll();
     }
 
-    errorP.textContent = '';
+    setLoginError('');
+    setPinErrorState(false);
     renderSelectedUser(selectedUserName);
 
     if (selectedUserAnnouncement) {
@@ -123,17 +147,12 @@ function renderSelectedUser(name) {
 }
 
 function resetLoginUiWithError(message) {
-    if (errorP) {
-        errorP.textContent = message;
-    }
+    setLoginError(message);
+    setSpinnerVisible(false);
 
     if (successMsg) {
         successMsg.classList.add('hidden');
         successMsg.classList.remove('glow-text');
-    }
-
-    if (spinner) {
-        spinner.hidden = true;
     }
 
     if (loginBtn) {
@@ -153,12 +172,12 @@ async function populateUsers() {
         const userList = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         if (userList.length === 0) {
-            errorP.textContent = 'No users found in the database.';
+            setLoginError('No users found in the database.');
             return;
         }
 
         if (!avatarGrid) {
-            errorP.textContent = 'Unable to load avatars.';
+            setLoginError('Unable to load avatars.');
             return;
         }
 
@@ -197,18 +216,14 @@ async function populateUsers() {
         renderSelectedUser('');
     } catch (err) {
         console.error(err);
-        errorP.textContent = 'Failed to load users from Firestore.';
+        setLoginError('Failed to load users from Firestore.');
     }
 }
 
 function startLoginUiState() {
-    if (errorP) {
-        errorP.textContent = '';
-    }
-
-    if (spinner) {
-        spinner.hidden = false;
-    }
+    setLoginError('');
+    setPinErrorState(false);
+    setSpinnerVisible(true);
 
     if (successMsg) {
         successMsg.classList.add('hidden');
@@ -222,11 +237,11 @@ function startLoginUiState() {
 }
 
 function handleAccessDenied() {
-    resetLoginUiWithError('Access denied. Hint: your PIN is the last 4 digits of your mobile number.');
+    resetLoginUiWithError('Access denied. Hint: your PIN is the last four digits of your mobile number.');
+    setPinErrorState(true);
 
     if (pinInput) {
-        pinInput.classList.add('input-error');
-        setTimeout(() => pinInput.classList.remove('input-error'), 450);
+        pinInput.value = '';
         pinInput.focus({ preventScroll: true });
     }
 }
@@ -240,6 +255,7 @@ async function handleLogin(event) {
 
     if (!userId) {
         resetLoginUiWithError('Please select your name.');
+        setPinErrorState(false);
         return;
     }
 
@@ -248,6 +264,7 @@ async function handleLogin(event) {
         const userSnap = await getDoc(userRef);
 
         if (!userSnap.exists()) {
+            console.error('User not found for login attempt:', userId);
             handleAccessDenied();
             return;
         }
@@ -259,13 +276,22 @@ async function handleLogin(event) {
             return;
         }
 
+        setSpinnerVisible(false);
+        setLoginError('');
+        setPinErrorState(false);
+        if (loginBtn) {
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = loginBtnDefaultText || 'CHECK LIST';
+        }
+
         localStorage.setItem("xmasUser", userSnap.id);
         // Keep a secondary key for compatibility with older pages/modules
         localStorage.setItem("currentUser", userSnap.id);
         window.location.href = 'choices.html';
     } catch (err) {
         console.error('Login failed:', err);
-        resetLoginUiWithError('Something went wrong verifying your details. Please check your PIN and try again.');
+        resetLoginUiWithError('Something went wrong, please try again.');
+        setPinErrorState(true);
     }
 }
 
@@ -284,5 +310,15 @@ avatarGrid?.addEventListener('keydown', (event) => {
     event.preventDefault();
     selectAvatarCard(card);
 });
+
+pinInput?.addEventListener('input', () => {
+    setPinErrorState(false);
+    if (errorP?.textContent) {
+        setLoginError('');
+    }
+});
+
+setLoginError('');
+setPinErrorState(false);
 
 populateUsers();
