@@ -13,7 +13,6 @@ const selectedUserCard = document.getElementById('selectedUserCard');
 const selectedUserAnnouncement = document.getElementById('selectedUserAnnouncement');
 const pinSection = document.getElementById('pinSection');
 const loginForm = document.getElementById('loginForm');
-const pinLabel = document.querySelector('label[for="pinInput"]');
 
 let activeCard = null;
 let selectedUserId = '';
@@ -21,6 +20,26 @@ let selectedUserName = '';
 let lastSelectedUserId = '';
 let focusTimeoutId;
 let highlightTimeoutId;
+
+function scrollToPinAndFocus() {
+    if (!pinInput) return;
+
+    const target = pinSection || pinInput;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    target?.scrollIntoView({
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+        block: 'center',
+    });
+
+    if (focusTimeoutId) {
+        clearTimeout(focusTimeoutId);
+    }
+
+    focusTimeoutId = setTimeout(() => {
+        pinInput.focus({ preventScroll: true });
+    }, prefersReducedMotion ? 0 : 400);
+}
 
 function setSpinnerVisible(isVisible) {
     if (!spinner) return;
@@ -51,7 +70,7 @@ function highlightPinArea(shouldScroll) {
     pinSection.classList.add('pin-section--highlight');
 
     if (shouldScroll) {
-        pinSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        scrollToPinAndFocus();
     }
 
     if (highlightTimeoutId) {
@@ -61,27 +80,6 @@ function highlightPinArea(shouldScroll) {
     highlightTimeoutId = setTimeout(() => {
         pinSection.classList.remove('pin-section--highlight');
     }, 900);
-}
-
-function focusPinLabelAfterScroll() {
-    const focusTarget = pinLabel || pinInput;
-    if (!focusTarget) return;
-
-    if (pinInput && !pinInput.hasAttribute('tabindex')) {
-        pinInput.setAttribute('tabindex', '-1');
-    }
-
-    if (!focusTarget.hasAttribute('tabindex')) {
-        focusTarget.setAttribute('tabindex', '-1');
-    }
-
-    if (focusTimeoutId) {
-        clearTimeout(focusTimeoutId);
-    }
-
-    focusTimeoutId = setTimeout(() => {
-        focusTarget.focus({ preventScroll: true });
-    }, 450);
 }
 
 function selectAvatarCard(card) {
@@ -109,9 +107,6 @@ function selectAvatarCard(card) {
     lastSelectedUserId = userId;
 
     highlightPinArea(isNewSelection);
-    if (isNewSelection) {
-        focusPinLabelAfterScroll();
-    }
 
     setLoginError('');
     setPinErrorState(false);
