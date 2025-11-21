@@ -87,7 +87,7 @@ function summarisePerson(data, docId, categoryMap) {
   const selections = normalizeSelections(data?.items || data?.selections || data?.choices);
   const name = data?.name || docId;
 
-  let totalSpend = Number(data?.total);
+  let totalSpend = Number(data?.totalSpend ?? data?.total);
   const shouldRecalculateTotal = !Number.isFinite(totalSpend);
   if (shouldRecalculateTotal) {
     totalSpend = 0;

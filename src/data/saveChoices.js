@@ -11,24 +11,18 @@ import {
  *
  * @param {string} userId - Document ID of the user
  * @param {string} userName - Display name of the user
- * @param {Array} selections - Array of objects: { name, price, qty }
- * @param {number} totalSpent - Total cost of selections
+ * @param {Object} choices - Map of drinkId/name -> quantity
+ * @param {number} totalSpend - Total cost of selections
  */
-export async function saveUserSelections(userId, userName, selections, totalSpent) {
+export async function saveUserSelections(userId, userName, choices, totalSpend) {
   if (!userId) throw new Error("Missing userId in saveUserSelections()");
-  if (!Array.isArray(selections)) throw new Error("Selections must be an array");
+  if (!choices || typeof choices !== "object") {
+    throw new Error("Choices must be provided as an object map");
+  }
 
-  const filteredItems = selections
-    .filter((s) => (Number(s.qty) || 0) > 0)
-    .map((s) => ({
-      name: s.name,
-      price: Number(s.price) || 0,
-      qty: Number(s.qty) || 0
-    }));
-
-  const safeTotal = Number(totalSpent) || 0;
-  const choicesMap = filteredItems.reduce((acc, item) => {
-    acc[item.name] = { qty: item.qty, price: item.price };
+  const safeTotal = Number(totalSpend) || 0;
+  const safeChoices = Object.entries(choices).reduce((acc, [key, qty]) => {
+    acc[key] = Number(qty) || 0;
     return acc;
   }, {});
 
@@ -39,9 +33,8 @@ export async function saveUserSelections(userId, userName, selections, totalSpen
     {
       name: userName || userId,
       hasSubmitted: true,
-      choices: choicesMap,
-      selections: filteredItems,
-      total: safeTotal,
+      totalSpend: safeTotal,
+      choices: safeChoices,
       updatedAt: serverTimestamp()
     },
     { merge: true }
