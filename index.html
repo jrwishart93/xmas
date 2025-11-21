@@ -181,14 +181,6 @@
       hideHint();
     });
 
-    // Submit Animation Wrapper
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      document
-        .getElementById('loginBtn')
-        .dispatchEvent(new Event('click', { bubbles: true }));
-    });
-
     document.addEventListener('userSelectionChanged', validate);
   </script>
 
