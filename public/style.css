@@ -2034,14 +2034,22 @@ body {
 
 .neon-text-pink {
   color: #fff;
-  text-shadow: 0 0 10px var(--neon-pink), 0 0 40px var(--neon-pink);
+  --neon-primary: var(--neon-pink);
+  --neon-shadow-on: 0 0 4px #fff, 0 0 10px #fff, 0 0 18px #fff, 0 0 38px var(--neon-primary),
+    0 0 72px var(--neon-primary);
+  --neon-shadow-off: 0 0 2px rgba(255, 255, 255, 0.4), 0 0 8px rgba(255, 0, 255, 0.25);
+  text-shadow: var(--neon-shadow-on);
   display: block;
   font-size: 2rem;
 }
 
 .neon-text-blue {
   color: #fff;
-  text-shadow: 0 0 10px var(--neon-blue), 0 0 40px var(--neon-blue);
+  --neon-primary: var(--neon-blue);
+  --neon-shadow-on: 0 0 4px #fff, 0 0 10px #fff, 0 0 18px #fff, 0 0 38px var(--neon-primary),
+    0 0 72px var(--neon-primary);
+  --neon-shadow-off: 0 0 2px rgba(255, 255, 255, 0.4), 0 0 8px rgba(0, 255, 255, 0.25);
+  text-shadow: var(--neon-shadow-on);
   display: block;
   font-size: 1.5rem;
 }
@@ -2246,7 +2254,19 @@ body {
 .flicker-fast { animation: flicker 0.9s infinite; }
 
 @keyframes flicker {
-  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
-  20%, 24%, 55% { opacity: 0.5; }
-  22%, 26% { opacity: 0.2; }
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    text-shadow: var(
+      --neon-shadow-on,
+      0 0 4px #fff,
+      0 0 11px #fff,
+      0 0 19px #fff,
+      0 0 40px #ff00de,
+      0 0 80px #ff00de
+    );
+    opacity: 1;
+  }
+  20%, 24%, 55% {
+    text-shadow: var(--neon-shadow-off, none);
+    opacity: 0.1;
+  }
 }
