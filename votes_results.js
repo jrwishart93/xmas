@@ -1,7 +1,8 @@
 import { TEAM } from "./team.js";
 import { VOTING_QUESTIONS } from "./src/data/votingQuestions.js";
+import { fetchUsersFromFirestore } from "./src/data/users.js";
 import { db } from "./firebase.js";
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const userId = sessionStorage.getItem("loggedInUser");
 if (!userId) location.href = "index.html";
@@ -17,14 +18,55 @@ const tallies = VOTING_QUESTIONS.reduce((acc, { id }) => {
 }, {});
 
 const resultsContainer = document.getElementById("resultsContainer");
+let participants = { ...TEAM };
+
+function extractAnswers(data = {}) {
+  const answers = {};
+
+  VOTING_QUESTIONS.forEach(({ id }) => {
+    if (data[id]) {
+      answers[id] = data[id];
+    }
+  });
+
+  if (!Object.keys(answers).length) {
+    const legacy = data.answers || data.votes;
+    if (legacy && typeof legacy === "object") {
+      Object.entries(legacy).forEach(([qid, choice]) => {
+        if (VOTING_QUESTIONS.some((q) => q.id === qid)) {
+          answers[qid] = choice;
+        }
+      });
+    }
+  }
+
+  return answers;
+}
+
+function getDisplayName(userId) {
+  return (
+    participants[userId]?.name ||
+    TEAM[userId]?.name ||
+    "Unknown"
+  );
+}
 
 async function loadResults() {
   try {
+    const remoteUsers = await fetchUsersFromFirestore();
+    Object.entries(remoteUsers).forEach(([id, data]) => {
+      participants[id] = {
+        ...participants[id],
+        ...data,
+        name: data.name || participants[id]?.name,
+      };
+    });
+
     const snap = await getDocs(collection(db, "votes"));
 
     snap.forEach(docSnap => {
       const data = docSnap.data();
-      const answers = data?.answers || data?.votes;
+      const answers = extractAnswers(data);
       if (!answers) return;
       for (const [qid, choice] of Object.entries(answers)) {
         if (!tallies[qid]) continue;
@@ -63,7 +105,7 @@ function renderTallies() {
       hasVotes = true;
       sortedAnswers.forEach(([uid, count]) => {
         const li = document.createElement("li");
-        const name = TEAM[uid]?.name || "Unknown";
+        const name = getDisplayName(uid);
         li.textContent = `${name}: ${count} vote(s)`;
         ul.appendChild(li);
       });

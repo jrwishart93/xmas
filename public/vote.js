@@ -1,4 +1,5 @@
 import { TEAM } from "./src/team.js";
+import { fetchUsersFromFirestore } from "../src/data/users.js";
 import { db } from "../firebase.js";
 import {
   doc,
@@ -35,6 +36,7 @@ const QUESTIONS = [
 ];
 
 const votesState = {};
+let participants = { ...TEAM };
 const userId = sessionStorage.getItem("loggedInUser");
 const voteLoading = document.getElementById("voteLoading");
 const submitButton = document.getElementById("submitVotes");
@@ -88,7 +90,8 @@ function renderAvatarGrids() {
 
     grid.innerHTML = "";
 
-    Object.entries(TEAM).forEach(([id, person]) => {
+    Object.entries(participants).forEach(([id, person]) => {
+      const avatarSrc = person.avatarUrl || person.image;
       const tile = document.createElement("button");
       tile.type = "button";
       tile.className = "avatar-tile";
@@ -99,9 +102,10 @@ function renderAvatarGrids() {
       );
       tile.setAttribute("aria-pressed", "false");
 
+      const resolvedSrc = avatarSrc?.startsWith("http") ? avatarSrc : `/${avatarSrc || ""}`;
       tile.innerHTML = `
         <div class="avatar-thumb">
-          <img src="/${person.image}" alt="${person.name}" />
+          <img src="${resolvedSrc}" alt="${person.name}" />
         </div>
         <span class="avatar-name">${person.name}</span>
       `;
@@ -112,10 +116,25 @@ function renderAvatarGrids() {
   });
 }
 
+async function loadParticipants() {
+  const remoteUsers = await fetchUsersFromFirestore();
+  const merged = {};
+
+  Object.entries(TEAM).forEach(([id, person]) => {
+    const remote = remoteUsers[id] || {};
+    merged[id] = {
+      ...person,
+      name: remote.name || person.name,
+      avatarUrl: remote.avatarUrl || person.image,
+    };
+  });
+
+  participants = merged;
+  renderAvatarGrids();
+}
+
 async function loadExistingVotes() {
   if (!userId) return;
-
-  toggleLoading(true);
 
   try {
     const ref = doc(db, "votes", userId);
@@ -124,8 +143,8 @@ async function loadExistingVotes() {
     if (snapshot.exists()) {
       const data = snapshot.data();
       QUESTIONS.forEach(({ id }) => {
-        const saved = data?.[id];
-        if (saved && TEAM[saved]) {
+        const saved = data?.[id] || data?.answers?.[id] || data?.votes?.[id];
+        if (saved && participants[saved]) {
           selectAvatar(id, saved);
         }
       });
@@ -133,8 +152,6 @@ async function loadExistingVotes() {
   } catch (error) {
     console.error("Unable to load previous votes", error);
     showToast("Could not load previous votes. You can still vote.");
-  } finally {
-    toggleLoading(false);
   }
 }
 
@@ -157,7 +174,7 @@ async function saveVotes() {
 
   const payload = QUESTIONS.reduce(
     (acc, q) => ({ ...acc, [q.id]: votesState[q.id] }),
-    { updatedAt: Date.now() }
+    { submittedAt: Date.now() }
   );
 
   try {
@@ -177,10 +194,15 @@ async function saveVotes() {
   }
 }
 
-function init() {
-  renderAvatarGrids();
-  loadExistingVotes();
-  submitButton?.addEventListener("click", saveVotes);
+async function init() {
+  toggleLoading(true);
+  try {
+    await loadParticipants();
+    await loadExistingVotes();
+    submitButton?.addEventListener("click", saveVotes);
+  } finally {
+    toggleLoading(false);
+  }
 }
 
 if (document.readyState === "loading") {
