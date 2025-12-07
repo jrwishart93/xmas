@@ -10,7 +10,7 @@ const questionsContainer = document.getElementById("voteQuestions");
 
 function buildQuestionSection({ id, question, icon, alt }) {
   const section = document.createElement("section");
-  section.className = "vote-question";
+  section.className = "vote-question vote-card";
   section.dataset.qid = id;
 
   const selectId = `select-${id}`;
