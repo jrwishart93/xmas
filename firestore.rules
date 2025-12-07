@@ -1,0 +1,73 @@
+// -------------------------------------
+// Firestore Security Rules (Full File)
+// -------------------------------------
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ----------------------------
+    // TEAM USER WHITELIST
+    // ----------------------------
+    function isValidUser(userId) {
+      return userId in [
+        "adamb",
+        "adamj",
+        "chrisb",
+        "derekn",
+        "jamiew",
+        "jom",
+        "lawriec",
+        "paule",
+        "steveh"
+      ];
+    }
+
+    // ----------------------------
+    // USERS COLLECTION (avatars)
+    // ----------------------------
+    match /users/{uid} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ----------------------------
+    // DRINK CHOICES COLLECTION
+    // choices/{userId}
+    // ----------------------------
+    match /choices/{userId} {
+
+      // Results page & dashboard require public read
+      allow read: if true;
+
+      // Write rules:
+      //  - Document ID must be one of the known team members
+      //  - Incoming data must contain ONLY the allowed fields
+      //  - No authentication required for this app
+      allow write: if isValidUser(userId)
+                   && request.resource.data.keys().hasOnly([
+                        "drinks", "snacks", "total", "hasSubmitted"
+                      ]);
+    }
+
+    // ----------------------------
+    // VOTING COLLECTION
+    // votes/{userId}
+    // ----------------------------
+    match /votes/{userId} {
+
+      allow read: if true;
+
+      // Allow writes when:
+      //  - userId is within TEAM list
+      //  - body contains only valid QIDs (matching your VOTING_QUESTIONS)
+      allow write: if isValidUser(userId)
+                   && request.resource.data.keys().hasOnly([
+                        "firstHome",
+                        "lastStanding",
+                        "mostDrunk",
+                        "mostAlcohol",
+                        "ninjaExit"
+                      ]);
+    }
+  }
+}
