@@ -6,19 +6,18 @@ import {
   getDocs,
   serverTimestamp,
   writeBatch
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
 import { TEAM } from "./team.js";
 
 const MAX_BUDGET_PER_PERSON = 20;
-const TOTAL_KITTY = 200;
+const TOTAL_USERS = Object.keys(TEAM).length;
+const MAX_KITTY = TOTAL_USERS * MAX_BUDGET_PER_PERSON;
 
 const submissionRows = document.getElementById("submissionRows");
 const peopleAccordion = document.getElementById("peopleAccordion");
 const itemTotalsList = document.getElementById("itemTotalsList");
-const kittyBar = document.getElementById("kittyBar");
-const kittyText = document.getElementById("kittyText");
 const hardResetTrigger = document.getElementById("hardResetTrigger");
 const hardResetModal = document.getElementById("hardResetModal");
 const confirmHardResetButton = document.getElementById("confirmHardReset");
@@ -305,26 +304,26 @@ function renderItemTotals(totalsMap) {
   });
 }
 
-function updateKittyBar(spent) {
-  if (!kittyText) return;
-  const remaining = TOTAL_KITTY - spent;
-  const previousText = kittyText.innerText;
+async function loadKitty() {
+  const kittyTotalEl = document.getElementById("kittyTotal");
+  if (!kittyTotalEl) return;
 
-  kittyText.innerText = `Kitty: £${TOTAL_KITTY.toFixed(2)} | Spent: £${spent.toFixed(2)} | Left: £${remaining.toFixed(2)}`;
+  const snap = await getDocs(collection(db, "choices"));
 
-  kittyText.classList.remove("kitty-warn", "kitty-over");
-  if (remaining < 0) {
-    kittyText.classList.add("kitty-over");
-  } else if (remaining < TOTAL_KITTY * 0.25) {
-    kittyText.classList.add("kitty-warn");
-  }
+  let totalUsed = 0;
 
-  if (kittyBar && kittyText.innerText !== previousText) {
-    kittyBar.classList.remove("updated");
-    // Force reflow to replay animation
-    void kittyBar.offsetWidth;
-    kittyBar.classList.add("updated");
-  }
+  snap.forEach((docSnap) => {
+    const userId = docSnap.id;
+    if (!TEAM[userId]) return;
+
+    const data = docSnap.data();
+    const spend = Number(data.totalSpend) || 0;
+    totalUsed += spend;
+  });
+
+  const remainingKitty = MAX_KITTY - totalUsed;
+
+  kittyTotalEl.textContent = `£${remainingKitty.toFixed(2)}`;
 }
 
 function toggleResetModal(show) {
@@ -406,8 +405,8 @@ async function performHardReset() {
     kittyRef,
     {
       totalSpent: 0,
-      kittyBudget: TOTAL_KITTY,
-      remainingBudget: TOTAL_KITTY,
+      kittyBudget: MAX_KITTY,
+      remainingBudget: MAX_KITTY,
       itemTotals: {},
       updatedAt: serverTimestamp()
     },
@@ -454,12 +453,6 @@ function renderDashboard(people) {
   renderSubmissionOverview(people);
   renderPeopleBreakdown(people);
   renderItemTotals(aggregateItems(people));
-
-  const spent = people
-    .filter((person) => person.hasSubmitted)
-    .reduce((sum, person) => sum + (Number(person.totalSpend) || 0), 0);
-
-  updateKittyBar(Number.isFinite(spent) ? spent : 0);
 }
 
 async function loadDashboard() {
@@ -478,6 +471,7 @@ async function loadDashboard() {
 
     snap.forEach((docSnapshot) => {
       const id = docSnapshot.id;
+      if (!TEAM[id]) return;
       const user = TEAM[id];
       const data = docSnapshot.data();
 
@@ -485,6 +479,7 @@ async function loadDashboard() {
     });
 
     renderDashboard(people);
+    await loadKitty();
   } catch (error) {
     console.error("Unable to load dashboard", error);
     if (submissionRows) {
