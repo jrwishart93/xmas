@@ -2996,6 +2996,11 @@ body.results-page {
     inset 0 1px 1px rgba(255, 255, 255, 0.24);
 }
 
+.result-row--joint-leader {
+  border-color: rgba(255, 198, 109, 0.6);
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.18), rgba(255, 198, 109, 0.1));
+}
+
 .result-row--leader .avatar {
   --avatar-size-base: 60px;
   box-shadow:
@@ -3009,6 +3014,19 @@ body.results-page {
   display: inline-flex;
   margin-right: 6px;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
+.result-row__joint-label {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 4px 10px;
+  background: rgba(255, 198, 109, 0.22);
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #ffde9a;
+  border: 1px solid rgba(255, 198, 109, 0.5);
 }
 
 .result-row--leader .avatar-name__label {

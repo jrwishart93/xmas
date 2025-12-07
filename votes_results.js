@@ -130,6 +130,8 @@ function renderTallies() {
     const ul = document.createElement("ul");
 
     const sortedAnswers = Object.entries(answers).sort((a, b) => b[1] - a[1]);
+    const topCount = sortedAnswers[0]?.[1] ?? 0;
+    const jointLeaders = sortedAnswers.filter(([, count]) => count === topCount && count > 0);
     const totalVotesForQuestion = sortedAnswers.reduce((acc, [, count]) => acc + count, 0);
     const totalLabel = totalVotesForQuestion === 1 ? "vote" : "votes";
 
@@ -140,13 +142,16 @@ function renderTallies() {
       ul.appendChild(emptyItem);
     } else {
       hasVotes = true;
-      sortedAnswers.forEach(([uid, count], index) => {
+      sortedAnswers.forEach(([uid, count]) => {
         const li = document.createElement("li");
         li.className = "result-row";
-        const isLeader = index === 0;
+        const isLeader = count === topCount && topCount > 0;
 
         if (isLeader) {
           li.classList.add("result-row--leader");
+          if (jointLeaders.length > 1) {
+            li.classList.add("result-row--joint-leader");
+          }
         }
 
         const name = getDisplayName(uid);
@@ -161,8 +166,15 @@ function renderTallies() {
           const badge = document.createElement("span");
           badge.className = "result-row__medal";
           badge.setAttribute("aria-hidden", "true");
-          badge.textContent = "🏆";
+          badge.textContent = jointLeaders.length > 1 ? "🤝" : "🏆";
           avatarName.prepend(badge);
+
+          if (jointLeaders.length > 1) {
+            const jointLabel = document.createElement("span");
+            jointLabel.className = "result-row__joint-label";
+            jointLabel.textContent = "Joint top";
+            avatarName.appendChild(jointLabel);
+          }
         }
 
         const countBadge = document.createElement("span");
