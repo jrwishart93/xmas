@@ -123,6 +123,7 @@ function selectAvatarCard(card) {
     selectedUserId = userId;
     selectedUserName = card.dataset.userName;
 
+    sessionStorage.setItem('loggedInUser', userId);
     sessionStorage.setItem('selectedUser', userId);
     sessionStorage.setItem('selectedUserId', userId);
     sessionStorage.setItem('selectedUserName', selectedUserName || '');

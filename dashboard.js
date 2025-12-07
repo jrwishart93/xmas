@@ -6,7 +6,7 @@ import {
   getDocs,
   serverTimestamp,
   writeBatch
-} from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
 import { TEAM } from "./team.js";
