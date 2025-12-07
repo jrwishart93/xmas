@@ -2,7 +2,7 @@ import { renderMenu } from "./src/ui/renderMenu.js";
 import { attachTotalHandler } from "./src/ui/updateTotals.js";
 import { resetUserSelections } from "./src/data/resetChoices.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
-import { TEAM, normaliseTeamId } from "./team.js";
+import { TEAM, normaliseTeamId, toLegacyId } from "./team.js";
 import {
   loadUserChoices,
   listenToUserChoices,
@@ -35,7 +35,8 @@ sessionStorage.setItem("loggedInUser", userId);
 let latestTotals = { total: 0, selections: [], remaining: MAX_BUDGET };
 let recalcTotals = () => {};
 let currentUserId = userId || sessionStorage.getItem("selectedUserId") || "";
-let currentLegacyId = sessionStorage.getItem("selectedUserLegacyId") || "";
+let currentLegacyId =
+  sessionStorage.getItem("selectedUserLegacyId") || toLegacyId(currentUserId) || "";
 let currentUserName =
   sessionStorage.getItem("selectedUserName") || TEAM[userId]?.name || "";
 let menuSections = [];
@@ -321,12 +322,14 @@ const handleSelectionsUpdate = (data) => {
 const subscribeToUserChoices = (userId) => {
   if (!userId) return;
 
+  const firestoreUserId = toLegacyId(userId);
+
   if (typeof unsubscribeFromChoices === "function") {
     unsubscribeFromChoices();
   }
 
   unsubscribeFromChoices = listenToUserChoices(
-    userId,
+    firestoreUserId,
     (data) => {
       if (!data) {
         handleSelectionsUpdate(null);
@@ -341,7 +344,8 @@ const subscribeToUserChoices = (userId) => {
 };
 
 async function fetchExistingSelections(userId) {
-  return loadUserChoices(userId);
+  const firestoreUserId = toLegacyId(userId);
+  return loadUserChoices(firestoreUserId);
 }
 
 async function init() {
@@ -389,7 +393,12 @@ const handleResetChoices = async () => {
 
   try {
     const zeroSelections = buildZeroedSelections();
-    await resetUserSelections(currentUserId, zeroSelections, currentLegacyId);
+    const firestoreUserId = toLegacyId(currentUserId || currentLegacyId);
+    await resetUserSelections(
+      firestoreUserId,
+      zeroSelections,
+      currentLegacyId || firestoreUserId
+    );
     setResetStatus("Your choices have been reset.", "success");
     setStatus("All choices cleared. Pick again if you like.", "success");
   } catch (err) {
@@ -407,8 +416,10 @@ const handleResetChoices = async () => {
 };
 
 async function submitChoices() {
-  const userId = sessionStorage.getItem("loggedInUser");
-  if (!userId) {
+  const userId = normaliseTeamId(sessionStorage.getItem("loggedInUser"));
+  const firestoreUserId = toLegacyId(userId || currentLegacyId);
+
+  if (!firestoreUserId) {
     alert("No logged-in user.");
     return;
   }
@@ -450,7 +461,7 @@ async function submitChoices() {
   };
 
   try {
-    await saveUserChoices(userId, payload);
+    await saveUserChoices(firestoreUserId, payload);
     setStatus("Choices saved!", "success");
     showSuccessOptions();
   } catch (err) {
@@ -479,7 +490,7 @@ function startChoices() {
   }
 
   if (!currentLegacyId) {
-    currentLegacyId = currentUserId;
+    currentLegacyId = toLegacyId(currentUserId);
   }
 
   renderUserBadge(currentUserName);

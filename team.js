@@ -23,6 +23,14 @@ export const LEGACY_ID_MAP = {
   steveh: "steve_h",
 };
 
+export const TEAM_ID_TO_LEGACY_MAP = Object.entries(LEGACY_ID_MAP).reduce(
+  (acc, [legacyId, teamId]) => {
+    acc[teamId] = legacyId;
+    return acc;
+  },
+  {}
+);
+
 export function getAvatarSrc(memberOrId) {
   if (!memberOrId) return "";
 
@@ -41,6 +49,11 @@ export function normaliseTeamId(id) {
   if (!id) return "";
   if (TEAM[id]) return id;
   return LEGACY_ID_MAP[id] || "";
+}
+
+export function toLegacyId(id) {
+  if (!id) return "";
+  return TEAM_ID_TO_LEGACY_MAP[id] || id;
 }
 
 export const TEAM = {
