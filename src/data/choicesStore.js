@@ -36,7 +36,13 @@ export async function saveUserChoices(userId, payload) {
     throw new Error("Invalid payload when saving choices");
   }
 
-  await setDoc(doc(db, "choices", userId), payload, { merge: true });
+  const body = {
+    ...payload,
+    submitted: true,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await setDoc(doc(db, "choices", userId), body, { merge: true });
 }
 
 /**

@@ -57,6 +57,7 @@ export async function saveUserSelections(
     name: userName || userId,
     legacyId,
     admin: Boolean(isAdmin),
+    submitted: true,
     updatedAt: new Date().toISOString()
   };
 

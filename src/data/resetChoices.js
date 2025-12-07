@@ -37,6 +37,7 @@ export async function resetUserSelections(
     selections: sanitizedSelections,
     totalSpend: 0,
     legacyId,
+    submitted: false,
     updatedAt: new Date().toISOString(),
   });
 }
