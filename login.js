@@ -34,6 +34,7 @@ function scrollToPinAndFocus() {
 
     focusTimeoutId = setTimeout(() => {
         pinInput.focus({ preventScroll: true });
+        pinInput.select();
     }, prefersReducedMotion ? 0 : 400);
 }
 
@@ -117,10 +118,9 @@ function selectAvatarCard(card) {
         loginForm.dataset.selectedUserName = selectedUserName;
     }
 
-    const isNewSelection = userId !== lastSelectedUserId;
     lastSelectedUserId = userId;
 
-    highlightPinArea(isNewSelection);
+    highlightPinArea(true);
 
     setLoginError('');
     setPinErrorState(false);
