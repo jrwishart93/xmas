@@ -1,141 +1,88 @@
 import { TEAM } from "./team.js";
 import { VOTING_QUESTIONS } from "./src/data/votingQuestions.js";
-import { createAvatarName } from "./src/utils/avatarMap.js";
 import { db } from "./firebase.js";
 import { collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
 const userId = sessionStorage.getItem("loggedInUser");
 if (!userId) location.href = "index.html";
 
-const questionsContainer = document.getElementById("voteQuestions");
-const voteSelections = {};
+const QUESTIONS = VOTING_QUESTIONS.map(({ id, question, icon }) => ({
+  id,
+  label: question,
+  image: icon
+}));
 
-function buildQuestionSection({ id, question, icon, alt }) {
-  const section = document.createElement("section");
-  section.className = "vote-question vote-card";
-  section.dataset.questionId = id;
+const questionsContainer = document.getElementById("questionsContainer");
+const votesState = {}; // { questionId: userId }
 
-  const selectId = `select-${id}`;
-  section.innerHTML = `
-    <h2>${question}</h2>
-    <div class="question-art">
-      <img src="${icon}" alt="${alt || ""}" class="vote-question-image" />
-    </div>
-    <div class="vote-avatar-grid" data-question-id="${id}"></div>
-    <label class="sr-only" for="${selectId}">Select a person for ${question}</label>
-    <select id="${selectId}" class="vote-select" data-question-id="${id}" hidden>
-      <option value="">Select a person…</option>
-    </select>
-  `;
+function handleVoteClick(questionId, userId, chip, strip) {
+  votesState[questionId] = userId;
 
-  return section;
-}
-
-if (questionsContainer) {
-  VOTING_QUESTIONS.forEach((question) => {
-    questionsContainer.appendChild(buildQuestionSection(question));
+  strip.querySelectorAll(".vote-avatar-chip.selected").forEach((el) => {
+    el.classList.remove("selected");
   });
-}
 
-const questionGrids = document.querySelectorAll(".vote-avatar-grid");
-const voteSelects = document.querySelectorAll(".vote-select");
+  chip.classList.add("selected");
 
-voteSelects.forEach((sel) => {
-  Object.entries(TEAM).forEach(([id, user]) => {
-    const opt = document.createElement("option");
-    opt.value = id;
-    opt.textContent = user.name;
-    sel.appendChild(opt);
-  });
-});
-
-function updateGridSelection(questionId, userId) {
-  const gridEl = document.querySelector(
-    `.vote-avatar-grid[data-question-id="${questionId}"]`
+  const label = document.querySelector(
+    `.vote-selected-label[data-selected-label="${questionId}"]`
   );
-
-  if (!gridEl) return;
-
-  gridEl.querySelectorAll(".vote-avatar-card").forEach((card) => {
-    const isSelected = card.dataset.userId === userId;
-    card.classList.toggle("selected", isSelected);
-    card.setAttribute("aria-pressed", String(isSelected));
-  });
+  const userName = TEAM[userId]?.name || userId;
+  if (label) {
+    label.textContent = `You’ve picked ${userName} for this question.`;
+  }
 }
 
-function setSelection(questionId, userId) {
-  if (userId) {
-    voteSelections[questionId] = userId;
-  } else {
-    delete voteSelections[questionId];
-  }
+function renderQuestions() {
+  if (!questionsContainer) return;
+  questionsContainer.innerHTML = "";
 
-  const selectEl = document.querySelector(
-    `.vote-select[data-question-id="${questionId}"]`
-  );
+  QUESTIONS.forEach((q) => {
+    const card = document.createElement("article");
+    card.className = "vote-question-card";
+    card.dataset.questionId = q.id;
 
-  if (selectEl) {
-    selectEl.value = userId || "";
-  }
+    card.innerHTML = `
+      <h2 class="vote-question-title">${q.label}</h2>
+      <div class="vote-question-image">
+        <img src="${q.image}" alt="${q.label}" />
+      </div>
+      <div class="avatar-strip" data-question-id="${q.id}"></div>
+      <p class="vote-selected-label" data-selected-label="${q.id}">
+        Tap a face to vote.
+      </p>
+    `;
 
-  updateGridSelection(questionId, userId);
-}
+    questionsContainer.appendChild(card);
 
-function renderAvatarGrid(gridEl) {
-  const questionId = gridEl.dataset.questionId;
-  gridEl.innerHTML = "";
+    const strip = card.querySelector(".avatar-strip");
+    if (!strip) return;
 
-  Object.entries(TEAM).forEach(([id, user]) => {
-    const card = document.createElement("button");
-    card.type = "button";
-    card.className = "vote-avatar-card";
-    card.dataset.userId = id;
-    card.setAttribute("aria-pressed", "false");
+    Object.entries(TEAM).forEach(([id, user]) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "vote-avatar-chip";
+      chip.dataset.userId = id;
+      chip.setAttribute("aria-label", `${q.label} – vote for ${user.name}`);
 
-    let avatarEl;
-    if (user.image) {
-      avatarEl = document.createElement("img");
-      avatarEl.src = user.image;
-      avatarEl.alt = user.name;
-      avatarEl.loading = "lazy";
-    } else {
-      const avatarWrapper = createAvatarName(user.name, 56, { image: user.image });
-      avatarWrapper.querySelector(".avatar-name__label")?.remove();
-      avatarEl = avatarWrapper.querySelector(".avatar") || avatarWrapper;
-    }
+      chip.innerHTML = `
+        <img src="${user.image}" alt="${user.name}" />
+        <span>${user.name}</span>
+      `;
 
-    const label = document.createElement("span");
-    label.className = "vote-avatar-name";
-    label.textContent = user.name;
+      chip.addEventListener("click", () => handleVoteClick(q.id, id, chip, strip));
 
-    card.append(avatarEl, label);
-
-    card.addEventListener("click", () => {
-      setSelection(questionId, id);
+      strip.appendChild(chip);
     });
-
-    gridEl.append(card);
   });
 }
-
-questionGrids.forEach(renderAvatarGrid);
-
-voteSelects.forEach((sel) => {
-  sel.addEventListener("change", () => {
-    const qid = sel.dataset.questionId;
-    const value = sel.value;
-    setSelection(qid, value);
-  });
-});
 
 const submitVotesBtn = document.getElementById("submitVotes");
 
 submitVotesBtn?.addEventListener("click", async () => {
   const voterId = sessionStorage.getItem("loggedInUser");
 
-  const requiredQuestions = VOTING_QUESTIONS.map(({ id }) => id);
-
-  const missing = requiredQuestions.filter((qId) => !voteSelections[qId]);
+  const missing = QUESTIONS.filter((q) => !votesState[q.id]);
   if (missing.length) {
     alert("Please choose someone for every question before submitting.");
     return;
@@ -148,7 +95,7 @@ submitVotesBtn?.addEventListener("click", async () => {
     const ref = doc(collection(db, "votes"), voterId);
     await setDoc(ref, {
       voterId,
-      answers: { ...voteSelections },
+      answers: { ...votesState },
       submittedAt: Date.now()
     });
 
@@ -160,4 +107,8 @@ submitVotesBtn?.addEventListener("click", async () => {
     submitVotesBtn.disabled = false;
     submitVotesBtn.textContent = "Submit votes";
   }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderQuestions();
 });
