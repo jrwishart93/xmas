@@ -7,7 +7,7 @@ import {
   writeBatch
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
-import { TEAM, normaliseTeamId } from "./team.js";
+import { TEAM, getAvatarSrc, normaliseTeamId } from "./team.js";
 
 const MAX_BUDGET_PER_PERSON = 20;
 const TOTAL_USERS = 9; // Ensure kitty calculation and team mapping stay in sync
@@ -134,10 +134,12 @@ async function renderCombinedDashboard(usersData, choicesData) {
     const choice = choicesData[uid] || null;
     const hasSubmitted = !!choice;
 
+    const teamMember = usersData[uid];
+
     return {
       uid,
-      name: usersData[uid].name,
-      avatar: `/public/${uid}.png`,
+      name: teamMember.name,
+      avatar: teamMember.avatar || getAvatarSrc(uid),
       hasSubmitted,
       total: hasSubmitted ? choice.totalPrice.toFixed(2) : "0.00",
       drinks: hasSubmitted ? choice.drinks.length : 0,
