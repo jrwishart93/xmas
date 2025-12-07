@@ -45,7 +45,12 @@ service cloud.firestore {
       //  - No authentication required for this app
       allow write: if isValidUser(userId)
                    && request.resource.data.keys().hasOnly([
-                        "drinks", "snacks", "total", "hasSubmitted"
+                        // Menu selections and totals
+                        "choices", "selections", "totalSpend",
+                        // User metadata
+                        "name", "legacyId", "admin",
+                        // Status and timestamps
+                        "submitted", "timestamp", "updatedAt"
                       ]);
     }
 
