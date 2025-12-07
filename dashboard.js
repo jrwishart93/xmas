@@ -7,15 +7,13 @@ import {
   writeBatch
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
-import { createAvatarName } from "./src/utils/avatarMap.js";
 import { TEAM, normaliseTeamId } from "./team.js";
 
 const MAX_BUDGET_PER_PERSON = 20;
 const TOTAL_USERS = 9; // Ensure kitty calculation and team mapping stay in sync
 const MAX_KITTY = TOTAL_USERS * MAX_BUDGET_PER_PERSON;
 
-const submissionRows = document.getElementById("submissionRows");
-const peopleAccordion = document.getElementById("peopleAccordion");
+const submissionList = document.getElementById("submissionList");
 const itemTotalsList = document.getElementById("itemTotalsList");
 const hardResetTrigger = document.getElementById("hardResetTrigger");
 const hardResetModal = document.getElementById("hardResetModal");
@@ -125,144 +123,48 @@ function summarisePerson(docId, data, user, categoryMap) {
   };
 }
 
-function renderSubmissionOverview(people) {
-  if (!submissionRows) return;
-  submissionRows.innerHTML = "";
+async function renderCombinedDashboard(usersData, choicesData) {
+  const container = submissionList;
+  if (!container) return;
 
-  if (!people.length) {
-    submissionRows.innerHTML = '<p class="muted-text">No submissions yet.</p>';
-    return;
-  }
+  container.innerHTML = "";
 
-  const sorted = [...people].sort((a, b) => a.name.localeCompare(b.name));
-  sorted.forEach((person) => {
-    const row = document.createElement("div");
-    row.className = "submission-row";
-    row.style.animation = "fadeSlideIn 0.3s ease forwards";
+  const list = Object.keys(usersData).map((uid) => {
+    const choice = choicesData[uid] || null;
+    const hasSubmitted = !!choice;
 
-    const nameEl = createAvatarName(person.name, 34, {
-      image: person.avatar,
-      status: person.hasSubmitted ? "submitted" : "pending",
-      overBudget: person.isOverBudget
-    });
-    nameEl.classList.add("name");
-
-    const status = document.createElement("span");
-    status.className = `status-pill ${person.hasSubmitted ? "submitted" : "pending"}`;
-    status.textContent = person.hasSubmitted ? "Submitted" : "Not submitted yet";
-
-    row.append(nameEl, status);
-    submissionRows.append(row);
-  });
-}
-
-function toggleAccordion(content, header) {
-  const isOpen = content.classList.contains("open");
-
-  document.querySelectorAll(".accordion-content.open").forEach((panel) => {
-    panel.classList.remove("open");
-    panel.style.maxHeight = null;
-    panel.style.opacity = "0";
-    panel.style.transition = "max-height 0.3s ease, opacity 0.3s ease";
+    return {
+      uid,
+      name: usersData[uid].name,
+      avatar: `/public/${uid}.png`,
+      hasSubmitted,
+      total: hasSubmitted ? choice.totalPrice.toFixed(2) : "0.00",
+      drinks: hasSubmitted ? choice.drinks.length : 0,
+      snacks: hasSubmitted ? choice.snacks.length : 0
+    };
   });
 
-  document.querySelectorAll(".accordion-header.active").forEach((btn) => {
-    btn.classList.remove("active");
-  });
+  // Sort: submitted users first
+  list.sort((a, b) => Number(b.hasSubmitted) - Number(a.hasSubmitted));
 
-  content.style.transition = "max-height 0.3s ease, opacity 0.3s ease";
-  content.style.opacity = isOpen ? "0" : "1";
+  list.forEach((user) => {
+    const card = document.createElement("div");
+    card.className = "submission-card";
 
-  if (!isOpen) {
-    content.classList.add("open");
-    content.style.maxHeight = content.scrollHeight + "px";
-    header.classList.add("active");
-  }
-}
+    card.innerHTML = `
+      <div class="submission-left">
+        <img src="${user.avatar}" class="submission-avatar" alt="${user.name} avatar" />
+        <div>
+          <div class="submission-name">${user.name}</div>
+          <div class="submission-meta">£${user.total} • ${user.drinks} drinks • ${user.snacks} snacks</div>
+        </div>
+      </div>
+      <span class="submission-status ${user.hasSubmitted ? "status-submitted" : "status-pending"}">
+        ${user.hasSubmitted ? "SUBMITTED" : "NOT SUBMITTED"}
+      </span>
+    `;
 
-function renderPeopleBreakdown(people) {
-  if (!peopleAccordion) return;
-  peopleAccordion.innerHTML = "";
-
-  if (!people.length) {
-    peopleAccordion.innerHTML = '<p class="muted-text">No selections found.</p>';
-    return;
-  }
-
-  const sorted = [...people].sort((a, b) => a.name.localeCompare(b.name));
-  sorted.forEach((person) => {
-    const item = document.createElement("div");
-    item.className = `accordion-item ${person.hasSubmitted ? "is-submitted" : "is-pending"}`;
-    item.style.animation = "fadeSlideIn 0.3s ease forwards";
-
-    const header = document.createElement("button");
-    header.className = "accordion-header";
-    header.type = "button";
-
-    const title = document.createElement("div");
-    title.className = "accordion-title";
-
-    const personLabel = createAvatarName(person.name, 42, {
-      image: person.avatar,
-      status: person.hasSubmitted ? "submitted" : "pending",
-      overBudget: person.isOverBudget
-    });
-    personLabel.classList.add("name");
-
-    const total = document.createElement("span");
-    total.className = "person-total";
-    total.textContent = currency.format(person.totalSpend);
-
-    const statusBadge = document.createElement("span");
-    statusBadge.className = `status-pill ${person.hasSubmitted ? "submitted" : "pending"}`;
-    statusBadge.textContent = person.hasSubmitted ? "Submitted" : "Not submitted yet";
-
-    const headerMeta = document.createElement("div");
-    headerMeta.className = "meta";
-    headerMeta.textContent = `${person.drinkCount} drinks • ${person.snackCount} snacks`;
-
-    const headerGrid = document.createElement("div");
-    headerGrid.className = "accordion-header__grid";
-    headerGrid.append(personLabel, total, statusBadge);
-
-    title.append(headerGrid, headerMeta);
-
-    header.append(title);
-
-    const content = document.createElement("div");
-    content.className = "accordion-content";
-
-    const lines = person.selections.filter((sel) => (Number(sel.qty) || 0) > 0);
-    if (!lines.length) {
-      const empty = document.createElement("div");
-      empty.className = "line";
-      empty.textContent = "No selections yet.";
-      empty.style.animation = "fadeSlideIn 0.3s ease forwards";
-      content.append(empty);
-    } else {
-      lines.forEach((sel) => {
-        const line = document.createElement("div");
-        line.className = "line";
-        line.style.animation = "fadeSlideIn 0.3s ease forwards";
-        const lineTotal = (Number(sel.qty) || 0) * (Number(sel.price) || 0);
-
-        const itemLabel = document.createElement("span");
-        itemLabel.className = "line__label";
-        itemLabel.textContent = `${sel.name} ×${sel.qty}`;
-
-        const itemTotal = document.createElement("span");
-        itemTotal.className = "line__total";
-        itemTotal.textContent = currency.format(lineTotal);
-
-        line.append(itemLabel, itemTotal);
-        content.append(line);
-      });
-    }
-
-    header.addEventListener("click", () => toggleAccordion(content, header));
-
-    item.append(header, content);
-    peopleAccordion.append(item);
+    container.appendChild(card);
   });
 }
 
@@ -437,9 +339,8 @@ async function handleHardReset() {
   }
 }
 
-function renderDashboard(people) {
-  renderSubmissionOverview(people);
-  renderPeopleBreakdown(people);
+function renderDashboard(people, choices) {
+  renderCombinedDashboard(TEAM, choices);
   renderItemTotals(aggregateItems(people));
 }
 
@@ -455,7 +356,8 @@ async function loadDashboardData() {
     console.warn("Menu failed to load", err);
   }
 
-  const result = [];
+  const people = [];
+  const choices = {};
 
   snap.forEach((docSnap) => {
     const id = normaliseTeamId(docSnap.id);
@@ -464,22 +366,42 @@ async function loadDashboardData() {
     const entry = docSnap.data();
     const normalised = normalizeSelections(entry.choices || entry.selections);
 
-    result.push(
-      summarisePerson(
-        id,
-        {
-          ...entry,
-          totalSpend: Number(entry.totalSpend) || 0,
-          choices: normalised,
-          selections: normalised
-        },
-        TEAM[id],
-        categoryMap
-      )
+    const summary = summarisePerson(
+      id,
+      {
+        ...entry,
+        totalSpend: Number(entry.totalSpend) || 0,
+        choices: normalised,
+        selections: normalised
+      },
+      TEAM[id],
+      categoryMap
     );
+
+    const drinks = [];
+    const snacks = [];
+
+    normalised.forEach((sel) => {
+      const qty = Number(sel.qty) || 0;
+      if (qty <= 0) return;
+
+      const category = categoryMap.get(sel.name);
+      const bucket = SNACK_CATEGORIES.has(category) ? snacks : drinks;
+      bucket.push(sel);
+    });
+
+    if (summary.hasSubmitted) {
+      choices[id] = {
+        totalPrice: summary.totalSpend,
+        drinks,
+        snacks
+      };
+    }
+
+    people.push(summary);
   });
 
-  return result;
+  return { people, choices };
 }
 
 hardResetTrigger?.addEventListener("click", () => {
@@ -503,8 +425,8 @@ async function startDashboard() {
   evaluateAdminAccess();
 
   try {
-    const people = await loadDashboardData();
-    renderDashboard(people);
+    const { people, choices } = await loadDashboardData();
+    renderDashboard(people, choices);
     await loadKitty();
   } catch (err) {
     console.error("Dashboard failed", err);
