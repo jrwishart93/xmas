@@ -1,4 +1,4 @@
-import { auth, db } from "./firebase.js";
+import { db } from "./firebase.js";
 import {
   collection,
   doc,
@@ -8,7 +8,6 @@ import {
   serverTimestamp,
   writeBatch
 } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
 
@@ -40,7 +39,8 @@ const ADMIN_IDS = new Set(["derek", "lawrie", "admin"]);
 const RESET_TOKEN = "RESET";
 
 let isAdminUser = false;
-let currentUserId = "";
+let currentUserId =
+  localStorage.getItem("xmasUser") || localStorage.getItem("currentUser") || "";
 const legacyUserId = localStorage.getItem("xmasUserLegacyId") || "";
 const cachedAdminFlag = localStorage.getItem("xmasUserIsAdmin") === "true";
 let hasLoadedDashboard = false;
@@ -520,20 +520,20 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    window.location.href = "index.html";
+function startDashboard() {
+  if (!currentUserId) {
+    currentUserId = "";
+  }
+
+  if (hasLoadedDashboard) {
+    evaluateAdminAccess();
     return;
   }
 
-  currentUserId = user.uid;
-  localStorage.setItem("xmasUser", currentUserId);
-  localStorage.setItem("currentUser", currentUserId);
-
-  if (hasLoadedDashboard) return;
   hasLoadedDashboard = true;
-
   evaluateAdminAccess();
   loadDashboard();
-});
+}
+
+startDashboard();
 

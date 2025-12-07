@@ -3,8 +3,7 @@ import { attachTotalHandler } from "./src/ui/updateTotals.js";
 import { saveUserSelections } from "./src/data/saveChoices.js";
 import { resetUserSelections } from "./src/data/resetChoices.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
-import { auth, db } from "./firebase.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
+import { db } from "./firebase.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
 const MAX_BUDGET = 20;
@@ -24,7 +23,8 @@ const userBadge = document.getElementById("userBadge");
 
 let latestTotals = { total: 0, selections: [], remaining: MAX_BUDGET };
 let recalcTotals = () => {};
-let currentUserId = "";
+let currentUserId =
+  localStorage.getItem("xmasUser") || localStorage.getItem("currentUser") || "";
 let currentLegacyId = localStorage.getItem("xmasUserLegacyId") || "";
 let currentUserName = localStorage.getItem("xmasUserName") || "";
 let menuSections = [];
@@ -315,13 +315,9 @@ const handleResetChoices = async () => {
 
 submitButton.addEventListener("click", async () => {
   if (!currentUserId) {
-    const activeUid = auth.currentUser?.uid;
-    if (!activeUid) {
-      setStatus("Your session expired. Please log in again.", "error");
-      window.location.href = "index.html";
-      return;
-    }
-    currentUserId = activeUid;
+    setStatus("Please start from the name selection screen.", "error");
+    window.location.href = "index.html";
+    return;
   }
 
   const { total, selections, remaining } = latestTotals;
@@ -373,24 +369,26 @@ submitButton.addEventListener("click", async () => {
 
 resetButton?.addEventListener("click", handleResetChoices);
 
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
+function startChoices() {
+  if (!currentUserId) {
     window.location.href = "index.html";
     return;
   }
-
-  currentUserId = user.uid;
-  localStorage.setItem("xmasUser", currentUserId);
-  localStorage.setItem("currentUser", currentUserId);
-
-  if (hasInitialised) return;
-  hasInitialised = true;
 
   if (!currentUserName) {
     currentUserName =
       localStorage.getItem("xmasUserName") || currentLegacyId || currentUserId;
   }
 
+  if (!currentLegacyId) {
+    currentLegacyId = currentUserId;
+  }
+
   renderUserBadge(currentUserName);
+
+  if (hasInitialised) return;
+  hasInitialised = true;
   init();
-});
+}
+
+startChoices();
