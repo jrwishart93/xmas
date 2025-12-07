@@ -110,9 +110,14 @@ function renderTallies() {
       ul.appendChild(emptyItem);
     } else {
       hasVotes = true;
-      sortedAnswers.forEach(([uid, count]) => {
+      sortedAnswers.forEach(([uid, count], index) => {
         const li = document.createElement("li");
         li.className = "result-row";
+        const isLeader = index === 0;
+
+        if (isLeader) {
+          li.classList.add("result-row--leader");
+        }
 
         const name = getDisplayName(uid);
         const avatar = participants[uid]?.avatar || participants[uid]?.avatarUrl || getAvatarSrc(uid);
@@ -121,8 +126,16 @@ function renderTallies() {
           : avatar
             ? `/${avatar.replace(/^\//, "")}`
             : undefined;
-        const avatarName = createAvatarName(name, 42, { image: resolvedAvatar });
+        const avatarName = createAvatarName(name, isLeader ? 60 : 42, { image: resolvedAvatar });
         avatarName.classList.add("result-row__identity");
+
+        if (isLeader) {
+          const badge = document.createElement("span");
+          badge.className = "result-row__medal";
+          badge.setAttribute("aria-hidden", "true");
+          badge.textContent = "🏆";
+          avatarName.prepend(badge);
+        }
 
         const countBadge = document.createElement("span");
         countBadge.className = "result-row__count";
