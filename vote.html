@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Christmas Predictions — Cast Your Vote</title>
+  <link rel="stylesheet" href="public/style.css" />
+</head>
+<body class="vote-page">
+  <div class="snowfall"></div>
+  <main class="vote-container" role="main">
+    <nav class="vote-nav" aria-label="Breadcrumb">
+      <a href="dashboard.html" class="back-link">← Back to dashboard</a>
+    </nav>
+
+    <header class="vote-header">
+      <p class="eyebrow">Christmas Predictions</p>
+      <h1>Cast Your Vote</h1>
+      <p class="muted-text">Pick one person for each question below.</p>
+    </header>
+
+    <section class="vote-question" data-qid="first_home">
+      <h2>Who will be the first person to go home?</h2>
+      <img src="public/vote_icons/first_home.png" alt="" class="vote-icon" />
+      <label class="sr-only" for="select-first_home">Select a person for first person to go home</label>
+      <select id="select-first_home" class="vote-select">
+        <option value="">Select a person…</option>
+      </select>
+    </section>
+
+    <section class="vote-question" data-qid="last_standing">
+      <h2>Who will be the last one standing?</h2>
+      <img src="public/vote_icons/last_standing.png" alt="" class="vote-icon" />
+      <label class="sr-only" for="select-last_standing">Select a person for last one standing</label>
+      <select id="select-last_standing" class="vote-select">
+        <option value="">Select a person…</option>
+      </select>
+    </section>
+
+    <section class="vote-question" data-qid="most_drunk">
+      <h2>Who will be the most drunk?</h2>
+      <img src="public/vote_icons/most_drunk.png" alt="" class="vote-icon" />
+      <label class="sr-only" for="select-most_drunk">Select a person for most drunk</label>
+      <select id="select-most_drunk" class="vote-select">
+        <option value="">Select a person…</option>
+      </select>
+    </section>
+
+    <section class="vote-question" data-qid="most_alcohol">
+      <h2>Who will consume the most alcohol?</h2>
+      <img src="public/vote_icons/most_alcohol.png" alt="" class="vote-icon" />
+      <label class="sr-only" for="select-most_alcohol">Select a person for most alcohol</label>
+      <select id="select-most_alcohol" class="vote-select">
+        <option value="">Select a person…</option>
+      </select>
+    </section>
+
+    <section class="vote-question" data-qid="irish_exit">
+      <h2>Who will do an Irish exit?</h2>
+      <img src="public/vote_icons/irish_exit.png" alt="" class="vote-icon" />
+      <label class="sr-only" for="select-irish_exit">Select a person for Irish exit</label>
+      <select id="select-irish_exit" class="vote-select">
+        <option value="">Select a person…</option>
+      </select>
+    </section>
+  </main>
+
+  <div class="vote-submit-bar">
+    <button class="submit-xmas-btn" type="button">Submit Votes</button>
+  </div>
+
+  <script>
+    // Create and append snow elements for the animation
+    const snowfallContainer = document.querySelector('.snowfall');
+    if (snowfallContainer) {
+      for (let i = 0; i < 120; i++) {
+        const snow = document.createElement('div');
+        snow.className = 'snow';
+        const size = Math.random() * 4 + 1;
+        snow.style.width = `${size}px`;
+        snow.style.height = `${size}px`;
+        snow.style.left = `${Math.random() * 100}%`;
+        snow.style.animationDuration = `${Math.random() * 5 + 5}s`;
+        snow.style.animationDelay = `${Math.random() * 5}s`;
+        snow.style.opacity = Math.random();
+        snowfallContainer.appendChild(snow);
+      }
+    }
+  </script>
+  <script type="module" src="vote.js"></script>
+</body>
+</html>
