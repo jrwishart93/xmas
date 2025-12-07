@@ -1,9 +1,7 @@
 // src/auth/login.js
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-import { app } from "../firebase/firebaseConfig.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { db } from "../firebase/firebaseConfig.js";
 import { validatePin } from "../utils/validatePin.js";
-
-const db = getFirestore(app);
 
 export async function loginUser(username, pin) {
   // simple validation
