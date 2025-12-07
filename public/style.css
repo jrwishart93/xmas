@@ -2461,153 +2461,96 @@ body.vote-page {
   margin-bottom: 4px;
 }
 
-.vote-question {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  padding: 20px 22px 26px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.35),
-    inset 0 1px 1px rgba(255, 255, 255, 0.08);
+.questions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.vote-question-card {
+  background: rgba(6, 10, 22, 0.9);
+  border-radius: 22px;
+  padding: 18px 18px 16px;
+  margin-bottom: 18px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+}
+
+.vote-question-title {
+  font-size: 1.35rem;
+  line-height: 1.2;
+  margin-bottom: 12px;
   text-align: center;
 }
 
-.vote-card {
-  padding: 1.5rem 1.25rem 1.75rem;
-}
-
-.vote-card h2 {
-  margin-bottom: 0.75rem;
-}
-
-/* Voting illustrations */
-.vote-illustration-wrapper {
-  margin: 1.5rem auto 1rem;
-  max-width: 260px;
+.vote-question-image img {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto 12px;
   border-radius: 24px;
-  padding: 6px;
-  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.1), transparent 55%)
-              , rgba(0, 0, 0, 0.4);
-  box-shadow:
-    0 12px 30px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.04);
   overflow: hidden;
-  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.55);
 }
 
-.vote-illustration-img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: inherit;
-  /* soften the harsh white */
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.6));
+.avatar-strip {
+  display: flex;
+  gap: 10px;
+  padding: 8px 4px 4px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Optional: fade the hard white edges using a mask for modern browsers */
-@supports (-webkit-mask-image: linear-gradient(#000, #000)) {
-  .vote-illustration-img {
-    -webkit-mask-image: radial-gradient(
-      circle at center,
-      #000 60%,
-      rgba(0, 0, 0, 0) 100%
-    );
-    mask-image: radial-gradient(
-      circle at center,
-      #000 60%,
-      rgba(0, 0, 0, 0) 100%
-    );
-  }
-}
-
-/* Slight hover / tap feedback on mobile */
-.vote-card:hover .vote-illustration-wrapper,
-.vote-card:focus-within .vote-illustration-wrapper {
-  transform: translateY(-2px);
-  box-shadow:
-    0 16px 40px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(255, 255, 255, 0.08);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.vote-question h2 {
-  border: none;
-  margin-bottom: 12px;
-}
-
-.question-art {
-  max-width: 280px;
-  margin: 1rem auto 0.25rem;
-}
-
-.vote-question-image {
-  width: 100%;
-  max-width: 260px;
-  display: block;
-  margin: 0 auto 1rem;
-  border-radius: 18px;
-  overflow: hidden;
-  background: radial-gradient(circle at 20% 0%, #ffffff0d, #00000044);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
-}
-
-/* Avatar grid under each question */
-.vote-avatar-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 0.5rem;
-}
-
-/* Individual selectable head */
-.vote-avatar-card {
-  position: relative;
-  padding: 8px 4px 10px;
-  border-radius: 16px;
-  background: rgba(10, 12, 24, 0.85);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.vote-avatar-chip {
+  flex: 0 0 auto;
+  scroll-snap-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: radial-gradient(circle at top, #141927 0, #050814 100%);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
   cursor: pointer;
-  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-width: 64px;
+  transition: transform 0.16s ease, box-shadow 0.16s ease,
+    border-color 0.16s ease, background 0.16s ease;
 }
 
-.vote-avatar-card:hover,
-.vote-avatar-card:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.55);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Avatar image inside card (reuse same size as index) */
-.vote-avatar-card img,
-.vote-avatar-card .avatar {
-  width: 56px;
-  height: 56px;
+.vote-avatar-chip img {
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
   display: block;
+  margin-bottom: 4px;
 }
 
-/* Name label under the head */
-.vote-avatar-name {
-  margin-top: 6px;
-  font-size: 0.72rem;
+.vote-avatar-chip span {
+  font-size: 0.65rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #f7f7ff;
+  white-space: nowrap;
 }
 
-/* Selected state with golden ring + soft glow */
-.vote-avatar-card.selected {
-  border-color: #f9d66b;
-  box-shadow:
-    0 0 0 1px rgba(249, 214, 107, 0.7),
-    0 0 22px rgba(249, 214, 107, 0.45);
+.vote-avatar-chip:hover,
+.vote-avatar-chip:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.75);
+  border-color: rgba(255, 255, 255, 0.28);
+  outline: none;
+}
+
+.vote-avatar-chip.selected {
+  background: linear-gradient(135deg, #facc6b, #ff7a3c);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 2px rgba(5, 8, 20, 0.8), 0 16px 32px rgba(0, 0, 0, 0.8);
+}
+
+.vote-avatar-chip.selected span {
+  color: #101018;
 }
 
 .vote-icon {
@@ -2647,8 +2590,8 @@ body.vote-page {
     max-width: 160px;
   }
 
-  .vote-question {
-    padding: 18px 16px 22px;
+  .vote-question-card {
+    padding: 16px 16px 18px;
   }
 
   .vote-submit-bar {
@@ -2656,9 +2599,6 @@ body.vote-page {
     right: 0;
   }
 
-  .vote-avatar-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 480px) {
@@ -2670,20 +2610,12 @@ body.vote-page {
     gap: 14px;
   }
 
-  .vote-question {
-    padding: 16px 14px 20px;
-  }
-
-  .vote-avatar-card {
-    padding: 10px 6px 12px;
+  .vote-question-card {
+    padding: 14px 14px 18px;
   }
 }
 
 @media (max-width: 360px) {
-  .vote-avatar-grid {
-    grid-template-columns: 1fr;
-  }
-
   .vote-submit-bar {
     padding-inline: 12px;
   }
