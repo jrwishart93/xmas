@@ -24,8 +24,9 @@ async function loadResults() {
 
     snap.forEach(docSnap => {
       const data = docSnap.data();
-      if (!data?.votes) return;
-      for (const [qid, choice] of Object.entries(data.votes)) {
+      const answers = data?.answers || data?.votes;
+      if (!answers) return;
+      for (const [qid, choice] of Object.entries(answers)) {
         if (!tallies[qid]) continue;
         tallies[qid][choice] = (tallies[qid][choice] || 0) + 1;
       }
