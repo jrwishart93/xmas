@@ -1,12 +1,11 @@
-import "../firebase.js";
+import { db } from "./firebase.js";
 import {
   collection,
   getDocs,
   doc,
-  getFirestore,
   serverTimestamp,
   writeBatch
-} from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
 import { TEAM } from "./team.js";
@@ -317,8 +316,7 @@ async function loadKitty() {
   const kittyTotalEl = document.getElementById("kittyTotal");
   if (!kittyTotalEl) return;
 
-  const database = getFirestore();
-  const snap = await getDocs(collection(database, "choices"));
+  const snap = await getDocs(collection(db, "choices"));
 
   let totalUsed = 0;
 
@@ -371,12 +369,11 @@ function updateConfirmButtonState() {
 }
 
 async function performHardReset() {
-  const database = getFirestore();
-  const usersSnapshot = await getDocs(collection(database, "choices"));
-  const batch = writeBatch(database);
+  const usersSnapshot = await getDocs(collection(db, "choices"));
+  const batch = writeBatch(db);
 
   usersSnapshot.forEach((userDoc) => {
-    const userRef = doc(database, "choices", userDoc.id);
+    const userRef = doc(db, "choices", userDoc.id);
     batch.set(
       userRef,
       {
@@ -391,7 +388,7 @@ async function performHardReset() {
     );
   });
 
-  const kittyRef = doc(database, "kitty", "shared");
+  const kittyRef = doc(db, "kitty", "shared");
   batch.set(
     kittyRef,
     {
@@ -447,8 +444,7 @@ function renderDashboard(people) {
 }
 
 async function loadDashboardData() {
-  const database = getFirestore();
-  const choicesRef = collection(database, "choices");
+  const choicesRef = collection(db, "choices");
   const snap = await getDocs(choicesRef);
 
   let categoryMap = new Map();
