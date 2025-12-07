@@ -2744,21 +2744,70 @@ body.vote-page {
 .vote-submit-bar .submit-xmas-btn {
   max-width: 520px;
   width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 24px;
 }
 
 .reset-votes-btn {
-  background: transparent;
-  color: rgba(255, 255, 255, 0.75);
-  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease,
+    box-shadow 0.2s ease;
+  padding: 10px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 14px 28px rgba(0, 0, 0, 0.26);
 }
 
 .reset-votes-btn:hover,
 .reset-votes-btn:focus-visible {
   color: var(--xmas-gold);
-  text-decoration: underline;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(230, 199, 127, 0.5);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.vote-btn-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)),
+    rgba(255, 255, 255, 0.16);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 12px 26px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.vote-btn-icon svg {
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+}
+
+.vote-btn-icon.subtle {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 10px 20px rgba(0, 0, 0, 0.26);
+}
+
+.vote-btn-text {
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 @media (max-width: 720px) {
@@ -2773,6 +2822,15 @@ body.vote-page {
   .vote-submit-bar {
     left: 0;
     right: 0;
+  }
+
+  .vote-submit-bar .submit-xmas-btn {
+    padding-inline: 16px;
+  }
+
+  .vote-btn-icon {
+    width: 34px;
+    height: 34px;
   }
 
 }

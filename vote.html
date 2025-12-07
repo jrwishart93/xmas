@@ -65,8 +65,41 @@
   </main>
 
   <div class="vote-submit-bar">
-    <button class="submit-xmas-btn" type="button" id="submitVotes">Submit Votes</button>
-    <button class="reset-votes-btn" type="button" id="resetVotes">Reset votes</button>
+    <button class="submit-xmas-btn" type="button" id="submitVotes">
+      <span class="vote-btn-icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32" role="presentation" focusable="false">
+          <defs>
+            <linearGradient id="voteTreeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#d64545" />
+              <stop offset="50%" stop-color="#e6c77f" />
+              <stop offset="100%" stop-color="#6ec8ff" />
+            </linearGradient>
+          </defs>
+          <path fill="url(#voteTreeGradient)" d="M16 2 8.5 12h4.5l-3.5 4.5h4.25L9 22.5h6v5.5h2v-5.5h6L18.25 16.5H22l-3.5-4.5h4.5L16 2Z" />
+          <circle cx="16" cy="6" r="1.4" fill="#fff8e1" />
+          <circle cx="19" cy="11" r="1" fill="#fff8e1" opacity="0.9" />
+          <circle cx="13" cy="14" r="0.9" fill="#fff8e1" opacity="0.9" />
+        </svg>
+      </span>
+      <span class="vote-btn-text">Submit Votes</span>
+    </button>
+    <button class="reset-votes-btn" type="button" id="resetVotes">
+      <span class="vote-btn-icon subtle" aria-hidden="true">
+        <svg viewBox="0 0 32 32" role="presentation" focusable="false">
+          <defs>
+            <linearGradient id="voteBaubleGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#6ec8ff" />
+              <stop offset="50%" stop-color="#a6e2ff" />
+              <stop offset="100%" stop-color="#d64545" />
+            </linearGradient>
+          </defs>
+          <path fill="url(#voteBaubleGradient)" d="M17.5 4.5h-3c-.83 0-1.5.67-1.5 1.5v2.1A10 10 0 1 0 26 18a9.93 9.93 0 0 0-6-9.1V6c0-.83-.67-1.5-1.5-1.5ZM16 12.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Z" />
+          <path fill="#0a0f1f" opacity="0.35" d="M12.7 3.5h6.6c.55 0 1 .45 1 1s-.45 1-1 1h-6.6a1 1 0 1 1 0-2Z" />
+          <path fill="#fff8e1" opacity="0.8" d="M13.2 18a2.8 2.8 0 0 1 3.7-2.63l-.52 1.46 2.12-1.2a2.8 2.8 0 1 1-4.33 3.35Z" />
+        </svg>
+      </span>
+      <span class="vote-btn-text">Reset votes</span>
+    </button>
   </div>
 
   <script>
