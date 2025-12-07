@@ -123,25 +123,6 @@ const normalizeSelections = (rawSelections) => {
 const hasNonZeroSelections = (selections = []) =>
   selections.some((selection) => Number(selection?.qty) > 0);
 
-const buildChoicesMap = () => {
-  const items = document.querySelectorAll(".menu-item");
-
-  return Array.from(items).reduce((acc, item) => {
-    const name = item.dataset.name;
-    if (!name) return acc;
-
-    const qty = Number(
-      item.dataset.quantity ||
-        item.querySelector(".qty-display")?.textContent ||
-        item.querySelector(".qty-input")?.value ||
-        0
-    );
-
-    acc[name] = Number.isFinite(qty) ? Math.max(0, qty) : 0;
-    return acc;
-  }, {});
-};
-
 const setItemQuantity = (itemElement, qty) => {
   const safeValue = Math.max(0, Number(qty) || 0);
   const stepper = itemElement.querySelector(".qty-stepper");
@@ -349,12 +330,23 @@ submitButton.addEventListener("click", async () => {
   setStatus("Saving your choices…");
 
   try {
-    const choices = buildChoicesMap();
+    const choiceMap = selections.reduce((acc, item) => {
+      if (!item?.name) return acc;
+      acc[item.name] = { qty: Number(item.qty) || 0, price: Number(item.price) || 0 };
+      return acc;
+    }, {});
+
     const totalSpend = Number(Number(total).toFixed(2)) || 0;
 
-    console.log("Saving choices for", storedUser, { choices, totalSpend });
+    console.log("Saving choices for", storedUser, { choices: choiceMap, totalSpend });
 
-    await saveUserSelections(storedUser, currentUserName, choices, totalSpend);
+    await saveUserSelections(
+      storedUser,
+      currentUserName,
+      choiceMap,
+      totalSpend,
+      selections
+    );
     setStatus("Choices saved!", "success");
     window.location.href = "complete.html";
   } catch (err) {
