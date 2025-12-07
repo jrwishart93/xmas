@@ -105,7 +105,9 @@ function renderAvatarGrids() {
       );
       tile.setAttribute("aria-pressed", "false");
 
-      const resolvedSrc = avatarSrc?.startsWith("http") ? avatarSrc : `/${avatarSrc || ""}`;
+      const resolvedSrc = avatarSrc?.startsWith("http")
+        ? avatarSrc
+        : (avatarSrc || "").replace(/^\//, "");
       tile.innerHTML = `
         <div class="avatar-thumb">
           <img src="${resolvedSrc}" alt="${person.name}" />
