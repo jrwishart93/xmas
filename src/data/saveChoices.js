@@ -1,10 +1,6 @@
 // src/data/saveChoices.js
 import { db } from "../../firebase.js";
-import {
-  doc,
-  serverTimestamp,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
 /**
  * Saves the user's selections to Firestore in a safe, structured way.
@@ -54,21 +50,16 @@ export async function saveUserSelections(
 
   const userRef = doc(db, "choices", userId);
 
-  await setDoc(
-    userRef,
-    {
-      name: userName || userId,
-      uid: userId,
-      legacyId,
-      admin: Boolean(isAdmin),
-      hasSubmitted: true,
-      total: safeTotal,
-      totalSpend: safeTotal,
-      choices: safeChoices,
-      selections: safeSelections,
-      updatedAt: serverTimestamp()
-    },
-    { merge: true }
-  );
+  const choiceData = {
+    choices: safeChoices,
+    totalSpend: safeTotal,
+    selections: safeSelections,
+    name: userName || userId,
+    legacyId,
+    admin: Boolean(isAdmin),
+    updatedAt: new Date().toISOString()
+  };
+
+  await setDoc(userRef, choiceData);
 }
 

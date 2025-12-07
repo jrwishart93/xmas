@@ -103,6 +103,9 @@ function selectAvatarCard(card) {
         legacyId: selectedUserId,
     };
 
+    sessionStorage.setItem('selectedUserId', userId);
+    sessionStorage.setItem('selectedUserName', selectedUserName || '');
+
     if (loginForm) {
         loginForm.dataset.selectedUserId = selectedUserId;
         loginForm.dataset.selectedUserName = selectedUserName;
@@ -290,12 +293,11 @@ async function handleLogin(event) {
             loginBtn.innerHTML = loginBtnDefaultText || 'CHECK LIST';
         }
 
-        localStorage.setItem("xmasUser", resolvedUserId);
-        localStorage.setItem("xmasUserUid", resolvedUserId);
-        localStorage.setItem("currentUser", resolvedUserId);
-        localStorage.setItem("xmasUserName", resolvedName);
-        localStorage.setItem("xmasUserLegacyId", resolvedLegacyId);
-        localStorage.setItem("xmasUserIsAdmin", userData?.admin ? 'true' : 'false');
+        sessionStorage.setItem('selectedUserId', resolvedUserId);
+        sessionStorage.setItem('selectedUserName', resolvedName || resolvedUserId);
+        sessionStorage.setItem('selectedUserLegacyId', resolvedLegacyId || resolvedUserId);
+        sessionStorage.setItem('xmasUserIsAdmin', userData?.admin ? 'true' : 'false');
+        sessionStorage.setItem('isLoggedIn', 'true');
 
         window.location.href = 'choices.html';
     } catch (err) {
