@@ -1,38 +1,45 @@
 import { TEAM } from "./team.js";
+import { db } from "./firebase.js";
+import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
-const questions = [
-  { id: "first_home", label: "Who will be the first person to go home?" },
-  { id: "last_standing", label: "Who will be the last one standing?" },
-  { id: "most_drunk", label: "Who will be the most drunk?" },
-  { id: "most_alcohol", label: "Who will consume the most alcohol?" },
-  { id: "irish_exit", label: "Who will do an Irish exit?" },
-];
+const userId = sessionStorage.getItem("loggedInUser");
+if (!userId) location.href = "index.html";
 
-function populateSelectOptions(select) {
-  if (!select) return;
-  const fragment = document.createDocumentFragment();
+const selects = document.querySelectorAll(".vote-select");
 
-  Object.entries(TEAM).forEach(([id, person]) => {
-    const option = document.createElement("option");
-    option.value = id;
-    option.textContent = person.name;
-    fragment.appendChild(option);
+selects.forEach(sel => {
+  Object.entries(TEAM).forEach(([id, user]) => {
+    const opt = document.createElement("option");
+    opt.value = id;
+    opt.textContent = user.name;
+    sel.appendChild(opt);
+  });
+});
+
+document.getElementById("submitVotes").addEventListener("click", async () => {
+  const results = {};
+  let valid = true;
+
+  document.querySelectorAll(".vote-question").forEach(q => {
+    const qid = q.dataset.qid;
+    const value = q.querySelector(".vote-select").value;
+    if (!value) valid = false;
+    results[qid] = value;
   });
 
-  select.appendChild(fragment);
-}
+  if (!valid) {
+    alert("Please answer all questions before submitting.");
+    return;
+  }
 
-function setQuestionLabels() {
-  questions.forEach(({ id, label }) => {
-    const select = document.querySelector(`#select-${id}`);
-    const section = document.querySelector(`.vote-question[data-qid="${id}"] h2`);
-
-    if (section) {
-      section.textContent = label;
-    }
-
-    populateSelectOptions(select);
-  });
-}
-
-setQuestionLabels();
+  try {
+    await setDoc(doc(db, "votes", userId), {
+      votes: results,
+      updatedAt: Date.now()
+    });
+    window.location.href = "votes_results.html";
+  } catch (e) {
+    alert("Unable to save votes. Please try again.");
+    console.error(e);
+  }
+});
