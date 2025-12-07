@@ -39,10 +39,9 @@ const ADMIN_IDS = new Set(["derek", "lawrie", "admin"]);
 const RESET_TOKEN = "RESET";
 
 let isAdminUser = false;
-let currentUserId =
-  localStorage.getItem("xmasUser") || localStorage.getItem("currentUser") || "";
-const legacyUserId = localStorage.getItem("xmasUserLegacyId") || "";
-const cachedAdminFlag = localStorage.getItem("xmasUserIsAdmin") === "true";
+let currentUserId = sessionStorage.getItem("selectedUserId") || "";
+const legacyUserId = sessionStorage.getItem("selectedUserLegacyId") || "";
+const cachedAdminFlag = sessionStorage.getItem("xmasUserIsAdmin") === "true";
 let hasLoadedDashboard = false;
 
 function normalizeSelections(rawSelections) {
@@ -522,7 +521,8 @@ document.addEventListener("keydown", (event) => {
 
 function startDashboard() {
   if (!currentUserId) {
-    currentUserId = "";
+    window.location.href = "index.html";
+    return;
   }
 
   if (hasLoadedDashboard) {

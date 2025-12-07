@@ -1,10 +1,6 @@
 // src/data/resetChoices.js
 import { db } from "../../firebase.js";
-import {
-  doc,
-  serverTimestamp,
-  setDoc,
-} from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
 /**
  * Clears a user's saved selections in Firestore.
@@ -36,18 +32,11 @@ export async function resetUserSelections(
   }, {});
 
   const userRef = doc(db, "choices", userId);
-  await setDoc(
-    userRef,
-    {
-      uid: userId,
-      legacyId,
-      hasSubmitted: false,
-      choices: zeroChoiceMap,
-      selections: sanitizedSelections,
-      total: 0,
-      totalSpend: 0,
-      updatedAt: serverTimestamp(),
-    },
-    { merge: true }
-  );
+  await setDoc(userRef, {
+    choices: zeroChoiceMap,
+    selections: sanitizedSelections,
+    totalSpend: 0,
+    legacyId,
+    updatedAt: new Date().toISOString(),
+  });
 }

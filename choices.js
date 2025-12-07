@@ -23,10 +23,9 @@ const userBadge = document.getElementById("userBadge");
 
 let latestTotals = { total: 0, selections: [], remaining: MAX_BUDGET };
 let recalcTotals = () => {};
-let currentUserId =
-  localStorage.getItem("xmasUser") || localStorage.getItem("currentUser") || "";
-let currentLegacyId = localStorage.getItem("xmasUserLegacyId") || "";
-let currentUserName = localStorage.getItem("xmasUserName") || "";
+let currentUserId = sessionStorage.getItem("selectedUserId") || "";
+let currentLegacyId = sessionStorage.getItem("selectedUserLegacyId") || "";
+let currentUserName = sessionStorage.getItem("selectedUserName") || "";
 let menuSections = [];
 let hasInitialised = false;
 
@@ -344,7 +343,7 @@ submitButton.addEventListener("click", async () => {
 
     const totalSpend = Number(Number(total).toFixed(2)) || 0;
 
-    const isAdminFlag = localStorage.getItem("xmasUserIsAdmin") === "true";
+    const isAdminFlag = sessionStorage.getItem("xmasUserIsAdmin") === "true";
 
     console.log("Saving choices for", currentUserId, { choices: choiceMap, totalSpend });
 
@@ -377,7 +376,7 @@ function startChoices() {
 
   if (!currentUserName) {
     currentUserName =
-      localStorage.getItem("xmasUserName") || currentLegacyId || currentUserId;
+      sessionStorage.getItem("selectedUserName") || currentLegacyId || currentUserId;
   }
 
   if (!currentLegacyId) {
