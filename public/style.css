@@ -2499,11 +2499,23 @@ body.vote-page {
   width: 100%;
 }
 
-.avatar-grid {
+.vote-question-card .avatar-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
   padding: 8px 0;
+}
+
+@media (min-width: 768px) {
+  .vote-question-card .avatar-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .vote-question-card .avatar-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 }
 
 .avatar-tile {
