@@ -1,9 +1,9 @@
-import { db } from "../firebase.js";
+import "../firebase.js";
 import {
   collection,
   getDocs,
   doc,
-  getDoc,
+  getFirestore,
   serverTimestamp,
   writeBatch
 } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
@@ -27,10 +27,6 @@ const hardResetError = document.getElementById("hardResetError");
 const hardResetModalError = document.getElementById("hardResetModalError");
 const hardResetProgress = document.getElementById("hardResetProgress");
 const dashboardToast = document.getElementById("dashboardToast");
-
-if (!db) {
-  console.error("Firestore DB not initialised.");
-}
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -275,12 +271,14 @@ function aggregateItems(people) {
   const totals = new Map();
   people.forEach((person) => {
     person.selections.forEach((sel) => {
-      const qty = Number(sel.qty) || 0;
+      const qty = Number(sel.qty);
       if (!sel.name || qty <= 0) return;
+
       const current = totals.get(sel.name) || { qty: 0 };
       totals.set(sel.name, { qty: current.qty + qty });
     });
   });
+
   return totals;
 }
 
@@ -319,30 +317,22 @@ async function loadKitty() {
   const kittyTotalEl = document.getElementById("kittyTotal");
   if (!kittyTotalEl) return;
 
-  const snap = await getDocs(collection(db, "choices"));
+  const database = getFirestore();
+  const snap = await getDocs(collection(database, "choices"));
 
   let totalUsed = 0;
 
   snap.forEach((docSnap) => {
-    const userId = docSnap.id;
-    if (!TEAM[userId]) return;
+    const id = docSnap.id;
+    if (!TEAM[id]) return;
 
     const data = docSnap.data();
     const spend = Number(data.totalSpend) || 0;
     totalUsed += spend;
   });
 
-  const remainingKitty = MAX_KITTY - totalUsed;
-
-  kittyTotalEl.textContent = `£${remainingKitty.toFixed(2)}`;
-  kittyTotalEl.classList.remove("kitty-warn", "kitty-danger", "kitty-boost");
-  if (remainingKitty < 20) {
-    kittyTotalEl.classList.add("kitty-danger");
-  } else if (remainingKitty < 40) {
-    kittyTotalEl.classList.add("kitty-warn");
-  } else if (remainingKitty > 100) {
-    kittyTotalEl.classList.add("kitty-boost");
-  }
+  const remaining = MAX_KITTY - totalUsed;
+  kittyTotalEl.textContent = `£${remaining.toFixed(2)}`;
 }
 
 function toggleResetModal(show) {
@@ -381,11 +371,12 @@ function updateConfirmButtonState() {
 }
 
 async function performHardReset() {
-  const usersSnapshot = await getDocs(collection(db, "choices"));
-  const batch = writeBatch(db);
+  const database = getFirestore();
+  const usersSnapshot = await getDocs(collection(database, "choices"));
+  const batch = writeBatch(database);
 
   usersSnapshot.forEach((userDoc) => {
-    const userRef = doc(db, "choices", userDoc.id);
+    const userRef = doc(database, "choices", userDoc.id);
     batch.set(
       userRef,
       {
@@ -400,7 +391,7 @@ async function performHardReset() {
     );
   });
 
-  const kittyRef = doc(db, "kitty", "shared");
+  const kittyRef = doc(database, "kitty", "shared");
   batch.set(
     kittyRef,
     {
@@ -456,35 +447,35 @@ function renderDashboard(people) {
 }
 
 async function loadDashboardData() {
-  let categoryMap = new Map();
+  const database = getFirestore();
+  const choicesRef = collection(database, "choices");
+  const snap = await getDocs(choicesRef);
 
+  let categoryMap = new Map();
   try {
     const menu = await fetchMenu();
     categoryMap = buildCategoryMap(menu);
-  } catch (error) {
-    console.error("Unable to load menu for dashboard", error);
+  } catch (err) {
+    console.warn("Menu failed to load", err);
   }
 
-  const colRef = collection(db, "choices");
-  const snap = await getDocs(colRef);
-
-  const data = [];
+  const result = [];
 
   snap.forEach((docSnap) => {
     const id = docSnap.id;
+    if (!TEAM[id]) return; // skip junk docs
+
     const entry = docSnap.data();
+    const normalised = normalizeSelections(entry.choices || entry.selections);
 
-    // Skip unknown docs to prevent duplicates or junk entries
-    if (!TEAM[id]) return;
-
-    data.push(
+    result.push(
       summarisePerson(
         id,
         {
           ...entry,
-          totalSpend: entry.totalSpend || 0,
-          choices: entry.choices || entry.selections || {},
-          selections: entry.choices || entry.selections || []
+          totalSpend: Number(entry.totalSpend) || 0,
+          choices: normalised,
+          selections: normalised
         },
         TEAM[id],
         categoryMap
@@ -492,7 +483,7 @@ async function loadDashboardData() {
     );
   });
 
-  return data;
+  return result;
 }
 
 hardResetTrigger?.addEventListener("click", () => {
@@ -516,12 +507,11 @@ async function startDashboard() {
   evaluateAdminAccess();
 
   try {
-    const data = await loadDashboardData();
-    renderDashboard(data);
+    const people = await loadDashboardData();
+    renderDashboard(people);
     await loadKitty();
-    showToast("Dashboard loaded 🎄");
   } catch (err) {
-    console.error("Unable to load dashboard", err);
+    console.error("Dashboard failed", err);
     alert("Unable to load dashboard data. Please refresh.");
   }
 }
