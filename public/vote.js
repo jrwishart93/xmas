@@ -65,7 +65,17 @@ function toggleLoading(isLoading) {
   voteLoading.classList.toggle("hidden", !isLoading);
 }
 
-function selectAvatar(questionId, userKey) {
+function scrollToNextQuestion(currentQuestionId) {
+  const currentIndex = QUESTIONS.findIndex((q) => q.id === currentQuestionId);
+  const nextQuestion = currentIndex >= 0 ? QUESTIONS[currentIndex + 1] : null;
+
+  if (!nextQuestion) return;
+
+  const nextElement = document.getElementById(nextQuestion.containerId);
+  nextElement?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function selectAvatar(questionId, userKey, { autoAdvance = false } = {}) {
   const grid = document.querySelector(`.avatar-grid[data-question="${questionId}"]`);
   if (!grid) return;
 
@@ -81,6 +91,10 @@ function selectAvatar(questionId, userKey) {
   }
 
   votesState[questionId] = userKey;
+
+  if (autoAdvance) {
+    scrollToNextQuestion(questionId);
+  }
 }
 
 function renderAvatarGrids() {
@@ -117,7 +131,9 @@ function renderAvatarGrids() {
         <span class="avatar-name">${person.name}</span>
       `;
 
-      tile.addEventListener("click", () => selectAvatar(question.id, id));
+      tile.addEventListener("click", () =>
+        selectAvatar(question.id, id, { autoAdvance: true })
+      );
       grid.appendChild(tile);
     });
   });
