@@ -2821,6 +2821,64 @@ body.results-page {
   text-align: center;
 }
 
+.results-summary {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 16px 44px rgba(0, 0, 0, 0.32),
+    inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.summary-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px 18px;
+  align-items: center;
+}
+
+.summary-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 2px 0 0;
+}
+
+.summary-label {
+  font-size: 0.9rem;
+  opacity: 0.75;
+  margin-left: 6px;
+}
+
+.summary-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-progress__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-progress__track {
+  width: 100%;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+}
+
+.summary-progress__fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(120deg, #f9d976, #f39f86);
+}
+
 .results-grid {
   display: grid;
   gap: 14px;
@@ -2862,6 +2920,8 @@ body.results-page {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  position: relative;
+  padding-left: 8px;
 }
 
 .result-row__identity {
@@ -2907,10 +2967,31 @@ body.results-page {
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
+.result-row__progress {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  border-radius: 12px;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
+  z-index: 0;
+}
+
+.result-row__identity,
+.result-row__count,
+.result-row__medal {
+  position: relative;
+  z-index: 1;
+}
+
 .result-row--leader .result-row__count {
   background: rgba(255, 198, 109, 0.18);
   border-color: rgba(255, 198, 109, 0.5);
   font-weight: 800;
+}
+
+.result-total {
+  margin-top: 10px;
 }
 
 .results-actions {
