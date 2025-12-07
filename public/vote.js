@@ -1,4 +1,10 @@
-import { TEAM, getAvatarSrc, normalizeAvatarPath, normaliseTeamId } from "./src/team.js";
+import {
+  TEAM,
+  getAvatarSrc,
+  normalizeAvatarPath,
+  normaliseTeamId,
+  toLegacyId,
+} from "./src/team.js";
 import { fetchUsersFromFirestore } from "../src/data/users.js";
 import { fetchVotingQuestions } from "../src/data/votingQuestionsStore.js";
 import { VOTING_QUESTIONS } from "../src/data/votingQuestions.js";
@@ -206,8 +212,11 @@ async function loadQuestions() {
 async function loadExistingVotes() {
   if (!userId) return;
 
+  const voteDocId = toLegacyId(userId);
+  if (!voteDocId) return;
+
   try {
-    const ref = doc(db, "votes", userId);
+    const ref = doc(db, "votes", voteDocId);
     const snapshot = await getDoc(ref);
 
     if (snapshot.exists()) {
@@ -248,7 +257,12 @@ async function saveVotes() {
   }, {});
 
   try {
-    const ref = doc(db, "votes", userId);
+    const voteDocId = toLegacyId(userId);
+    if (!voteDocId) {
+      throw new Error("Unable to determine voter id");
+    }
+
+    const ref = doc(db, "votes", voteDocId);
     await setDoc(ref, payload, { merge: true });
 
     showToast("Votes saved!");
