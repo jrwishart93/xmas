@@ -752,7 +752,8 @@ button.btn-green:hover:not(:disabled) {
   font-size: 0.95rem;
 }
 
-.dashboard-btn {
+.dashboard-btn,
+.btn-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -771,9 +772,27 @@ button.btn-green:hover:not(:disabled) {
 }
 
 .dashboard-btn:hover,
-.dashboard-btn:focus-visible {
+.dashboard-btn:focus-visible,
+.btn-secondary:hover,
+.btn-secondary:focus-visible {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.22);
+}
+
+.voting-card {
+  margin-top: 14px;
+}
+
+.voting-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.voting-actions .btn-secondary {
+  flex: 1 1 220px;
+  justify-content: center;
 }
 
 @media (max-width: 480px) {
@@ -2446,4 +2465,76 @@ body.vote-page {
     left: 0;
     right: 0;
   }
+}
+
+/* --- VOTE RESULTS PAGE --- */
+body.results-page {
+  padding: 16px;
+}
+
+.results-wrapper {
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.results-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.results-header {
+  text-align: center;
+}
+
+.results-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.result-section {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 18px 20px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 16px 44px rgba(0, 0, 0, 0.32),
+    inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.result-section h2 {
+  border: none;
+  margin-bottom: 10px;
+}
+
+.result-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result-section li {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.results-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.results-actions .btn-secondary {
+  flex: 1 1 220px;
 }
