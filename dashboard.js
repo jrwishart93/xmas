@@ -143,6 +143,7 @@ function renderSubmissionOverview(people) {
   sorted.forEach((person) => {
     const row = document.createElement("div");
     row.className = "submission-row";
+    row.style.animation = "fadeSlideIn 0.3s ease forwards";
 
     const nameEl = createAvatarName(person.name, 34, {
       image: person.image,
@@ -166,11 +167,16 @@ function toggleAccordion(content, header) {
   document.querySelectorAll(".accordion-content.open").forEach((panel) => {
     panel.classList.remove("open");
     panel.style.maxHeight = null;
+    panel.style.opacity = "0";
+    panel.style.transition = "max-height 0.3s ease, opacity 0.3s ease";
   });
 
   document.querySelectorAll(".accordion-header.active").forEach((btn) => {
     btn.classList.remove("active");
   });
+
+  content.style.transition = "max-height 0.3s ease, opacity 0.3s ease";
+  content.style.opacity = isOpen ? "0" : "1";
 
   if (!isOpen) {
     content.classList.add("open");
@@ -192,6 +198,7 @@ function renderPeopleBreakdown(people) {
   sorted.forEach((person) => {
     const item = document.createElement("div");
     item.className = `accordion-item ${person.hasSubmitted ? "is-submitted" : "is-pending"}`;
+    item.style.animation = "fadeSlideIn 0.3s ease forwards";
 
     const header = document.createElement("button");
     header.className = "accordion-header";
@@ -235,11 +242,13 @@ function renderPeopleBreakdown(people) {
       const empty = document.createElement("div");
       empty.className = "line";
       empty.textContent = "No selections yet.";
+      empty.style.animation = "fadeSlideIn 0.3s ease forwards";
       content.append(empty);
     } else {
       lines.forEach((sel) => {
         const line = document.createElement("div");
         line.className = "line";
+        line.style.animation = "fadeSlideIn 0.3s ease forwards";
         const lineTotal = (Number(sel.qty) || 0) * (Number(sel.price) || 0);
 
         const itemLabel = document.createElement("span");
@@ -291,6 +300,7 @@ function renderItemTotals(totalsMap) {
   entries.forEach(([name, data]) => {
     const line = document.createElement("div");
     line.className = "total-line";
+    line.style.animation = "fadeSlideIn 0.3s ease forwards";
 
     const label = document.createElement("span");
     label.className = "label";
@@ -325,6 +335,14 @@ async function loadKitty() {
   const remainingKitty = MAX_KITTY - totalUsed;
 
   kittyTotalEl.textContent = `£${remainingKitty.toFixed(2)}`;
+  kittyTotalEl.classList.remove("kitty-warn", "kitty-danger", "kitty-boost");
+  if (remainingKitty < 20) {
+    kittyTotalEl.classList.add("kitty-danger");
+  } else if (remainingKitty < 40) {
+    kittyTotalEl.classList.add("kitty-warn");
+  } else if (remainingKitty > 100) {
+    kittyTotalEl.classList.add("kitty-boost");
+  }
 }
 
 function toggleResetModal(show) {
@@ -501,6 +519,7 @@ async function startDashboard() {
     const data = await loadDashboardData();
     renderDashboard(data);
     await loadKitty();
+    showToast("Dashboard loaded 🎄");
   } catch (err) {
     console.error("Unable to load dashboard", err);
     alert("Unable to load dashboard data. Please refresh.");

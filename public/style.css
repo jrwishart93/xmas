@@ -3,8 +3,10 @@
 :root {
   --snow: #ffffffd9;
   --frost: rgba(255, 255, 255, 0.45);
-  --xmas-red: #e94040;
-  --xmas-green: #3cb371;
+  --xmas-red: #d64545;
+  --xmas-green: #2e7d4f;
+  --xmas-gold: #e6c77f;
+  --xmas-snow: rgba(255,255,255,0.8);
   --ice-blue: #6ec8ff;
   --night-sky: #0a0f1f;
   --gold: #f9d57e;
@@ -80,11 +82,22 @@ body {
   z-index: -1;
 }
 
-.snow {
+.snow { 
   position: absolute;
   background: var(--snow);
   border-radius: 50%;
   animation: snowfall linear infinite;
+}
+
+.snowflake-light {
+  background: var(--xmas-snow);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
+}
+
+.snowflake-heavy {
+  background: rgba(255, 255, 255, 0.92);
+  filter: drop-shadow(0 0 6px rgba(230, 199, 127, 0.45));
+  opacity: 0.95;
 }
 
 @keyframes snowfall {
@@ -94,15 +107,19 @@ body {
 
 /* --- GLASS CARDS --- */
 .card {
-  background: var(--frost);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08)), var(--frost);
   backdrop-filter: blur(var(--blur-amount));
   -webkit-backdrop-filter: blur(var(--blur-amount));
   border-radius: var(--card-radius);
   padding: 28px 32px;
   margin-bottom: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 
-              inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+  border: 1px solid transparent;
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3),
+              inset 0 1px 1px 0 rgba(255, 255, 255, 0.15),
+              0 0 28px rgba(230, 199, 127, 0.28);
+  border-image: linear-gradient(135deg, rgba(214, 69, 69, 0.45), rgba(46, 125, 79, 0.45)) 1;
   text-align: left;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -139,9 +156,13 @@ h1 {
 h2 {
   font-size: 1.6rem;
   font-weight: 600;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   padding-bottom: 10px;
   margin-bottom: 20px;
+}
+
+.card h2 {
+  border-bottom: 2px dashed var(--xmas-red);
+  padding-bottom: 0.25rem;
 }
 
 p, label {
@@ -758,25 +779,24 @@ button.btn-green:hover:not(:disabled) {
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  font-size: 0.9rem;
-  padding: 0.6rem 1.4rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 0 0 transparent;
+  font-size: 0.95rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 2rem;
+  background: var(--xmas-red);
+  border: none;
   color: #fff;
-  font-weight: 600;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+  transition: background 0.25s ease, transform 0.2s ease;
 }
 
 .dashboard-btn:hover,
 .dashboard-btn:focus-visible,
 .btn-secondary:hover,
 .btn-secondary:focus-visible {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.22);
+  background: var(--xmas-green);
+  transform: translateY(-1px);
 }
 
 .voting-card {
@@ -854,6 +874,18 @@ button.btn-green:hover:not(:disabled) {
   padding-right: 12px;
 }
 
+.festive-header h1 {
+  margin: 0;
+}
+
+.dashboard-footer {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.78);
+  margin: 16px 0 8px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
 .kitty-container {
   margin-top: 20px;
   padding: 14px 18px;
@@ -873,6 +905,18 @@ button.btn-green:hover:not(:disabled) {
   font-size: 1.4rem;
   font-weight: 600;
   color: #a4ffcc;
+}
+
+.kitty-amount.kitty-boost {
+  color: var(--xmas-green);
+}
+
+.kitty-amount.kitty-warn {
+  color: #f0c674;
+}
+
+.kitty-amount.kitty-danger {
+  color: var(--xmas-red);
 }
 
 #budgetBar {
@@ -1210,15 +1254,15 @@ button.btn-green:hover:not(:disabled) {
 }
 
 .status-pill.submitted {
-  background: rgba(21, 128, 61, 0.18);
+  background: rgba(46, 125, 79, 0.18);
   color: var(--xmas-green);
-  border-color: rgba(42, 179, 104, 0.5);
+  border-color: rgba(46, 125, 79, 0.5);
 }
 
 .status-pill.pending {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.85);
-  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(214, 69, 69, 0.16);
+  color: var(--xmas-red);
+  border-color: rgba(214, 69, 69, 0.45);
 }
 
 .accordion-item {
@@ -1627,6 +1671,11 @@ button.btn-green:hover:not(:disabled) {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(120deg, rgba(214, 69, 69, 0.3), rgba(46, 125, 79, 0.3));
+  border-radius: 16px;
+  border: 1px solid rgba(230, 199, 127, 0.25);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25), 0 0 18px rgba(230, 199, 127, 0.2);
 }
 
 .page-links {
@@ -1651,6 +1700,15 @@ button.btn-green:hover:not(:disabled) {
   color: #fff;
   border-color: rgba(255, 255, 255, 0.4);
   background: rgba(255, 255, 255, 0.22);
+}
+
+.candy-divider {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: repeating-linear-gradient(90deg, rgba(214, 69, 69, 0.85) 0 12px, rgba(255, 255, 255, 0.9) 12px 18px, rgba(46, 125, 79, 0.75) 18px 30px, rgba(255, 255, 255, 0.9) 30px 36px);
+  margin: 12px 0 14px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
 }
 
 .modal {
@@ -2537,4 +2595,9 @@ body.results-page {
 
 .results-actions .btn-secondary {
   flex: 1 1 220px;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
