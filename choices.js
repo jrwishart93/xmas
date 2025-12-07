@@ -216,6 +216,33 @@ const setResetInProgress = (isResetting) => {
   if (cancelResetButton) cancelResetButton.disabled = isResetting;
 };
 
+const showSuccessMessage = () => {
+  if (submitButton) {
+    submitButton.disabled = false;
+    submitButton.textContent = defaultButtonText;
+  }
+
+  const box = document.getElementById("choiceSuccess");
+  if (!box) return;
+
+  box.classList.remove("hidden");
+
+  const dashboardButton = document.getElementById("goDashboard");
+  if (dashboardButton) {
+    dashboardButton.onclick = () => {
+      window.location.href = "dashboard.html";
+    };
+  }
+
+  const orderMoreButton = document.getElementById("orderMore");
+  if (orderMoreButton) {
+    orderMoreButton.onclick = () => {
+      location.reload();
+    };
+  }
+
+};
+
 const applyExistingSelections = (selections) => {
   selections.forEach(({ name, qty }) => {
     if (!name) return;
@@ -361,7 +388,7 @@ submitButton.addEventListener("click", async () => {
       updatedAt: Date.now()
     });
     setStatus("Choices saved!", "success");
-    window.location.href = "complete.html";
+    showSuccessMessage();
   } catch (err) {
     console.error(err);
     setStatus("Unable to save your choices. Please try again.", "error");
