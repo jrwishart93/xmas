@@ -482,84 +482,39 @@ label[for="pinInput"] {
   gap: 6px;
 }
 
-.pin-hint-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+.pin-hint {
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 0.75rem;
-  line-height: 0;
-  color: #ffe9c6;
-  display: inline-flex;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-weight: 700;
+  display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  padding: 0;
   margin-left: 6px;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  box-shadow: 0 0 0 0 rgba(255, 230, 170, 0.35);
-  transition: box-shadow 0.25s ease, transform 0.2s ease, color 0.2s ease;
-  animation: hintSparkle 6s infinite ease-in-out;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
+  transition: 0.2s;
 }
 
-.pin-hint-btn:hover,
-.pin-hint-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 6px 2px rgba(255, 230, 170, 0.6);
-  transform: scale(1.08);
+.pin-hint:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
-@keyframes hintSparkle {
-  0%,
-  95% {
-    box-shadow: 0 0 0 0 rgba(255, 230, 170, 0.2);
-  }
-  98% {
-    box-shadow: 0 0 8px 3px rgba(255, 230, 170, 0.7);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 230, 170, 0.2);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pin-hint-btn {
-    animation: none;
-    transform: none;
-    transition: none;
-  }
-
-  .pin-hint-btn:hover,
-  .pin-hint-btn:focus-visible {
-    transform: none;
-  }
-}
-
-.pin-hint {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  background: rgba(10, 15, 31, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  padding: 10px 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-  color: rgba(255, 255, 255, 0.88);
+.pin-error {
+  color: #ff6b6b;
+  margin-top: 8px;
   font-size: 0.9rem;
-  line-height: 1.4;
-  width: min(260px, 78vw);
-  z-index: 10;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
 }
 
-@media (max-width: 480px) {
-  .pin-hint {
-    top: calc(100% + 12px);
-    right: 4px;
-  }
+.pin-error.show {
+  opacity: 1;
+  transform: translateY(4px);
 }
 
 .pin-section--highlight {

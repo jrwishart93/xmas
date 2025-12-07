@@ -4,7 +4,7 @@ import { createAvatarElement, createAvatarName } from './src/utils/avatarMap.js'
 const avatarGrid = document.getElementById('avatarGrid');
 const pinInput = document.getElementById('pinInput');
 const loginBtn = document.getElementById('loginBtn');
-const errorP = document.getElementById('loginError');
+const pinError = document.getElementById('pinError');
 const selectedUserCard = document.getElementById('selectedUserCard');
 const selectedUserAnnouncement = document.getElementById('selectedUserAnnouncement');
 const pinSection = document.getElementById('pinSection');
@@ -16,6 +16,7 @@ let selectedUserName = selectedUserId && TEAM[selectedUserId]?.name ? TEAM[selec
 let lastSelectedUserId = '';
 let focusTimeoutId;
 let highlightTimeoutId;
+let errorTimeoutId;
 
 function scrollToPinAndFocus() {
     if (!pinInput) return;
@@ -38,20 +39,34 @@ function scrollToPinAndFocus() {
     }, prefersReducedMotion ? 0 : 400);
 }
 
-function setLoginError(message) {
-    if (!errorP) return;
-
-    errorP.textContent = message;
-    const hasMessage = Boolean(message);
-    errorP.style.display = hasMessage ? 'block' : 'none';
-    errorP.classList.toggle('hidden', !hasMessage);
-}
-
 function setPinErrorState(isError) {
     if (!pinInput) return;
 
     pinInput.setAttribute('aria-invalid', isError ? 'true' : 'false');
     pinInput.classList.toggle('input-error', isError);
+}
+
+function showError(message) {
+    if (!pinError) return;
+
+    if (errorTimeoutId) {
+        clearTimeout(errorTimeoutId);
+    }
+
+    pinError.textContent = message;
+    pinError.classList.add('show');
+
+    errorTimeoutId = setTimeout(() => pinError?.classList.remove('show'), 4000);
+}
+
+function clearError() {
+    if (!pinError) return;
+    if (errorTimeoutId) {
+        clearTimeout(errorTimeoutId);
+    }
+
+    pinError.textContent = '';
+    pinError.classList.remove('show');
 }
 
 function highlightPinArea(shouldScroll) {
@@ -122,7 +137,7 @@ function selectAvatarCard(card) {
 
     highlightPinArea(true);
 
-    setLoginError('');
+    clearError();
     setPinErrorState(false);
     renderSelectedUser(selectedUserName);
 
@@ -140,7 +155,7 @@ function populateUsers() {
 
     const entries = Object.entries(TEAM);
     if (!entries.length) {
-        setLoginError('No team members found.');
+        showError('No team members found.');
         return;
     }
 
@@ -182,11 +197,6 @@ function populateUsers() {
     }
 }
 
-function showError(message) {
-    setLoginError(message);
-    setPinErrorState(Boolean(message));
-}
-
 function handleLogin(event) {
     event?.preventDefault();
 
@@ -196,6 +206,7 @@ function handleLogin(event) {
 
     if (!user) {
         showError('Unknown user — please go back.');
+        setPinErrorState(true);
         return;
     }
 
@@ -207,6 +218,7 @@ function handleLogin(event) {
         window.location.href = 'choices.html';
     } else {
         showError('Access denied. Hint: last 4 digits of your mobile number.');
+        setPinErrorState(true);
     }
 }
 
@@ -228,12 +240,12 @@ avatarGrid?.addEventListener('keydown', (event) => {
 
 pinInput?.addEventListener('input', () => {
     setPinErrorState(false);
-    if (errorP?.textContent) {
-        setLoginError('');
+    if (pinError?.textContent) {
+        clearError();
     }
 });
 
-setLoginError('');
+clearError();
 setPinErrorState(false);
 
 populateUsers();
