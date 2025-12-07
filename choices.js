@@ -1,12 +1,13 @@
 import { renderMenu } from "./src/ui/renderMenu.js";
 import { attachTotalHandler } from "./src/ui/updateTotals.js";
-import { saveUserSelections } from "./src/data/saveChoices.js";
 import { resetUserSelections } from "./src/data/resetChoices.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
+import { TEAM } from "./team.js";
 import { db } from "./firebase.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
 const MAX_BUDGET = 20;
+const userId = sessionStorage.getItem("loggedInUser");
 const budgetTextElement = document.getElementById("budgetText");
 const budgetBarElement = document.getElementById("budgetBar");
 const menuContainer = document.getElementById("menu-container");
@@ -21,11 +22,17 @@ const defaultButtonText = submitButton.textContent;
 const defaultConfirmResetText = confirmResetButton?.textContent || "Reset choices";
 const userBadge = document.getElementById("userBadge");
 
+if (!userId || !TEAM[userId]) {
+  alert("User session expired. Please log in again.");
+  window.location.href = "index.html";
+}
+
 let latestTotals = { total: 0, selections: [], remaining: MAX_BUDGET };
 let recalcTotals = () => {};
-let currentUserId = sessionStorage.getItem("selectedUserId") || "";
+let currentUserId = userId || sessionStorage.getItem("selectedUserId") || "";
 let currentLegacyId = sessionStorage.getItem("selectedUserLegacyId") || "";
-let currentUserName = sessionStorage.getItem("selectedUserName") || "";
+let currentUserName =
+  sessionStorage.getItem("selectedUserName") || TEAM[userId]?.name || "";
 let menuSections = [];
 let hasInitialised = false;
 
@@ -343,19 +350,16 @@ submitButton.addEventListener("click", async () => {
 
     const totalSpend = Number(Number(total).toFixed(2)) || 0;
 
-    const isAdminFlag = sessionStorage.getItem("xmasUserIsAdmin") === "true";
+    console.log("Saving choices for", userId, { choices: choiceMap, totalSpend });
 
-    console.log("Saving choices for", currentUserId, { choices: choiceMap, totalSpend });
+    const userChoices = choiceMap;
+    const total = totalSpend;
 
-    await saveUserSelections(
-      currentUserId,
-      currentUserName,
-      choiceMap,
-      totalSpend,
-      selections,
-      currentLegacyId,
-      isAdminFlag
-    );
+    await setDoc(doc(db, "choices", userId), {
+      choices: userChoices,
+      totalSpend: total,
+      updatedAt: Date.now()
+    });
     setStatus("Choices saved!", "success");
     window.location.href = "complete.html";
   } catch (err) {
