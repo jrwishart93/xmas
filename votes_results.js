@@ -1,25 +1,20 @@
 import { TEAM } from "./team.js";
+import { VOTING_QUESTIONS } from "./src/data/votingQuestions.js";
 import { db } from "./firebase.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
 const userId = sessionStorage.getItem("loggedInUser");
 if (!userId) location.href = "index.html";
 
-const QUESTION_TITLES = {
-  first_home: "First Person to Go Home",
-  last_standing: "Last Person Standing",
-  most_drunk: "Most Drunk",
-  most_alcohol: "Most Alcohol Consumed",
-  irish_exit: "Most Likely to Disappear"
-};
+const QUESTION_TITLES = VOTING_QUESTIONS.reduce((acc, { id, question }) => {
+  acc[id] = question;
+  return acc;
+}, {});
 
-const tallies = {
-  first_home: {},
-  last_standing: {},
-  most_drunk: {},
-  most_alcohol: {},
-  irish_exit: {}
-};
+const tallies = VOTING_QUESTIONS.reduce((acc, { id }) => {
+  acc[id] = {};
+  return acc;
+}, {});
 
 const resultsContainer = document.getElementById("resultsContainer");
 
