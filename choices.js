@@ -3,7 +3,8 @@ import { attachTotalHandler } from "./src/ui/updateTotals.js";
 import { saveUserSelections } from "./src/data/saveChoices.js";
 import { resetUserSelections } from "./src/data/resetChoices.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
-import { db } from "./firebase.js";
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
 const MAX_BUDGET = 20;
@@ -21,15 +22,13 @@ const defaultButtonText = submitButton.textContent;
 const defaultConfirmResetText = confirmResetButton?.textContent || "Reset choices";
 const userBadge = document.getElementById("userBadge");
 
-const storedUser = localStorage.getItem("xmasUser") || localStorage.getItem("currentUser");
-if (!storedUser) {
-  window.location.href = "index.html";
-}
-
 let latestTotals = { total: 0, selections: [], remaining: MAX_BUDGET };
 let recalcTotals = () => {};
-let currentUserName = storedUser;
+let currentUserId = "";
+let currentLegacyId = localStorage.getItem("xmasUserLegacyId") || "";
+let currentUserName = localStorage.getItem("xmasUserName") || "";
 let menuSections = [];
+let hasInitialised = false;
 
 const renderUserBadge = (name) => {
   if (!userBadge) return;
@@ -227,7 +226,7 @@ const applyExistingSelections = (selections) => {
 };
 
 async function fetchExistingSelections(userId) {
-  const choiceRef = doc(db, "users", userId);
+  const choiceRef = doc(db, "choices", userId);
   const snap = await getDoc(choiceRef);
   if (!snap.exists()) return null;
   return snap.data();
@@ -235,7 +234,7 @@ async function fetchExistingSelections(userId) {
 
 async function fetchUserName(userId) {
   try {
-    const userRef = doc(db, "users", userId);
+    const userRef = doc(db, "choices", userId);
     const snap = await getDoc(userRef);
     if (snap.exists() && snap.data()?.name) {
       return snap.data().name;
@@ -261,11 +260,12 @@ async function init() {
       },
     });
 
-    const existing = await fetchExistingSelections(storedUser);
+    const existing = await fetchExistingSelections(currentUserId);
     const selections = normalizeSelections(
       existing?.choices || existing?.items || existing?.selections
     );
-    currentUserName = existing?.name || (await fetchUserName(storedUser));
+    currentUserName =
+      existing?.name || currentUserName || (await fetchUserName(currentUserId));
     renderUserBadge(currentUserName);
     if (selections.length) {
       applyExistingSelections(selections);
@@ -296,7 +296,7 @@ const handleResetChoices = async () => {
 
   try {
     const zeroSelections = buildZeroedSelections();
-    await resetUserSelections(storedUser, zeroSelections);
+    await resetUserSelections(currentUserId, zeroSelections, currentLegacyId);
     setResetStatus("Your choices have been reset.", "success");
     setStatus("All choices cleared. Pick again if you like.", "success");
   } catch (err) {
@@ -314,6 +314,16 @@ const handleResetChoices = async () => {
 };
 
 submitButton.addEventListener("click", async () => {
+  if (!currentUserId) {
+    const activeUid = auth.currentUser?.uid;
+    if (!activeUid) {
+      setStatus("Your session expired. Please log in again.", "error");
+      window.location.href = "index.html";
+      return;
+    }
+    currentUserId = activeUid;
+  }
+
   const { total, selections, remaining } = latestTotals;
   if (!selections.length) {
     setStatus("Please add at least one item before saving.", "error");
@@ -338,14 +348,18 @@ submitButton.addEventListener("click", async () => {
 
     const totalSpend = Number(Number(total).toFixed(2)) || 0;
 
-    console.log("Saving choices for", storedUser, { choices: choiceMap, totalSpend });
+    const isAdminFlag = localStorage.getItem("xmasUserIsAdmin") === "true";
+
+    console.log("Saving choices for", currentUserId, { choices: choiceMap, totalSpend });
 
     await saveUserSelections(
-      storedUser,
+      currentUserId,
       currentUserName,
       choiceMap,
       totalSpend,
-      selections
+      selections,
+      currentLegacyId,
+      isAdminFlag
     );
     setStatus("Choices saved!", "success");
     window.location.href = "complete.html";
@@ -359,4 +373,24 @@ submitButton.addEventListener("click", async () => {
 
 resetButton?.addEventListener("click", handleResetChoices);
 
-init();
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUserId = user.uid;
+  localStorage.setItem("xmasUser", currentUserId);
+  localStorage.setItem("currentUser", currentUserId);
+
+  if (hasInitialised) return;
+  hasInitialised = true;
+
+  if (!currentUserName) {
+    currentUserName =
+      localStorage.getItem("xmasUserName") || currentLegacyId || currentUserId;
+  }
+
+  renderUserBadge(currentUserName);
+  init();
+});

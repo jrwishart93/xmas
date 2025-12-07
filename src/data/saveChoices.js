@@ -14,13 +14,17 @@ import {
  * @param {Object} choices - Map of drinkId/name -> quantity & price
  * @param {number} totalSpend - Total cost of selections
  * @param {Array} selections - Normalised selections array
+ * @param {string} legacyId - Optional legacy identifier (e.g. username)
+ * @param {boolean} isAdmin - Whether the user has admin privileges
  */
 export async function saveUserSelections(
   userId,
   userName,
   choices,
   totalSpend,
-  selections = []
+  selections = [],
+  legacyId = "",
+  isAdmin = false
 ) {
   if (!userId) throw new Error("Missing userId in saveUserSelections()");
   if (!choices || typeof choices !== "object") {
@@ -48,12 +52,15 @@ export async function saveUserSelections(
         }))
     : [];
 
-  const userRef = doc(db, "users", userId);
+  const userRef = doc(db, "choices", userId);
 
   await setDoc(
     userRef,
     {
       name: userName || userId,
+      uid: userId,
+      legacyId,
+      admin: Boolean(isAdmin),
       hasSubmitted: true,
       total: safeTotal,
       totalSpend: safeTotal,

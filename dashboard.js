@@ -1,4 +1,4 @@
-import { db } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import {
   collection,
   doc,
@@ -8,6 +8,7 @@ import {
   serverTimestamp,
   writeBatch
 } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
 
@@ -39,8 +40,10 @@ const ADMIN_IDS = new Set(["derek", "lawrie", "admin"]);
 const RESET_TOKEN = "RESET";
 
 let isAdminUser = false;
-const currentUserId =
-  localStorage.getItem("xmasUser") || localStorage.getItem("currentUser") || "";
+let currentUserId = "";
+const legacyUserId = localStorage.getItem("xmasUserLegacyId") || "";
+const cachedAdminFlag = localStorage.getItem("xmasUserIsAdmin") === "true";
+let hasLoadedDashboard = false;
 
 function normalizeSelections(rawSelections) {
   if (!rawSelections) return [];
@@ -350,10 +353,15 @@ async function evaluateAdminAccess() {
   }
 
   try {
-    const docRef = doc(db, "users", currentUserId);
+    const docRef = doc(db, "choices", currentUserId);
     const docSnap = await getDoc(docRef);
     const data = docSnap.data();
-    isAdminUser = Boolean(data?.admin) || ADMIN_IDS.has(currentUserId);
+    const isAdminFromProfile = Boolean(data?.admin);
+    const isAdminFromLegacy = legacyUserId
+      ? ADMIN_IDS.has(legacyUserId)
+      : false;
+
+    isAdminUser = cachedAdminFlag || isAdminFromProfile || isAdminFromLegacy;
     setResetAvailability(isAdminUser);
     if (!isAdminUser && hardResetError) {
       hardResetError.textContent = "You must be an admin to hard reset.";
@@ -372,11 +380,11 @@ function updateConfirmButtonState() {
 }
 
 async function performHardReset() {
-  const usersSnapshot = await getDocs(collection(db, "users"));
+  const usersSnapshot = await getDocs(collection(db, "choices"));
   const batch = writeBatch(db);
 
   usersSnapshot.forEach((userDoc) => {
-    const userRef = doc(db, "users", userDoc.id);
+    const userRef = doc(db, "choices", userDoc.id);
     batch.set(
       userRef,
       {
@@ -469,7 +477,7 @@ async function loadDashboard() {
 
   try {
     onSnapshot(
-      collection(db, "users"),
+      collection(db, "choices"),
       (snapshot) => {
         const allChoices = [];
         snapshot.forEach((docSnapshot) => {
@@ -512,6 +520,20 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-evaluateAdminAccess();
-loadDashboard();
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUserId = user.uid;
+  localStorage.setItem("xmasUser", currentUserId);
+  localStorage.setItem("currentUser", currentUserId);
+
+  if (hasLoadedDashboard) return;
+  hasLoadedDashboard = true;
+
+  evaluateAdminAccess();
+  loadDashboard();
+});
 

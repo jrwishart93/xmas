@@ -11,8 +11,13 @@ import {
  *
  * @param {string} userId
  * @param {Array} zeroSelections - List of items to reset with zero quantities
+ * @param {string} legacyId - Optional legacy identifier (e.g. username)
  */
-export async function resetUserSelections(userId, zeroSelections = []) {
+export async function resetUserSelections(
+  userId,
+  zeroSelections = [],
+  legacyId = ""
+) {
   if (!userId) throw new Error("Missing userId in resetUserSelections()");
 
   const sanitizedSelections = Array.isArray(zeroSelections)
@@ -30,10 +35,12 @@ export async function resetUserSelections(userId, zeroSelections = []) {
     return acc;
   }, {});
 
-  const userRef = doc(db, "users", userId);
+  const userRef = doc(db, "choices", userId);
   await setDoc(
     userRef,
     {
+      uid: userId,
+      legacyId,
       hasSubmitted: false,
       choices: zeroChoiceMap,
       selections: sanitizedSelections,
