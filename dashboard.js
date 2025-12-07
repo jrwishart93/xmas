@@ -1,17 +1,15 @@
 import {
-  getFirestore,
   collection,
   getDocs,
   doc,
   serverTimestamp,
   writeBatch
-} from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
-import { app } from "./firebase.js";
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { db } from "./firebase.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
 import { TEAM } from "./team.js";
 
-const db = getFirestore(app);
 const MAX_BUDGET_PER_PERSON = 20;
 const TOTAL_USERS = Object.keys(TEAM).length;
 const MAX_KITTY = TOTAL_USERS * MAX_BUDGET_PER_PERSON;
