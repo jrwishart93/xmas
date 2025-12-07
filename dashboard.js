@@ -4,7 +4,6 @@ import {
   doc,
   getDoc,
   getDocs,
-  onSnapshot,
   serverTimestamp,
   writeBatch
 } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
@@ -475,30 +474,23 @@ async function loadDashboard() {
   }
 
   try {
-    onSnapshot(
-      collection(db, "choices"),
-      (snapshot) => {
-        const allChoices = [];
-        snapshot.forEach((docSnapshot) => {
-          allChoices.push({ id: docSnapshot.id, ...docSnapshot.data() });
-        });
-        renderDashboard(allChoices, categoryMap);
-      },
-      (error) => {
-        console.error("Unable to load dashboard", error);
-        if (submissionRows) {
-          submissionRows.innerHTML = '<p class="muted-text">Unable to load submissions.</p>';
-        }
-        if (peopleAccordion) {
-          peopleAccordion.innerHTML = '<p class="muted-text">Unable to load breakdown.</p>';
-        }
-        if (itemTotalsList) {
-          itemTotalsList.innerHTML = '<p class="muted-text">Unable to load item totals.</p>';
-        }
-      }
-    );
+    const snapshot = await getDocs(collection(db, "choices"));
+    const allChoices = [];
+    snapshot.forEach((docSnapshot) => {
+      allChoices.push({ id: docSnapshot.id, ...docSnapshot.data() });
+    });
+    renderDashboard(allChoices, categoryMap);
   } catch (error) {
-    console.error("Unable to start dashboard listener", error);
+    console.error("Unable to load dashboard", error);
+    if (submissionRows) {
+      submissionRows.innerHTML = '<p class="muted-text">Unable to load submissions.</p>';
+    }
+    if (peopleAccordion) {
+      peopleAccordion.innerHTML = '<p class="muted-text">Unable to load breakdown.</p>';
+    }
+    if (itemTotalsList) {
+      itemTotalsList.innerHTML = '<p class="muted-text">Unable to load item totals.</p>';
+    }
   }
 }
 
