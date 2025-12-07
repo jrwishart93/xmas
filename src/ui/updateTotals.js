@@ -9,8 +9,8 @@ export function calculateTotals() {
 
   items.forEach((item) => {
     const name = item.dataset.name;
-    const price = Number(item.dataset.price);
-    if (!name || isNaN(price)) return;
+    const price = Number.parseFloat(item.dataset.price);
+    if (!name || !Number.isFinite(price)) return;
 
     const qtyDisplay = item.querySelector('.qty-display');
     const qtyInput = item.querySelector('.qty-input');

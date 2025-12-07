@@ -4,25 +4,29 @@ import { fetchMenu } from "../data/loadMenu.js";
 // optional: a tiny icon map for fun
 const iconFor = (cat) => {
   const m = {
-    "Tap Beers": "🍺",
-    "Bottles & Cans": "🧴",
-    "Sparkling": "🥂",
+    "Tank & Tap Beers": "🍺",
+    "Beer Bottles & Cans": "🧴",
+    "Beer Flights": "🧪",
+    "Sparkling Wine": "🥂",
     "White Wine": "🍷",
     "Red Wine": "🍷",
-    "Rosé / Orange": "🌸",
+    "Rosé / Orange Wine": "🌸",
     "Cocktails": "🍸",
-    "Spirits": "🥃",
+    "Spirits – Speciality": "🥃",
+    "Spirits – Tequila": "🪅",
+    "Spirits – Vodka": "❄️",
+    "Spirits – Rum": "🏴‍☠️",
     "Schnapps": "🍶",
-    "No & Low": "🫗",
+    "Alcohol-Free Cocktails": "🫗",
     "Alcohol-Free Beers": "🍺",
-    "Alcohol-Free Spirits": "🧊",
-    "Alcohol-Free Wine": "🍷",
-    "Soft Drinks": "🥤",
-    "Bites": "🍟",
-    "Sharers": "🧀"
   };
+  if (cat?.startsWith("Spirits")) return "🥃";
+  if (cat?.startsWith("Alcohol-Free")) return "🫗";
   return m[cat] || "🎄";
 };
+
+const formatPrice = (price) =>
+  Number.isFinite(price) ? `£${Number(price).toFixed(2)}` : "TBC";
 
 export async function renderMenu(container) {
   container.innerHTML = ""; // clear
@@ -46,11 +50,16 @@ export async function renderMenu(container) {
     list.className = "items";
 
     cat.items.forEach((it) => {
+      const hasPrice = Number.isFinite(it.price);
       const row = document.createElement("div");
       row.classList.add("item", "menu-item", "drink-item");
       row.dataset.name = it.name;
-      row.dataset.price = String(it.price);
+      row.dataset.price = hasPrice ? String(it.price) : "";
       row.dataset.quantity = "0";
+      if (!hasPrice) {
+        row.setAttribute("aria-disabled", "true");
+        row.classList.add("item--unpriced");
+      }
 
       const infoWrap = document.createElement("div");
       infoWrap.className = "drink-info";
@@ -61,18 +70,18 @@ export async function renderMenu(container) {
 
       const priceSpan = document.createElement("span");
       priceSpan.className = "item-price";
-      priceSpan.textContent = `£${Number(it.price).toFixed(2)}`;
+      priceSpan.textContent = formatPrice(it.price);
 
       infoWrap.appendChild(nameSpan);
       infoWrap.appendChild(priceSpan);
 
-      const createQuantityStepper = () => {
+      const createQuantityStepper = (enabled = true) => {
         const stepper = document.createElement("div");
         stepper.className = "qty-stepper";
         stepper.dataset.value = "0";
 
         const toggleMinusState = (value) => {
-          const isDisabled = value === 0;
+          const isDisabled = value === 0 || !enabled;
           if (isDisabled) {
             minusBtn.classList.add("is-disabled");
             minusBtn.setAttribute("aria-disabled", "true");
@@ -122,15 +131,21 @@ export async function renderMenu(container) {
         plusBtn.textContent = "+";
 
         minusBtn.addEventListener("click", () => {
+          if (!enabled) return;
           const current = Number(stepper.dataset.value) || 0;
           if (current === 0) return;
           updateQuantity(current - 1);
         });
 
         plusBtn.addEventListener("click", () => {
+          if (!enabled) return;
           const current = Number(stepper.dataset.value) || 0;
           updateQuantity(current + 1);
         });
+
+        minusBtn.disabled = !enabled;
+        plusBtn.disabled = !enabled;
+        stepper.classList.toggle("is-disabled", !enabled);
 
         stepper.appendChild(minusBtn);
         stepper.appendChild(display);
@@ -140,7 +155,7 @@ export async function renderMenu(container) {
         return stepper;
       };
 
-      const quantityStepper = createQuantityStepper();
+      const quantityStepper = createQuantityStepper(hasPrice);
 
       row.appendChild(infoWrap);
       row.appendChild(quantityStepper);
