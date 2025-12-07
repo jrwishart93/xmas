@@ -4,7 +4,12 @@ import { resetUserSelections } from "./src/data/resetChoices.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
 import { TEAM, normaliseTeamId } from "./team.js";
 import { db } from "./firebase.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import {
+  doc,
+  getDoc,
+  onSnapshot,
+  setDoc,
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const MAX_BUDGET = 20;
 const userId = normaliseTeamId(sessionStorage.getItem("loggedInUser"));
@@ -37,6 +42,8 @@ let currentUserName =
   sessionStorage.getItem("selectedUserName") || TEAM[userId]?.name || "";
 let menuSections = [];
 let hasInitialised = false;
+let unsubscribeFromChoices = null;
+let hasRestoredSelections = false;
 
 const renderUserBadge = (name) => {
   if (!userBadge) return;
@@ -283,24 +290,66 @@ const applyExistingSelections = (selections) => {
   }
 };
 
+const handleSelectionsUpdate = (data) => {
+  if (!data) {
+    hasRestoredSelections = true;
+    setStatus("Pick up to £20 worth of drinks and bites.");
+    return;
+  }
+
+  const selections = normalizeSelections(
+    data.choices || data.items || data.selections
+  );
+  currentUserName = data?.name || currentUserName;
+  renderUserBadge(currentUserName);
+
+  if (selections.length) {
+    applyExistingSelections(selections);
+  }
+
+  if (hasNonZeroSelections(selections)) {
+    setStatus(
+      hasRestoredSelections
+        ? "Updated your saved picks from Firestore."
+        : "We restored your previous picks. Update them if you like and hit save.",
+      "success"
+    );
+    hasRestoredSelections = true;
+  } else {
+    setStatus("Pick up to £20 worth of drinks and bites.");
+  }
+};
+
+const subscribeToUserChoices = (userId) => {
+  if (!userId) return;
+
+  if (typeof unsubscribeFromChoices === "function") {
+    unsubscribeFromChoices();
+  }
+
+  const choiceRef = doc(db, "choices", userId);
+  unsubscribeFromChoices = onSnapshot(
+    choiceRef,
+    (snapshot) => {
+      if (!snapshot.exists()) {
+        handleSelectionsUpdate(null);
+        return;
+      }
+
+      handleSelectionsUpdate(snapshot.data());
+    },
+    (error) => {
+      console.error("Choices listener error", error);
+      setStatus("We couldn't load your saved choices. Please refresh.", "error");
+    }
+  );
+};
+
 async function fetchExistingSelections(userId) {
   const choiceRef = doc(db, "choices", userId);
   const snap = await getDoc(choiceRef);
   if (!snap.exists()) return null;
   return snap.data();
-}
-
-async function fetchUserName(userId) {
-  try {
-    const userRef = doc(db, "choices", userId);
-    const snap = await getDoc(userRef);
-    if (snap.exists() && snap.data()?.name) {
-      return snap.data().name;
-    }
-  } catch (error) {
-    console.warn("Unable to fetch user profile", error);
-  }
-  return userId;
 }
 
 async function init() {
@@ -319,24 +368,11 @@ async function init() {
     });
 
     const existing = await fetchExistingSelections(currentUserId);
-    const selections = normalizeSelections(
-      existing?.choices || existing?.items || existing?.selections
-    );
-    currentUserName =
-      existing?.name || currentUserName || (await fetchUserName(currentUserId));
-    renderUserBadge(currentUserName);
-    if (selections.length) {
-      applyExistingSelections(selections);
+    if (existing) {
+      handleSelectionsUpdate(existing);
     }
 
-    if (hasNonZeroSelections(selections)) {
-      setStatus(
-        "We restored your previous picks. Update them if you like and hit save.",
-        "success"
-      );
-    } else {
-      setStatus("Pick up to £20 worth of drinks and bites.");
-    }
+    subscribeToUserChoices(currentUserId);
   } catch (err) {
     console.error(err);
     setStatus("We couldn't load the menu. Please refresh and try again.", "error");
