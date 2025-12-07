@@ -3,13 +3,11 @@ import { attachTotalHandler } from "./src/ui/updateTotals.js";
 import { resetUserSelections } from "./src/data/resetChoices.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
 import { TEAM, normaliseTeamId } from "./team.js";
-import { db } from "./firebase.js";
 import {
-  doc,
-  getDoc,
-  onSnapshot,
-  setDoc,
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+  loadUserChoices,
+  listenToUserChoices,
+  saveUserChoices,
+} from "./src/data/choicesStore.js";
 
 const MAX_BUDGET = 20;
 const userId = normaliseTeamId(sessionStorage.getItem("loggedInUser"));
@@ -327,29 +325,23 @@ const subscribeToUserChoices = (userId) => {
     unsubscribeFromChoices();
   }
 
-  const choiceRef = doc(db, "choices", userId);
-  unsubscribeFromChoices = onSnapshot(
-    choiceRef,
-    (snapshot) => {
-      if (!snapshot.exists()) {
+  unsubscribeFromChoices = listenToUserChoices(
+    userId,
+    (data) => {
+      if (!data) {
         handleSelectionsUpdate(null);
         return;
       }
-
-      handleSelectionsUpdate(snapshot.data());
+      handleSelectionsUpdate(data);
     },
-    (error) => {
-      console.error("Choices listener error", error);
+    () => {
       setStatus("We couldn't load your saved choices. Please refresh.", "error");
     }
   );
 };
 
 async function fetchExistingSelections(userId) {
-  const choiceRef = doc(db, "choices", userId);
-  const snap = await getDoc(choiceRef);
-  if (!snap.exists()) return null;
-  return snap.data();
+  return loadUserChoices(userId);
 }
 
 async function init() {
@@ -378,6 +370,13 @@ async function init() {
     setStatus("We couldn't load the menu. Please refresh and try again.", "error");
   }
 }
+
+const detachListeners = () => {
+  if (typeof unsubscribeFromChoices === "function") {
+    unsubscribeFromChoices();
+    unsubscribeFromChoices = null;
+  }
+};
 
 const handleResetChoices = async () => {
   setResetStatus("");
@@ -451,7 +450,7 @@ async function submitChoices() {
   };
 
   try {
-    await setDoc(doc(db, "choices", userId), payload, { merge: true });
+    await saveUserChoices(userId, payload);
     setStatus("Choices saved!", "success");
     showSuccessOptions();
   } catch (err) {
@@ -488,6 +487,8 @@ function startChoices() {
   if (hasInitialised) return;
   hasInitialised = true;
   init();
+
+  window.addEventListener("beforeunload", detachListeners);
 }
 
 startChoices();
