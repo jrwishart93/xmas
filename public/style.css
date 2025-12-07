@@ -800,7 +800,7 @@ button.btn-green:hover:not(:disabled) {
 }
 
 .voting-card {
-  margin-top: 14px;
+  margin-top: 1.5rem;
 }
 
 .voting-actions {
@@ -887,7 +887,7 @@ button.btn-green:hover:not(:disabled) {
 }
 
 .kitty-container {
-  margin-top: 20px;
+  margin-top: 1.5rem;
   padding: 14px 18px;
   background: rgba(255, 255, 255, 0.06);
   border-radius: 12px;
