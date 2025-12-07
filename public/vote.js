@@ -1,5 +1,7 @@
 import { TEAM, getAvatarSrc, normalizeAvatarPath, normaliseTeamId } from "./src/team.js";
 import { fetchUsersFromFirestore } from "../src/data/users.js";
+import { fetchVotingQuestions } from "../src/data/votingQuestionsStore.js";
+import { VOTING_QUESTIONS } from "../src/data/votingQuestions.js";
 import { db } from "../firebase.js";
 import {
   doc,
@@ -7,33 +9,27 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-const QUESTIONS = [
-  {
-    id: "firstHome",
-    containerId: "q-first-home",
-    prompt: "Who will be the first person to go home?"
-  },
-  {
-    id: "lastStanding",
-    containerId: "q-last-standing",
-    prompt: "Who will be the last person standing?"
-  },
-  {
-    id: "mostDrunk",
-    containerId: "q-most-drunk",
-    prompt: "Who will be the most drunk?"
-  },
-  {
-    id: "mostAlcohol",
-    containerId: "q-most-alcohol",
-    prompt: "Who will consume the most alcohol?"
-  },
-  {
-    id: "ninjaExit",
-    containerId: "q-ninja-exit",
-    prompt: "Who is most likely to disappear without saying goodbye?"
-  }
-];
+function toKebabCase(value = "") {
+  return value
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .replace(/[_\s]+/g, "-")
+    .toLowerCase();
+}
+
+function createQuestionShape(entry) {
+  const baseId = entry?.id || "";
+  const containerId = entry?.containerId || `q-${toKebabCase(baseId)}`;
+
+  return {
+    id: baseId,
+    containerId,
+    prompt: entry?.prompt || entry?.question || "",
+    icon: entry?.icon,
+    alt: entry?.alt,
+  };
+}
+
+let QUESTIONS = VOTING_QUESTIONS.map(createQuestionShape);
 
 const votesState = {};
 let participants = { ...TEAM };
@@ -95,6 +91,29 @@ function selectAvatar(questionId, userKey, { autoAdvance = false } = {}) {
   if (autoAdvance) {
     scrollToNextQuestion(questionId);
   }
+}
+
+function renderQuestionContent() {
+  QUESTIONS.forEach((question) => {
+    const container = document.getElementById(question.containerId);
+    if (!container) return;
+
+    const title = container.querySelector(".vote-question-title");
+    const img = container.querySelector(".vote-image");
+
+    if (title) {
+      title.textContent = question.prompt;
+    }
+
+    if (img && (question.icon || question.alt)) {
+      if (question.icon) {
+        img.src = question.icon;
+      }
+      if (question.alt) {
+        img.alt = question.alt;
+      }
+    }
+  });
 }
 
 function renderAvatarGrids() {
@@ -175,6 +194,15 @@ async function loadParticipants() {
   renderAvatarGrids();
 }
 
+async function loadQuestions() {
+  const remoteQuestions = await fetchVotingQuestions();
+  if (remoteQuestions.length) {
+    QUESTIONS = remoteQuestions.map(createQuestionShape);
+  }
+
+  renderQuestionContent();
+}
+
 async function loadExistingVotes() {
   if (!userId) return;
 
@@ -240,6 +268,7 @@ async function saveVotes() {
 async function init() {
   toggleLoading(true);
   try {
+    await loadQuestions();
     await loadParticipants();
     await loadExistingVotes();
     submitButton?.addEventListener("click", saveVotes);

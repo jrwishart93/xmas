@@ -1,5 +1,6 @@
 import { TEAM, getAvatarSrc, normalizeAvatarPath, normaliseTeamId } from "./team.js";
 import { VOTING_QUESTIONS } from "./src/data/votingQuestions.js";
+import { fetchVotingQuestions } from "./src/data/votingQuestionsStore.js";
 import { fetchUsersFromFirestore } from "./src/data/users.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
 import { db } from "./firebase.js";
@@ -8,23 +9,39 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/f
 const userId = normaliseTeamId(sessionStorage.getItem("loggedInUser"));
 if (!userId) location.href = "index.html";
 
-const QUESTION_TITLES = VOTING_QUESTIONS.reduce((acc, { id, question }) => {
-  acc[id] = question;
-  return acc;
-}, {});
-
-const tallies = VOTING_QUESTIONS.reduce((acc, { id }) => {
-  acc[id] = {};
-  return acc;
-}, {});
+let QUESTIONS = [...VOTING_QUESTIONS];
+let QUESTION_TITLES = {};
+let tallies = {};
 
 const resultsContainer = document.getElementById("resultsContainer");
 let participants = { ...TEAM };
 
+function buildQuestionTitleMap(list) {
+  return list.reduce((acc, { id, question }) => {
+    acc[id] = question;
+    return acc;
+  }, {});
+}
+
+function buildTallies(list) {
+  return list.reduce((acc, { id }) => {
+    acc[id] = {};
+    return acc;
+  }, {});
+}
+
+function setQuestions(list = []) {
+  QUESTIONS = list.length ? list : VOTING_QUESTIONS;
+  QUESTION_TITLES = buildQuestionTitleMap(QUESTIONS);
+  tallies = buildTallies(QUESTIONS);
+}
+
+setQuestions(QUESTIONS);
+
 function extractAnswers(data = {}) {
   const answers = {};
 
-  VOTING_QUESTIONS.forEach(({ id }) => {
+  QUESTIONS.forEach(({ id }) => {
     if (data[id]) {
       answers[id] = data[id];
     }
@@ -34,7 +51,7 @@ function extractAnswers(data = {}) {
     const legacy = data.answers || data.votes;
     if (legacy && typeof legacy === "object") {
       Object.entries(legacy).forEach(([qid, choice]) => {
-        if (VOTING_QUESTIONS.some((q) => q.id === qid)) {
+        if (QUESTIONS.some((q) => q.id === qid)) {
           answers[qid] = choice;
         }
       });
@@ -54,6 +71,11 @@ function getDisplayName(userId) {
 
 async function loadResults() {
   try {
+    const remoteQuestions = await fetchVotingQuestions();
+    if (remoteQuestions.length) {
+      setQuestions(remoteQuestions);
+    }
+
     const remoteUsers = await fetchUsersFromFirestore();
     Object.entries(remoteUsers).forEach(([id, data]) => {
       const canonicalId = normaliseTeamId(id);
