@@ -12,8 +12,10 @@ if (!userId) location.href = "index.html";
 let QUESTIONS = [...VOTING_QUESTIONS];
 let QUESTION_TITLES = {};
 let tallies = {};
+let ballotCount = 0;
 
 const resultsContainer = document.getElementById("resultsContainer");
+const resultsSummary = document.getElementById("resultsSummary");
 let participants = { ...TEAM };
 
 function buildQuestionTitleMap(list) {
@@ -95,6 +97,7 @@ async function loadResults() {
 
     snap.forEach(docSnap => {
       const data = docSnap.data();
+      ballotCount += 1;
       const answers = extractAnswers(data);
       if (!answers) return;
       for (const [qid, choice] of Object.entries(answers)) {
@@ -106,6 +109,7 @@ async function loadResults() {
     });
 
     renderTallies();
+    renderSummary();
   } catch (error) {
     console.error("Error loading votes", error);
     resultsContainer.innerHTML = "<p class=\"muted-text\">Unable to load voting results right now. Please try again soon.</p>";
@@ -126,6 +130,8 @@ function renderTallies() {
     const ul = document.createElement("ul");
 
     const sortedAnswers = Object.entries(answers).sort((a, b) => b[1] - a[1]);
+    const totalVotesForQuestion = sortedAnswers.reduce((acc, [, count]) => acc + count, 0);
+    const totalLabel = totalVotesForQuestion === 1 ? "vote" : "votes";
 
     if (!sortedAnswers.length) {
       const emptyItem = document.createElement("li");
@@ -162,14 +168,24 @@ function renderTallies() {
         const countBadge = document.createElement("span");
         countBadge.className = "result-row__count";
         const voteWord = count === 1 ? "vote" : "votes";
-        countBadge.textContent = `${count} ${voteWord}`;
+        const percentage = totalVotesForQuestion ? Math.round((count / totalVotesForQuestion) * 100) : 0;
+        countBadge.textContent = `${count} ${voteWord} (${percentage}%)`;
 
-        li.append(avatarName, countBadge);
+        const progress = document.createElement("span");
+        progress.className = "result-row__progress";
+        progress.style.width = `${Math.max(percentage, 8)}%`;
+        progress.setAttribute("aria-hidden", "true");
+
+        li.append(progress, avatarName, countBadge);
         ul.appendChild(li);
       });
     }
 
-    block.appendChild(ul);
+    const total = document.createElement("p");
+    total.className = "result-total muted-text";
+    total.textContent = `${totalVotesForQuestion} ${totalLabel} recorded for this question.`;
+
+    block.append(ul, total);
     resultsContainer.appendChild(block);
   });
 
@@ -179,6 +195,46 @@ function renderTallies() {
     notice.textContent = "As soon as people vote, results will appear here.";
     resultsContainer.prepend(notice);
   }
+}
+
+function renderSummary() {
+  if (!resultsSummary) return;
+
+  const totalVotes = Object.values(tallies).reduce((sum, answers) => {
+    return sum + Object.values(answers).reduce((a, b) => a + b, 0);
+  }, 0);
+
+  const activeQuestions = Object.values(tallies).filter((answers) => Object.keys(answers).length).length;
+  const totalQuestions = QUESTIONS.length;
+
+  const ballotLabel = ballotCount === 1 ? "ballot" : "ballots";
+  const voteLabel = totalVotes === 1 ? "vote" : "votes";
+
+  const progress = totalQuestions
+    ? Math.round((activeQuestions / totalQuestions) * 100)
+    : 0;
+
+  resultsSummary.innerHTML = `
+    <div class="summary-card">
+      <div>
+        <p class="muted-text">Ballots counted</p>
+        <p class="summary-value">${ballotCount} <span class="summary-label">${ballotLabel}</span></p>
+      </div>
+      <div>
+        <p class="muted-text">Total predictions</p>
+        <p class="summary-value">${totalVotes} <span class="summary-label">${voteLabel}</span></p>
+      </div>
+      <div class="summary-progress">
+        <div class="summary-progress__header">
+          <p class="muted-text">Questions with votes</p>
+          <p class="summary-label">${activeQuestions}/${totalQuestions}</p>
+        </div>
+        <div class="summary-progress__track" role="img" aria-label="${progress}% of questions have been voted on">
+          <span class="summary-progress__fill" style="width: ${progress}%"></span>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 loadResults();
