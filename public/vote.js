@@ -1,4 +1,4 @@
-import { TEAM, getAvatarSrc, normaliseTeamId } from "./src/team.js";
+import { TEAM, getAvatarSrc, normalizeAvatarPath, normaliseTeamId } from "./src/team.js";
 import { fetchUsersFromFirestore } from "../src/data/users.js";
 import { db } from "../firebase.js";
 import {
@@ -94,7 +94,9 @@ function renderAvatarGrids() {
     grid.innerHTML = "";
 
     Object.entries(participants).forEach(([id, person]) => {
-      const avatarSrc = person.avatarUrl || person.avatar || getAvatarSrc(id);
+      const avatarSrc = normalizeAvatarPath(
+        person.avatarUrl || person.avatar || getAvatarSrc(id)
+      );
       const tile = document.createElement("button");
       tile.type = "button";
       tile.className = "avatar-tile";
@@ -107,7 +109,7 @@ function renderAvatarGrids() {
 
       const resolvedSrc = avatarSrc?.startsWith("http")
         ? avatarSrc
-        : (avatarSrc || "").replace(/^\//, "");
+        : normalizeAvatarPath(avatarSrc);
       tile.innerHTML = `
         <div class="avatar-thumb">
           <img src="${resolvedSrc}" alt="${person.name}" />
@@ -130,8 +132,10 @@ async function loadParticipants() {
     merged[id] = {
       ...person,
       name: remote.name || person.name,
-      avatar: remote.avatarUrl || remote.avatar || person.avatar || getAvatarSrc(id),
-      avatarUrl: remote.avatarUrl || person.avatarUrl,
+      avatar: normalizeAvatarPath(
+        remote.avatarUrl || remote.avatar || person.avatar || getAvatarSrc(id)
+      ),
+      avatarUrl: normalizeAvatarPath(remote.avatarUrl || person.avatarUrl),
     };
   });
 
@@ -142,8 +146,12 @@ async function loadParticipants() {
     merged[canonicalId] = {
       ...merged[canonicalId],
       name: data.name || merged[canonicalId].name,
-      avatar: data.avatarUrl || data.avatar || merged[canonicalId].avatar,
-      avatarUrl: data.avatarUrl || merged[canonicalId].avatarUrl,
+      avatar: normalizeAvatarPath(
+        data.avatarUrl || data.avatar || merged[canonicalId].avatar
+      ),
+      avatarUrl: normalizeAvatarPath(
+        data.avatarUrl || merged[canonicalId].avatarUrl
+      ),
     };
   });
 

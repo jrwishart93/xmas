@@ -1,4 +1,4 @@
-import { TEAM, getAvatarSrc, normaliseTeamId } from "./team.js";
+import { TEAM, getAvatarSrc, normalizeAvatarPath, normaliseTeamId } from "./team.js";
 import { VOTING_QUESTIONS } from "./src/data/votingQuestions.js";
 import { fetchUsersFromFirestore } from "./src/data/users.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
@@ -63,7 +63,9 @@ async function loadResults() {
         ...participants[canonicalId],
         ...data,
         name: data.name || participants[canonicalId]?.name,
-        avatar: data.avatarUrl || data.avatar || participants[canonicalId]?.avatar || getAvatarSrc(canonicalId),
+        avatar: normalizeAvatarPath(
+          data.avatarUrl || data.avatar || participants[canonicalId]?.avatar || getAvatarSrc(canonicalId)
+        ),
       };
     });
 
@@ -120,12 +122,10 @@ function renderTallies() {
         }
 
         const name = getDisplayName(uid);
-        const avatar = participants[uid]?.avatar || participants[uid]?.avatarUrl || getAvatarSrc(uid);
-        const resolvedAvatar = avatar?.startsWith("http")
-          ? avatar
-          : avatar
-            ? `/${avatar.replace(/^\//, "")}`
-            : undefined;
+        const avatar = normalizeAvatarPath(
+          participants[uid]?.avatar || participants[uid]?.avatarUrl || getAvatarSrc(uid)
+        );
+        const resolvedAvatar = normalizeAvatarPath(avatar) || undefined;
         const avatarName = createAvatarName(name, isLeader ? 60 : 42, { image: resolvedAvatar });
         avatarName.classList.add("result-row__identity");
 
