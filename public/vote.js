@@ -268,7 +268,7 @@ async function saveVotes() {
     showToast("Votes saved!");
     submitButton.textContent = "Saved";
     setTimeout(() => {
-      window.location.href = "dashboard.html";
+      window.location.href = "votes_results.html";
     }, 700);
   } catch (error) {
     console.error("Failed to save votes", error);
