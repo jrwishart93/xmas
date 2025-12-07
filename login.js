@@ -1,4 +1,4 @@
-import { TEAM } from './team.js';
+import { TEAM, getAvatarSrc, normaliseTeamId } from './team.js';
 import { createAvatarElement, createAvatarName } from './src/utils/avatarMap.js';
 import { fetchUsersFromFirestore } from './src/data/users.js';
 
@@ -12,7 +12,7 @@ const pinSection = document.getElementById('pinSection');
 const loginForm = document.getElementById('loginForm');
 
 let activeCard = null;
-let selectedUserId = sessionStorage.getItem('selectedUser') || '';
+let selectedUserId = normaliseTeamId(sessionStorage.getItem('selectedUser') || '');
 let selectedUserName = selectedUserId && TEAM[selectedUserId]?.name ? TEAM[selectedUserId].name : '';
 let lastSelectedUserId = '';
 let focusTimeoutId;
@@ -166,7 +166,7 @@ async function populateUsers() {
     entries.forEach(([id, data]) => {
         const remoteData = remoteUsers[id] || {};
         const displayName = remoteData.name || data.name;
-        const avatarUrl = remoteData.avatarUrl || data.image;
+        const avatarUrl = remoteData.avatarUrl || data.avatar || getAvatarSrc(id);
 
         const card = document.createElement('button');
         card.type = 'button';
@@ -207,7 +207,7 @@ async function populateUsers() {
 function handleLogin(event) {
     event?.preventDefault();
 
-    const selectedUser = sessionStorage.getItem('selectedUser');
+    const selectedUser = normaliseTeamId(sessionStorage.getItem('selectedUser'));
     const user = TEAM[selectedUser];
     const entered = pinInput.value.trim();
 

@@ -2,15 +2,15 @@ import { db } from './firebase.js';
 import { collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const requiredUsers = {
-    'derek': { name: 'Derek N', password: '7006', uid: 'uid_derek_n_001', admin: true },
-    'lawrie': { name: 'Lawrie C', password: '1024', uid: 'uid_lawrie_c_001', admin: true },
-    'jo': { name: 'Jo M', password: '0175', uid: 'uid_jo_m_001' },
-    'paul': { name: 'Paul E', password: '6571', uid: 'uid_paul_e_001' },
-    'chris': { name: 'Chris B', password: '2181', uid: 'uid_chris_b_001' },
-    'steve': { name: 'Steve H', password: '4545', uid: 'uid_steve_h_001' },
-    'adamj': { name: 'Adam J', password: '2287', uid: 'uid_adam_j_001' },
-    'adamb': { name: 'Adam B', password: '7120', uid: 'uid_adam_b_001' },
-    'jamie': { name: 'Jamie W', password: '3393', uid: 'uid_jamie_w_001' },
+    'derek_n': { name: 'Derek N', password: '7006', uid: 'uid_derek_n_001', admin: true },
+    'lawrie_c': { name: 'Lawrie C', password: '1024', uid: 'uid_lawrie_c_001', admin: true },
+    'jo_m': { name: 'Jo M', password: '0175', uid: 'uid_jo_m_001' },
+    'paul_e': { name: 'Paul E', password: '6571', uid: 'uid_paul_e_001' },
+    'chris_b': { name: 'Chris B', password: '2181', uid: 'uid_chris_b_001' },
+    'steve_h': { name: 'Steve H', password: '4545', uid: 'uid_steve_h_001' },
+    'adam_j': { name: 'Adam J', password: '2287', uid: 'uid_adam_j_001' },
+    'adam_b': { name: 'Adam B', password: '7120', uid: 'uid_adam_b_001' },
+    'jamie_w': { name: 'Jamie W', password: '3393', uid: 'uid_jamie_w_001' },
 };
 
 async function validateUsers() {

@@ -2,12 +2,12 @@ import { renderMenu } from "./src/ui/renderMenu.js";
 import { attachTotalHandler } from "./src/ui/updateTotals.js";
 import { resetUserSelections } from "./src/data/resetChoices.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
-import { TEAM } from "./team.js";
+import { TEAM, normaliseTeamId } from "./team.js";
 import { db } from "./firebase.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const MAX_BUDGET = 20;
-const userId = sessionStorage.getItem("loggedInUser");
+const userId = normaliseTeamId(sessionStorage.getItem("loggedInUser"));
 const budgetTextElement = document.getElementById("budgetText");
 const budgetBarElement = document.getElementById("budgetBar");
 const menuContainer = document.getElementById("menu-container");
@@ -26,6 +26,8 @@ if (!userId || !TEAM[userId]) {
   alert("User session expired. Please log in again.");
   window.location.href = "index.html";
 }
+
+sessionStorage.setItem("loggedInUser", userId);
 
 let latestTotals = { total: 0, selections: [], remaining: MAX_BUDGET };
 let recalcTotals = () => {};
