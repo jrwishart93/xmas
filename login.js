@@ -1,4 +1,4 @@
-import { TEAM, getAvatarSrc, normaliseTeamId } from './team.js';
+import { TEAM, getAvatarSrc, normalizeAvatarPath, normaliseTeamId } from './team.js';
 import { createAvatarElement, createAvatarName } from './src/utils/avatarMap.js';
 import { fetchUsersFromFirestore } from './src/data/users.js';
 
@@ -166,7 +166,9 @@ async function populateUsers() {
     entries.forEach(([id, data]) => {
         const remoteData = remoteUsers[id] || {};
         const displayName = remoteData.name || data.name;
-        const avatarUrl = remoteData.avatarUrl || data.avatar || getAvatarSrc(id);
+        const avatarUrl = normalizeAvatarPath(
+            remoteData.avatarUrl || remoteData.avatar || data.avatar || getAvatarSrc(id)
+        );
 
         const card = document.createElement('button');
         card.type = 'button';

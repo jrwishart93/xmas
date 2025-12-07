@@ -1,4 +1,15 @@
-const buildAvatarPath = (id) => `public/${id}.png`;
+export function normalizeAvatarPath(path) {
+  if (!path) return "";
+  if (path.startsWith("http")) return path;
+
+  const cleaned = path
+    .replace(/^\/?public\//, "")
+    .replace(/^\//, "");
+
+  return cleaned ? `/${cleaned}` : "";
+}
+
+const buildAvatarPath = (id) => normalizeAvatarPath(`${id}.png`);
 
 export const LEGACY_ID_MAP = {
   adamb: "adam_b",
