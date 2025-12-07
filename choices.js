@@ -255,10 +255,11 @@ const showSuccessOptions = () => {
   modal.innerHTML = `
         <div class="success-box">
             <h2>🎉 Choice Saved!</h2>
-            <p>Your selection has been recorded.</p>
+            <p>Your selection has been recorded. Want to share your predictions?</p>
 
             <button id="goDashboard">View Dashboard</button>
             <button id="addMore">Order More</button>
+            <button id="castVote">Cast Your Vote</button>
         </div>
     `;
 
@@ -271,6 +272,10 @@ const showSuccessOptions = () => {
   document.getElementById("addMore").onclick = () => {
     modal.remove();
     window.location.href = "choices.html";
+  };
+
+  document.getElementById("castVote").onclick = () => {
+    window.location.href = "vote.html";
   };
 };
 
