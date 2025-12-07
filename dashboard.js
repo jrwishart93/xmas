@@ -1,16 +1,17 @@
-import { db } from "./firebase.js";
 import {
+  getFirestore,
   collection,
-  doc,
-  getDoc,
   getDocs,
+  doc,
   serverTimestamp,
   writeBatch
 } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+import { app } from "./firebase.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
 import { TEAM } from "./team.js";
 
+const db = getFirestore(app);
 const MAX_BUDGET_PER_PERSON = 20;
 const TOTAL_USERS = Object.keys(TEAM).length;
 const MAX_KITTY = TOTAL_USERS * MAX_BUDGET_PER_PERSON;
@@ -34,14 +35,11 @@ const currency = new Intl.NumberFormat("en-GB", {
 });
 
 const SNACK_CATEGORIES = new Set(["Bites", "Sharers"]);
-const ADMIN_IDS = new Set(["derek", "lawrie", "admin"]);
 const RESET_TOKEN = "RESET";
 
-let isAdminUser = false;
-let currentUserId = sessionStorage.getItem("selectedUserId") || "";
-const legacyUserId = sessionStorage.getItem("selectedUserLegacyId") || "";
-const cachedAdminFlag = sessionStorage.getItem("xmasUserIsAdmin") === "true";
-let hasLoadedDashboard = false;
+function isAdmin() {
+  return sessionStorage.getItem("loggedInUser") === "jamiew";
+}
 
 function normalizeSelections(rawSelections) {
   if (!rawSelections) return [];
@@ -345,32 +343,13 @@ function setResetAvailability(isAllowed) {
   hardResetTrigger.setAttribute("aria-disabled", String(!isAllowed));
 }
 
-async function evaluateAdminAccess() {
+function evaluateAdminAccess() {
   if (!hardResetTrigger) return;
-  if (!currentUserId) {
-    hardResetError && (hardResetError.textContent = "Log in as an admin to reset.");
-    setResetAvailability(false);
-    return;
-  }
-
-  try {
-    const docRef = doc(db, "choices", currentUserId);
-    const docSnap = await getDoc(docRef);
-    const data = docSnap.data();
-    const isAdminFromProfile = Boolean(data?.admin);
-    const isAdminFromLegacy = legacyUserId
-      ? ADMIN_IDS.has(legacyUserId)
-      : false;
-
-    isAdminUser = cachedAdminFlag || isAdminFromProfile || isAdminFromLegacy;
-    setResetAvailability(isAdminUser);
-    if (!isAdminUser && hardResetError) {
-      hardResetError.textContent = "You must be an admin to hard reset.";
-    }
-  } catch (error) {
-    console.error("Unable to verify admin access", error);
-    hardResetError && (hardResetError.textContent = "Unable to check admin access.");
-    setResetAvailability(false);
+  const admin = isAdmin();
+  hardResetTrigger.style.display = admin ? "block" : "none";
+  setResetAvailability(admin);
+  if (!admin && hardResetError) {
+    hardResetError.textContent = "You must be an admin to hard reset.";
   }
 }
 
@@ -417,7 +396,7 @@ async function performHardReset() {
 }
 
 async function handleHardReset() {
-  if (!isAdminUser) {
+  if (!isAdmin()) {
     hardResetModalError && (hardResetModalError.textContent = "Only admins can reset data.");
     hardResetError && (hardResetError.textContent = "Only admins can reset data.");
     return;
@@ -455,7 +434,7 @@ function renderDashboard(people) {
   renderItemTotals(aggregateItems(people));
 }
 
-async function loadDashboard() {
+async function loadDashboardData() {
   let categoryMap = new Map();
 
   try {
@@ -465,38 +444,39 @@ async function loadDashboard() {
     console.error("Unable to load menu for dashboard", error);
   }
 
-  try {
-    const snap = await getDocs(collection(db, "choices"));
-    const people = [];
+  const colRef = collection(db, "choices");
+  const snap = await getDocs(colRef);
 
-    snap.forEach((docSnapshot) => {
-      const id = docSnapshot.id;
-      if (!TEAM[id]) return;
-      const user = TEAM[id];
-      const data = docSnapshot.data();
+  const data = [];
 
-      people.push(summarisePerson(id, data, user, categoryMap));
-    });
+  snap.forEach((docSnap) => {
+    const id = docSnap.id;
+    const entry = docSnap.data();
 
-    renderDashboard(people);
-    await loadKitty();
-  } catch (error) {
-    console.error("Unable to load dashboard", error);
-    if (submissionRows) {
-      submissionRows.innerHTML = '<p class="muted-text">Unable to load submissions.</p>';
-    }
-    if (peopleAccordion) {
-      peopleAccordion.innerHTML = '<p class="muted-text">Unable to load breakdown.</p>';
-    }
-    if (itemTotalsList) {
-      itemTotalsList.innerHTML = '<p class="muted-text">Unable to load item totals.</p>';
-    }
-  }
+    // Skip unknown docs to prevent duplicates or junk entries
+    if (!TEAM[id]) return;
+
+    data.push(
+      summarisePerson(
+        id,
+        {
+          ...entry,
+          totalSpend: entry.totalSpend || 0,
+          choices: entry.choices || entry.selections || {},
+          selections: entry.choices || entry.selections || []
+        },
+        TEAM[id],
+        categoryMap
+      )
+    );
+  });
+
+  return data;
 }
 
 hardResetTrigger?.addEventListener("click", () => {
   toggleResetModal(true);
-  if (!isAdminUser && hardResetModalError) {
+  if (!isAdmin() && hardResetModalError) {
     hardResetModalError.textContent = "Only admins can reset data.";
   }
 });
@@ -511,15 +491,17 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-function startDashboard() {
-  if (hasLoadedDashboard) {
-    evaluateAdminAccess();
-    return;
-  }
-
-  hasLoadedDashboard = true;
+async function startDashboard() {
   evaluateAdminAccess();
-  loadDashboard();
+
+  try {
+    const data = await loadDashboardData();
+    renderDashboard(data);
+    await loadKitty();
+  } catch (err) {
+    console.error("Unable to load dashboard", err);
+    alert("Unable to load dashboard data. Please refresh.");
+  }
 }
 
 startDashboard();
