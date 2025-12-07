@@ -42,6 +42,7 @@ let participants = { ...TEAM };
 const userId = normaliseTeamId(sessionStorage.getItem("loggedInUser"));
 const voteLoading = document.getElementById("voteLoading");
 const submitButton = document.getElementById("submitVotes");
+const resetButton = document.getElementById("resetVotes");
 
 if (!userId) {
   window.location.href = "index.html";
@@ -245,6 +246,22 @@ function validateVotes() {
   return true;
 }
 
+function resetVotes() {
+  Object.keys(votesState).forEach((key) => delete votesState[key]);
+
+  document.querySelectorAll(".avatar-grid .avatar-tile.selected").forEach((tile) => {
+    tile.classList.remove("selected");
+    tile.setAttribute("aria-pressed", "false");
+  });
+
+  if (submitButton) {
+    submitButton.disabled = false;
+    submitButton.textContent = "Submit Votes";
+  }
+
+  showToast("Votes reset");
+}
+
 async function saveVotes() {
   if (!validateVotes()) return;
   if (!submitButton) return;
@@ -285,6 +302,7 @@ async function init() {
     await loadParticipants();
     await loadExistingVotes();
     submitButton?.addEventListener("click", saveVotes);
+    resetButton?.addEventListener("click", resetVotes);
   } finally {
     toggleLoading(false);
   }
