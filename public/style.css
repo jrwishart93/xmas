@@ -1985,6 +1985,56 @@ button.btn-green:hover:not(:disabled) {
   margin-top: 8px;
 }
 
+.selection-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.selection-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.selection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.selection-name {
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.selection-count {
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.selection-people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.selection-pill {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
 @media (max-width: 720px) {
   .dashboard-page .avatar {
     --avatar-size: calc(var(--avatar-size-base, 36px) - 6px);

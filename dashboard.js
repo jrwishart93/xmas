@@ -15,6 +15,7 @@ const MAX_KITTY = TOTAL_USERS * MAX_BUDGET_PER_PERSON;
 
 const submissionList = document.getElementById("submissionList");
 const itemTotalsList = document.getElementById("itemTotalsList");
+const selectionBreakdownList = document.getElementById("selectionBreakdownList");
 const hardResetTrigger = document.getElementById("hardResetTrigger");
 const hardResetModal = document.getElementById("hardResetModal");
 const confirmHardResetButton = document.getElementById("confirmHardReset");
@@ -183,6 +184,24 @@ function aggregateItems(people) {
   return totals;
 }
 
+function aggregateItemSelections(people) {
+  const selections = new Map();
+
+  people.forEach((person) => {
+    person.selections.forEach((sel) => {
+      const qty = Number(sel.qty) || 0;
+      if (!sel.name || qty <= 0) return;
+
+      const entry = selections.get(sel.name) || { qty: 0, people: [] };
+      entry.qty += qty;
+      entry.people.push({ name: person.name, qty });
+      selections.set(sel.name, entry);
+    });
+  });
+
+  return selections;
+}
+
 function renderItemTotals(totalsMap) {
   if (!itemTotalsList) return;
   itemTotalsList.innerHTML = "";
@@ -211,6 +230,54 @@ function renderItemTotals(totalsMap) {
 
     line.append(label, count);
     itemTotalsList.append(line);
+  });
+}
+
+function renderSelectionBreakdown(selectionMap) {
+  if (!selectionBreakdownList) return;
+  selectionBreakdownList.innerHTML = "";
+
+  const entries = Array.from(selectionMap.entries()).sort((a, b) => {
+    return b[1].qty - a[1].qty || a[0].localeCompare(b[0]);
+  });
+
+  if (!entries.length) {
+    selectionBreakdownList.innerHTML = '<p class="muted-text">No selections yet.</p>';
+    return;
+  }
+
+  entries.forEach(([name, data]) => {
+    const card = document.createElement("div");
+    card.className = "selection-card";
+
+    const header = document.createElement("div");
+    header.className = "selection-header";
+
+    const label = document.createElement("span");
+    label.className = "selection-name";
+    label.textContent = name;
+
+    const count = document.createElement("span");
+    count.className = "selection-count";
+    count.textContent = `${data.qty} total`;
+
+    header.append(label, count);
+
+    const peopleList = document.createElement("div");
+    peopleList.className = "selection-people";
+
+    data.people
+      .slice()
+      .sort((a, b) => b.qty - a.qty || a.name.localeCompare(b.name))
+      .forEach((person) => {
+        const pill = document.createElement("span");
+        pill.className = "selection-pill";
+        pill.textContent = `${person.name} ×${person.qty}`;
+        peopleList.append(pill);
+      });
+
+    card.append(header, peopleList);
+    selectionBreakdownList.append(card);
   });
 }
 
@@ -342,6 +409,7 @@ async function handleHardReset() {
 function renderDashboard(people, choices) {
   renderCombinedDashboard(TEAM, choices);
   renderItemTotals(aggregateItems(people));
+  renderSelectionBreakdown(aggregateItemSelections(people));
 }
 
 async function loadDashboardData() {
