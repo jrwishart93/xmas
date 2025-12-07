@@ -1,24 +1,19 @@
-import { db } from './firebase.js';
-import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
-import { createAvatarElement, createAvatarName, getAvatarUrl } from './src/utils/avatarMap.js';
+import { TEAM } from './team.js';
+import { createAvatarElement, createAvatarName } from './src/utils/avatarMap.js';
 
 const avatarGrid = document.getElementById('avatarGrid');
 const pinInput = document.getElementById('pinInput');
 const loginBtn = document.getElementById('loginBtn');
 const errorP = document.getElementById('loginError');
-const successMsg = document.getElementById('successMsg');
-const spinner = document.getElementById('loginSpinner');
-const loginBtnDefaultText = loginBtn?.innerHTML || '';
 const selectedUserCard = document.getElementById('selectedUserCard');
 const selectedUserAnnouncement = document.getElementById('selectedUserAnnouncement');
 const pinSection = document.getElementById('pinSection');
 const loginForm = document.getElementById('loginForm');
 
 let activeCard = null;
-let selectedUserId = '';
-let selectedUserName = '';
+let selectedUserId = sessionStorage.getItem('selectedUser') || '';
+let selectedUserName = selectedUserId && TEAM[selectedUserId]?.name ? TEAM[selectedUserId].name : '';
 let lastSelectedUserId = '';
-let selectedUser = null;
 let focusTimeoutId;
 let highlightTimeoutId;
 
@@ -40,13 +35,6 @@ function scrollToPinAndFocus() {
     focusTimeoutId = setTimeout(() => {
         pinInput.focus({ preventScroll: true });
     }, prefersReducedMotion ? 0 : 400);
-}
-
-function setSpinnerVisible(isVisible) {
-    if (!spinner) return;
-    spinner.hidden = !isVisible;
-    spinner.setAttribute('aria-hidden', (!isVisible).toString());
-    spinner.classList.toggle('hidden', !isVisible);
 }
 
 function setLoginError(message) {
@@ -83,53 +71,6 @@ function highlightPinArea(shouldScroll) {
     }, 900);
 }
 
-function selectAvatarCard(card) {
-    if (!card) return;
-
-    if (activeCard) {
-        activeCard.classList.remove('selected', 'avatar-card--selected');
-        activeCard.setAttribute('aria-pressed', 'false');
-    }
-
-    activeCard = card;
-    activeCard.classList.add('selected');
-    activeCard.setAttribute('aria-pressed', 'true');
-
-    const userId = card.dataset.userId;
-    selectedUserId = userId;
-    selectedUserName = card.dataset.userName;
-    selectedUser = {
-        name: selectedUserName,
-        legacyId: selectedUserId,
-    };
-
-    sessionStorage.setItem('selectedUserId', userId);
-    sessionStorage.setItem('selectedUserName', selectedUserName || '');
-
-    if (loginForm) {
-        loginForm.dataset.selectedUserId = selectedUserId;
-        loginForm.dataset.selectedUserName = selectedUserName;
-        delete loginForm.dataset.selectedUserUid;
-    }
-
-    const isNewSelection = userId !== lastSelectedUserId;
-    lastSelectedUserId = userId;
-
-    highlightPinArea(isNewSelection);
-
-    setLoginError('');
-    setPinErrorState(false);
-    renderSelectedUser(selectedUserName);
-
-    if (selectedUserAnnouncement) {
-        selectedUserAnnouncement.textContent = selectedUserName
-            ? `Selected user: ${selectedUserName}`
-            : '';
-    }
-
-    document.dispatchEvent(new CustomEvent('userSelectionChanged'));
-}
-
 function renderSelectedUser(name) {
     if (!selectedUserCard) return;
     selectedUserCard.innerHTML = '';
@@ -150,160 +91,122 @@ function renderSelectedUser(name) {
     selectedUserCard.classList.remove('hidden');
 }
 
-function resetLoginUiWithError(message) {
-    setLoginError(message);
-    setSpinnerVisible(false);
+function selectAvatarCard(card) {
+    if (!card) return;
 
-    if (successMsg) {
-        successMsg.classList.add('hidden');
-        successMsg.classList.remove('glow-text');
+    if (activeCard) {
+        activeCard.classList.remove('selected', 'avatar-card--selected');
+        activeCard.setAttribute('aria-pressed', 'false');
     }
 
-    if (loginBtn) {
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = loginBtnDefaultText || 'CHECK LIST';
+    activeCard = card;
+    activeCard.classList.add('selected');
+    activeCard.setAttribute('aria-pressed', 'true');
+
+    const userId = card.dataset.userId;
+    selectedUserId = userId;
+    selectedUserName = card.dataset.userName;
+
+    sessionStorage.setItem('selectedUser', userId);
+    sessionStorage.setItem('selectedUserId', userId);
+    sessionStorage.setItem('selectedUserName', selectedUserName || '');
+    sessionStorage.setItem('selectedUserLegacyId', userId);
+
+    if (loginForm) {
+        loginForm.dataset.selectedUserId = selectedUserId;
+        loginForm.dataset.selectedUserName = selectedUserName;
     }
 
-    if (pinInput) {
-        pinInput.focus({ preventScroll: true });
-    }
-}
+    const isNewSelection = userId !== lastSelectedUserId;
+    lastSelectedUserId = userId;
 
-async function populateUsers() {
-    try {
-        const usersCol = collection(db, 'users');
-        const userSnapshot = await getDocs(usersCol);
-        const userList = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    highlightPinArea(isNewSelection);
 
-        if (userList.length === 0) {
-            setLoginError('No users found in the database.');
-            return;
-        }
-
-        if (!avatarGrid) {
-            setLoginError('Unable to load avatars.');
-            return;
-        }
-
-        avatarGrid.innerHTML = '';
-        userList.forEach(user => {
-            const card = document.createElement('button');
-            card.type = 'button';
-            card.className = 'avatar-card';
-            card.dataset.userId = user.id;
-            card.dataset.userName = user.name;
-            card.setAttribute('role', 'listitem');
-            card.setAttribute('aria-pressed', 'false');
-            card.setAttribute('aria-label', `Select ${user.name}`);
-
-            const avatarUrl = getAvatarUrl(user.name);
-            let avatarVisual;
-
-            if (avatarUrl) {
-                avatarVisual = document.createElement('img');
-                avatarVisual.src = avatarUrl;
-                avatarVisual.alt = user.name;
-                avatarVisual.className = 'avatar-image';
-            } else {
-                avatarVisual = createAvatarElement(user.name, 84);
-                avatarVisual.classList.add('avatar-image', 'avatar-image--fallback');
-            }
-
-            const nameLabel = document.createElement('span');
-            nameLabel.className = 'avatar-name';
-            nameLabel.textContent = user.name;
-
-            card.append(avatarVisual, nameLabel);
-            avatarGrid.appendChild(card);
-        });
-
-        renderSelectedUser('');
-    } catch (err) {
-        console.error(err);
-        setLoginError('Failed to load users from Firestore.');
-    }
-}
-
-function startLoginUiState() {
     setLoginError('');
     setPinErrorState(false);
-    setSpinnerVisible(true);
+    renderSelectedUser(selectedUserName);
 
-    if (successMsg) {
-        successMsg.classList.add('hidden');
-        successMsg.classList.remove('glow-text');
+    if (selectedUserAnnouncement) {
+        selectedUserAnnouncement.textContent = selectedUserName
+            ? `Selected user: ${selectedUserName}`
+            : '';
     }
 
-    if (loginBtn) {
-        loginBtn.disabled = true;
-        loginBtn.innerHTML = '<span class="flicker-fast">VERIFYING...</span>';
-    }
+    document.dispatchEvent(new CustomEvent('userSelectionChanged'));
 }
 
-function handleAccessDenied() {
-    resetLoginUiWithError('Access denied. Hint: your PIN is the last four digits of your mobile number.');
-    setPinErrorState(true);
+function populateUsers() {
+    if (!avatarGrid) return;
 
-    if (pinInput) {
-        pinInput.value = '';
-        pinInput.focus({ preventScroll: true });
-    }
-}
-
-async function handleLogin(event) {
-    event?.preventDefault();
-    startLoginUiState();
-
-    const userId = loginForm?.dataset.selectedUserId || selectedUserId;
-    const pin = pinInput.value.trim();
-
-    if (!userId) {
-        resetLoginUiWithError('Please select your name.');
-        setPinErrorState(false);
+    const entries = Object.entries(TEAM);
+    if (!entries.length) {
+        setLoginError('No team members found.');
         return;
     }
 
-    try {
-        const userRef = doc(db, "users", userId);
-        const userSnap = await getDoc(userRef);
+    avatarGrid.innerHTML = '';
+    entries.forEach(([id, data]) => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'avatar-card';
+        card.dataset.userId = id;
+        card.dataset.userName = data.name;
+        card.setAttribute('role', 'listitem');
+        card.setAttribute('aria-pressed', 'false');
+        card.setAttribute('aria-label', `Select ${data.name}`);
 
-        if (!userSnap.exists()) {
-            console.error('User not found for login attempt:', userId);
-            handleAccessDenied();
-            return;
+        let avatarVisual;
+        if (data.image) {
+            avatarVisual = document.createElement('img');
+            avatarVisual.src = data.image;
+            avatarVisual.alt = data.name;
+            avatarVisual.className = 'avatar-image';
+        } else {
+            avatarVisual = createAvatarElement(data.name, 84);
+            avatarVisual.classList.add('avatar-image', 'avatar-image--fallback');
         }
 
-        const userData = userSnap.data();
-        const expectedPin = userData.password;
+        const nameLabel = document.createElement('span');
+        nameLabel.className = 'avatar-name';
+        nameLabel.textContent = data.name;
 
-        if (pin !== expectedPin) {
-            handleAccessDenied();
-            return;
-        }
+        card.append(avatarVisual, nameLabel);
+        avatarGrid.appendChild(card);
+    });
 
-        const resolvedUserId = userData?.choiceId || userId;
-        const resolvedLegacyId = userData?.legacyId || userId;
-        const resolvedName = userData?.name || selectedUserName || userId;
+    renderSelectedUser('');
 
-        setSpinnerVisible(false);
-        setLoginError('');
-        setPinErrorState(false);
-        if (loginBtn) {
-            loginBtn.disabled = false;
-            loginBtn.innerHTML = loginBtnDefaultText || 'CHECK LIST';
-        }
+    if (selectedUserId) {
+        const existingCard = avatarGrid.querySelector(`[data-user-id="${selectedUserId}"]`);
+        selectAvatarCard(existingCard);
+    }
+}
 
-        sessionStorage.setItem('selectedUserId', resolvedUserId);
-        sessionStorage.setItem('selectedUserName', resolvedName || resolvedUserId);
-        sessionStorage.setItem('selectedUserLegacyId', resolvedLegacyId || resolvedUserId);
-        sessionStorage.setItem('xmasUserIsAdmin', userData?.admin ? 'true' : 'false');
-        sessionStorage.setItem('isLoggedIn', 'true');
+function showError(message) {
+    setLoginError(message);
+    setPinErrorState(Boolean(message));
+}
 
+function handleLogin(event) {
+    event?.preventDefault();
+
+    const selectedUser = sessionStorage.getItem('selectedUser');
+    const user = TEAM[selectedUser];
+    const entered = pinInput.value.trim();
+
+    if (!user) {
+        showError('Unknown user — please go back.');
+        return;
+    }
+
+    if (entered === user.pin) {
+        sessionStorage.setItem('loggedInUser', selectedUser);
+        sessionStorage.setItem('selectedUserId', selectedUser);
+        sessionStorage.setItem('selectedUserName', user.name);
+        sessionStorage.setItem('selectedUserLegacyId', selectedUser);
         window.location.href = 'choices.html';
-    } catch (err) {
-        console.error('Login failed:', err);
-        resetLoginUiWithError('Something went wrong, please try again.');
-        setPinErrorState(true);
+    } else {
+        showError('Access denied. Hint: last 4 digits of your mobile number.');
     }
 }
 
