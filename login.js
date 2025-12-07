@@ -1,5 +1,6 @@
 import { TEAM } from './team.js';
 import { createAvatarElement, createAvatarName } from './src/utils/avatarMap.js';
+import { fetchUsersFromFirestore } from './src/data/users.js';
 
 const avatarGrid = document.getElementById('avatarGrid');
 const pinInput = document.getElementById('pinInput');
@@ -151,9 +152,10 @@ function selectAvatarCard(card) {
     document.dispatchEvent(new CustomEvent('userSelectionChanged'));
 }
 
-function populateUsers() {
+async function populateUsers() {
     if (!avatarGrid) return;
 
+    const remoteUsers = await fetchUsersFromFirestore();
     const entries = Object.entries(TEAM);
     if (!entries.length) {
         showError('No team members found.');
@@ -162,29 +164,33 @@ function populateUsers() {
 
     avatarGrid.innerHTML = '';
     entries.forEach(([id, data]) => {
+        const remoteData = remoteUsers[id] || {};
+        const displayName = remoteData.name || data.name;
+        const avatarUrl = remoteData.avatarUrl || data.image;
+
         const card = document.createElement('button');
         card.type = 'button';
         card.className = 'avatar-card';
         card.dataset.userId = id;
-        card.dataset.userName = data.name;
+        card.dataset.userName = displayName;
         card.setAttribute('role', 'listitem');
         card.setAttribute('aria-pressed', 'false');
-        card.setAttribute('aria-label', `Select ${data.name}`);
+        card.setAttribute('aria-label', `Select ${displayName}`);
 
         let avatarVisual;
-        if (data.image) {
+        if (avatarUrl) {
             avatarVisual = document.createElement('img');
-            avatarVisual.src = data.image;
-            avatarVisual.alt = data.name;
+            avatarVisual.src = avatarUrl;
+            avatarVisual.alt = displayName;
             avatarVisual.className = 'avatar-image';
         } else {
-            avatarVisual = createAvatarElement(data.name, 84);
+            avatarVisual = createAvatarElement(displayName, 84);
             avatarVisual.classList.add('avatar-image', 'avatar-image--fallback');
         }
 
         const nameLabel = document.createElement('span');
         nameLabel.className = 'avatar-name';
-        nameLabel.textContent = data.name;
+        nameLabel.textContent = displayName;
 
         card.append(avatarVisual, nameLabel);
         avatarGrid.appendChild(card);
