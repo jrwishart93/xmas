@@ -3,10 +3,10 @@ export function normalizeAvatarPath(path) {
   if (path.startsWith("http")) return path;
 
   const cleaned = path
-    .replace(/^\/?public\//, "")
+    .replace(/^\.?\/?public\//, "")
     .replace(/^\//, "");
 
-  return cleaned ? `/${cleaned}` : "";
+  return cleaned ? `public/${cleaned}` : "";
 }
 
 const buildAvatarPath = (id) => normalizeAvatarPath(`${id}.png`);
