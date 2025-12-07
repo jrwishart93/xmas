@@ -1,10 +1,11 @@
-import { TEAM } from "./team.js";
+import { TEAM, getAvatarSrc, normaliseTeamId } from "./team.js";
 import { VOTING_QUESTIONS } from "./src/data/votingQuestions.js";
 import { fetchUsersFromFirestore } from "./src/data/users.js";
+import { createAvatarName } from "./src/utils/avatarMap.js";
 import { db } from "./firebase.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-const userId = sessionStorage.getItem("loggedInUser");
+const userId = normaliseTeamId(sessionStorage.getItem("loggedInUser"));
 if (!userId) location.href = "index.html";
 
 const QUESTION_TITLES = VOTING_QUESTIONS.reduce((acc, { id, question }) => {
@@ -55,10 +56,14 @@ async function loadResults() {
   try {
     const remoteUsers = await fetchUsersFromFirestore();
     Object.entries(remoteUsers).forEach(([id, data]) => {
-      participants[id] = {
-        ...participants[id],
+      const canonicalId = normaliseTeamId(id);
+      if (!canonicalId) return;
+
+      participants[canonicalId] = {
+        ...participants[canonicalId],
         ...data,
-        name: data.name || participants[id]?.name,
+        name: data.name || participants[canonicalId]?.name,
+        avatar: data.avatarUrl || data.avatar || participants[canonicalId]?.avatar || getAvatarSrc(canonicalId),
       };
     });
 
@@ -70,7 +75,9 @@ async function loadResults() {
       if (!answers) return;
       for (const [qid, choice] of Object.entries(answers)) {
         if (!tallies[qid]) continue;
-        tallies[qid][choice] = (tallies[qid][choice] || 0) + 1;
+        const normalisedChoice = normaliseTeamId(choice);
+        if (!normalisedChoice) continue;
+        tallies[qid][normalisedChoice] = (tallies[qid][normalisedChoice] || 0) + 1;
       }
     });
 
@@ -105,8 +112,24 @@ function renderTallies() {
       hasVotes = true;
       sortedAnswers.forEach(([uid, count]) => {
         const li = document.createElement("li");
+        li.className = "result-row";
+
         const name = getDisplayName(uid);
-        li.textContent = `${name}: ${count} vote(s)`;
+        const avatar = participants[uid]?.avatar || participants[uid]?.avatarUrl || getAvatarSrc(uid);
+        const resolvedAvatar = avatar?.startsWith("http")
+          ? avatar
+          : avatar
+            ? `/${avatar.replace(/^\//, "")}`
+            : undefined;
+        const avatarName = createAvatarName(name, 42, { image: resolvedAvatar });
+        avatarName.classList.add("result-row__identity");
+
+        const countBadge = document.createElement("span");
+        countBadge.className = "result-row__count";
+        const voteWord = count === 1 ? "vote" : "votes";
+        countBadge.textContent = `${count} ${voteWord}`;
+
+        li.append(avatarName, countBadge);
         ul.appendChild(li);
       });
     }

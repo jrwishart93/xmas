@@ -1,14 +1,12 @@
-export const AVATAR_MAP = {
-  "Paul E": "public/IMG_2510.png",
-  "Jamie W": "public/IMG_2514.png",
-  "Adam J": "public/IMG_2515.png",
-  "Adam B": "public/IMG_2517.png",
-  "Derek N": "public/IMG_2518.png",
-  "Jo M": "public/IMG_2519.png",
-  "Lawrie C": "public/IMG_2520.png",
-  "Steve H": "public/IMG_2524.png",
-  "Chris B": "public/IMG_2528.png",
-};
+import { TEAM, getAvatarSrc } from "../../team.js";
+
+export const AVATAR_MAP = Object.values(TEAM).reduce((map, member) => {
+  const src = member.avatar || getAvatarSrc(member);
+  if (member.name && src) {
+    map[member.name] = src;
+  }
+  return map;
+}, {});
 
 export function getAvatarUrl(name) {
   if (!name) return null;

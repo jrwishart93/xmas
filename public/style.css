@@ -2749,6 +2749,26 @@ body.results-page {
   letter-spacing: 0.2px;
 }
 
+.result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.result-row__identity {
+  flex: 1;
+}
+
+.result-row__count {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 14px;
+  letter-spacing: 0.1px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
 .results-actions {
   display: flex;
   gap: 10px;

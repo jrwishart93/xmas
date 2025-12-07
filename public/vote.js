@@ -1,4 +1,4 @@
-import { TEAM } from "./src/team.js";
+import { TEAM, getAvatarSrc, normaliseTeamId } from "./src/team.js";
 import { fetchUsersFromFirestore } from "../src/data/users.js";
 import { db } from "../firebase.js";
 import {
@@ -37,12 +37,15 @@ const QUESTIONS = [
 
 const votesState = {};
 let participants = { ...TEAM };
-const userId = sessionStorage.getItem("loggedInUser");
+const userId = normaliseTeamId(sessionStorage.getItem("loggedInUser"));
 const voteLoading = document.getElementById("voteLoading");
 const submitButton = document.getElementById("submitVotes");
 
 if (!userId) {
   window.location.href = "index.html";
+} else {
+  sessionStorage.setItem("loggedInUser", userId);
+  sessionStorage.setItem("selectedUser", userId);
 }
 
 function showToast(message) {
@@ -91,7 +94,7 @@ function renderAvatarGrids() {
     grid.innerHTML = "";
 
     Object.entries(participants).forEach(([id, person]) => {
-      const avatarSrc = person.avatarUrl || person.image;
+      const avatarSrc = person.avatarUrl || person.avatar || getAvatarSrc(id);
       const tile = document.createElement("button");
       tile.type = "button";
       tile.className = "avatar-tile";
@@ -125,7 +128,20 @@ async function loadParticipants() {
     merged[id] = {
       ...person,
       name: remote.name || person.name,
-      avatarUrl: remote.avatarUrl || person.image,
+      avatar: remote.avatarUrl || remote.avatar || person.avatar || getAvatarSrc(id),
+      avatarUrl: remote.avatarUrl || person.avatarUrl,
+    };
+  });
+
+  Object.entries(remoteUsers).forEach(([id, data]) => {
+    const canonicalId = normaliseTeamId(id);
+    if (!canonicalId || !merged[canonicalId]) return;
+
+    merged[canonicalId] = {
+      ...merged[canonicalId],
+      name: data.name || merged[canonicalId].name,
+      avatar: data.avatarUrl || data.avatar || merged[canonicalId].avatar,
+      avatarUrl: data.avatarUrl || merged[canonicalId].avatarUrl,
     };
   });
 
@@ -144,8 +160,9 @@ async function loadExistingVotes() {
       const data = snapshot.data();
       QUESTIONS.forEach(({ id }) => {
         const saved = data?.[id] || data?.answers?.[id] || data?.votes?.[id];
-        if (saved && participants[saved]) {
-          selectAvatar(id, saved);
+        const normalisedSaved = normaliseTeamId(saved);
+        if (normalisedSaved && participants[normalisedSaved]) {
+          selectAvatar(id, normalisedSaved);
         }
       });
     }

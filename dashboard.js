@@ -8,7 +8,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
-import { TEAM } from "./team.js";
+import { TEAM, normaliseTeamId } from "./team.js";
 
 const MAX_BUDGET_PER_PERSON = 20;
 const TOTAL_USERS = 9; // Ensure kitty calculation and team mapping stay in sync
@@ -36,7 +36,7 @@ const SNACK_CATEGORIES = new Set(["Bites", "Sharers"]);
 const RESET_TOKEN = "RESET";
 
 function isAdmin() {
-  return sessionStorage.getItem("loggedInUser") === "jamiew";
+  return normaliseTeamId(sessionStorage.getItem("loggedInUser")) === "jamie_w";
 }
 
 function normalizeSelections(rawSelections) {
@@ -115,7 +115,7 @@ function summarisePerson(docId, data, user, categoryMap) {
   return {
     id: docId,
     name,
-    image: user?.image,
+    avatar: user?.avatar || user?.image,
     selections,
     totalSpend: Number.isFinite(totalSpend) ? totalSpend : 0,
     drinkCount,
@@ -141,7 +141,7 @@ function renderSubmissionOverview(people) {
     row.style.animation = "fadeSlideIn 0.3s ease forwards";
 
     const nameEl = createAvatarName(person.name, 34, {
-      image: person.image,
+      image: person.avatar,
       status: person.hasSubmitted ? "submitted" : "pending",
       overBudget: person.isOverBudget
     });
@@ -203,7 +203,7 @@ function renderPeopleBreakdown(people) {
     title.className = "accordion-title";
 
     const personLabel = createAvatarName(person.name, 42, {
-      image: person.image,
+      image: person.avatar,
       status: person.hasSubmitted ? "submitted" : "pending",
       overBudget: person.isOverBudget
     });
@@ -321,7 +321,7 @@ async function loadKitty() {
   let totalUsed = 0;
 
   snap.forEach((docSnap) => {
-    const id = docSnap.id;
+    const id = normaliseTeamId(docSnap.id);
     if (!TEAM[id]) return;
 
     const data = docSnap.data();
@@ -458,7 +458,7 @@ async function loadDashboardData() {
   const result = [];
 
   snap.forEach((docSnap) => {
-    const id = docSnap.id;
+    const id = normaliseTeamId(docSnap.id);
     if (!TEAM[id]) return; // skip junk docs
 
     const entry = docSnap.data();
