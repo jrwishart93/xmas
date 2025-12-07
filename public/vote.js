@@ -243,10 +243,9 @@ async function saveVotes() {
   submitButton.disabled = true;
   submitButton.textContent = "Submitting…";
 
-  const payload = QUESTIONS.reduce(
-    (acc, q) => ({ ...acc, [q.id]: votesState[q.id] }),
-    { submittedAt: Date.now() }
-  );
+  const payload = QUESTIONS.reduce((acc, q) => {
+    return { ...acc, [q.id]: votesState[q.id] };
+  }, {});
 
   try {
     const ref = doc(db, "votes", userId);
