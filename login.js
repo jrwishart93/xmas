@@ -1,4 +1,4 @@
-import { TEAM, getAvatarSrc, normalizeAvatarPath, normaliseTeamId } from './team.js';
+import { TEAM, getAvatarSrc, normalizeAvatarPath, normaliseTeamId, toLegacyId } from './team.js';
 import { createAvatarElement, createAvatarName } from './src/utils/avatarMap.js';
 import { fetchUsersFromFirestore } from './src/data/users.js';
 
@@ -128,7 +128,7 @@ function selectAvatarCard(card) {
     sessionStorage.setItem('selectedUser', userId);
     sessionStorage.setItem('selectedUserId', userId);
     sessionStorage.setItem('selectedUserName', selectedUserName || '');
-    sessionStorage.setItem('selectedUserLegacyId', userId);
+    sessionStorage.setItem('selectedUserLegacyId', toLegacyId(userId));
 
     if (loginForm) {
         loginForm.dataset.selectedUserId = selectedUserId;
@@ -223,7 +223,7 @@ function handleLogin(event) {
         sessionStorage.setItem('loggedInUser', selectedUser);
         sessionStorage.setItem('selectedUserId', selectedUser);
         sessionStorage.setItem('selectedUserName', user.name);
-        sessionStorage.setItem('selectedUserLegacyId', selectedUser);
+        sessionStorage.setItem('selectedUserLegacyId', toLegacyId(selectedUser));
         window.location.href = 'choices.html';
     } else {
         showError('Access denied. Hint: last 4 digits of your mobile number.');
