@@ -8,7 +8,7 @@ if (!userId) location.href = "index.html";
 
 const questionsContainer = document.getElementById("voteQuestions");
 
-function buildQuestionSection({ id, question, icon }) {
+function buildQuestionSection({ id, question, icon, alt }) {
   const section = document.createElement("section");
   section.className = "vote-question";
   section.dataset.qid = id;
@@ -16,7 +16,9 @@ function buildQuestionSection({ id, question, icon }) {
   const selectId = `select-${id}`;
   section.innerHTML = `
     <h2>${question}</h2>
-    <img src="${icon}" alt="" class="vote-icon" />
+    <div class="vote-illustration-wrapper">
+      <img src="${icon}" alt="${alt || ""}" class="vote-illustration-img" />
+    </div>
     <label class="sr-only" for="${selectId}">Select a person for ${question}</label>
     <select id="${selectId}" class="vote-select">
       <option value="">Select a person…</option>
