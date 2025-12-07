@@ -1,6 +1,6 @@
 // src/data/saveChoices.js
 import { db } from "../../firebase.js";
-import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 /**
  * Saves the user's selections to Firestore in a safe, structured way.

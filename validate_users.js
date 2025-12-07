@@ -1,5 +1,5 @@
 import { db } from './firebase.js';
-import { collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+import { collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const requiredUsers = {
     'derek': { name: 'Derek N', password: '7006', uid: 'uid_derek_n_001', admin: true },

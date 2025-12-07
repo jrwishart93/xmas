@@ -4,7 +4,7 @@ import { resetUserSelections } from "./src/data/resetChoices.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
 import { TEAM } from "./team.js";
 import { db } from "./firebase.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const MAX_BUDGET = 20;
 const userId = sessionStorage.getItem("loggedInUser");
@@ -128,6 +128,23 @@ const normalizeSelections = (rawSelections) => {
 const hasNonZeroSelections = (selections = []) =>
   selections.some((selection) => Number(selection?.qty) > 0);
 
+const calculateTotalSpend = (selections = []) =>
+  selections.reduce((total, item) => {
+    const qty = Number(item?.qty) || 0;
+    const price = Number(item?.price) || 0;
+    return total + qty * price;
+  }, 0);
+
+const buildChoiceMap = (selections = []) =>
+  selections.reduce((acc, item) => {
+    if (!item?.name) return acc;
+    acc[item.name] = {
+      qty: Number(item.qty) || 0,
+      price: Number(item.price) || 0,
+    };
+    return acc;
+  }, {});
+
 const setItemQuantity = (itemElement, qty) => {
   const safeValue = Math.max(0, Number(qty) || 0);
   const stepper = itemElement.querySelector(".qty-stepper");
@@ -216,31 +233,37 @@ const setResetInProgress = (isResetting) => {
   if (cancelResetButton) cancelResetButton.disabled = isResetting;
 };
 
-const showSuccessMessage = () => {
+const showSuccessOptions = () => {
   if (submitButton) {
     submitButton.disabled = false;
     submitButton.textContent = defaultButtonText;
   }
 
-  const box = document.getElementById("choiceSuccess");
-  if (!box) return;
+  document.querySelector(".success-modal")?.remove();
 
-  box.classList.remove("hidden");
+  const modal = document.createElement("div");
+  modal.className = "success-modal";
 
-  const dashboardButton = document.getElementById("goDashboard");
-  if (dashboardButton) {
-    dashboardButton.onclick = () => {
-      window.location.href = "dashboard.html";
-    };
-  }
+  modal.innerHTML = `
+        <div class="success-box">
+            <h2>🎉 Choice Saved!</h2>
+            <p>Your selection has been recorded.</p>
 
-  const orderMoreButton = document.getElementById("orderMore");
-  if (orderMoreButton) {
-    orderMoreButton.onclick = () => {
-      location.reload();
-    };
-  }
+            <button id="goDashboard">View Dashboard</button>
+            <button id="addMore">Order More</button>
+        </div>
+    `;
 
+  document.body.appendChild(modal);
+
+  document.getElementById("goDashboard").onclick = () => {
+    window.location.href = "dashboard.html";
+  };
+
+  document.getElementById("addMore").onclick = () => {
+    modal.remove();
+    window.location.href = "choices.html";
+  };
 };
 
 const applyExistingSelections = (selections) => {
@@ -346,14 +369,19 @@ const handleResetChoices = async () => {
   }
 };
 
-submitButton.addEventListener("click", async () => {
-  if (!currentUserId) {
-    setStatus("Please start from the name selection screen.", "error");
-    window.location.href = "index.html";
+async function submitChoices() {
+  const userId = sessionStorage.getItem("loggedInUser");
+  if (!userId) {
+    alert("No logged-in user.");
     return;
   }
 
-  const { total, selections, remaining } = latestTotals;
+  if (!TEAM[userId]) {
+    alert("Unknown user ID. Cannot save choices.");
+    return;
+  }
+
+  const { selections = [], remaining } = latestTotals;
   if (!selections.length) {
     setStatus("Please add at least one item before saving.", "error");
     return;
@@ -368,34 +396,37 @@ submitButton.addEventListener("click", async () => {
   submitButton.textContent = "Saving…";
   setStatus("Saving your choices…");
 
+  const sanitizedSelections = selections
+    .filter((item) => Boolean(item?.name))
+    .map((item) => ({
+      name: item.name,
+      price: Number(item.price) || 0,
+      qty: Number(item.qty) || 0,
+    }));
+
+  const payload = {
+    choices: buildChoiceMap(sanitizedSelections),
+    selections: sanitizedSelections,
+    totalSpend: Number(calculateTotalSpend(sanitizedSelections).toFixed(2)) || 0,
+    timestamp: Date.now(),
+    name: TEAM[userId]?.name || userId,
+  };
+
   try {
-    const choiceMap = selections.reduce((acc, item) => {
-      if (!item?.name) return acc;
-      acc[item.name] = { qty: Number(item.qty) || 0, price: Number(item.price) || 0 };
-      return acc;
-    }, {});
-
-    const totalSpend = Number(Number(total).toFixed(2)) || 0;
-
-    console.log("Saving choices for", userId, { choices: choiceMap, totalSpend });
-
-    const userChoices = choiceMap;
-    const total = totalSpend;
-
-    await setDoc(doc(db, "choices", userId), {
-      choices: userChoices,
-      totalSpend: total,
-      updatedAt: Date.now()
-    });
+    await setDoc(doc(db, "choices", userId), payload, { merge: true });
     setStatus("Choices saved!", "success");
-    showSuccessMessage();
+    showSuccessOptions();
   } catch (err) {
-    console.error(err);
+    console.error("Save failed:", err);
     setStatus("Unable to save your choices. Please try again.", "error");
+    alert("Unable to save your choices. Please try again.");
+  } finally {
     submitButton.disabled = false;
     submitButton.textContent = defaultButtonText;
   }
-});
+}
+
+submitButton.addEventListener("click", submitChoices);
 
 resetButton?.addEventListener("click", handleResetChoices);
 
