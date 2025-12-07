@@ -19,50 +19,7 @@
       <p class="muted-text">Pick one person for each question below.</p>
     </header>
 
-    <section class="vote-question" data-qid="first_home">
-      <h2>Who will be the first person to go home?</h2>
-      <img src="public/vote_icons/first_home.png" alt="" class="vote-icon" />
-      <label class="sr-only" for="select-first_home">Select a person for first person to go home</label>
-      <select id="select-first_home" class="vote-select">
-        <option value="">Select a person…</option>
-      </select>
-    </section>
-
-    <section class="vote-question" data-qid="last_standing">
-      <h2>Who will be the last one standing?</h2>
-      <img src="public/vote_icons/last_standing.png" alt="" class="vote-icon" />
-      <label class="sr-only" for="select-last_standing">Select a person for last one standing</label>
-      <select id="select-last_standing" class="vote-select">
-        <option value="">Select a person…</option>
-      </select>
-    </section>
-
-    <section class="vote-question" data-qid="most_drunk">
-      <h2>Who will be the most drunk?</h2>
-      <img src="public/vote_icons/most_drunk.png" alt="" class="vote-icon" />
-      <label class="sr-only" for="select-most_drunk">Select a person for most drunk</label>
-      <select id="select-most_drunk" class="vote-select">
-        <option value="">Select a person…</option>
-      </select>
-    </section>
-
-    <section class="vote-question" data-qid="most_alcohol">
-      <h2>Who will consume the most alcohol?</h2>
-      <img src="public/vote_icons/most_alcohol.png" alt="" class="vote-icon" />
-      <label class="sr-only" for="select-most_alcohol">Select a person for most alcohol</label>
-      <select id="select-most_alcohol" class="vote-select">
-        <option value="">Select a person…</option>
-      </select>
-    </section>
-
-    <section class="vote-question" data-qid="irish_exit">
-      <h2>Who will do an Irish exit?</h2>
-      <img src="public/vote_icons/irish_exit.png" alt="" class="vote-icon" />
-      <label class="sr-only" for="select-irish_exit">Select a person for Irish exit</label>
-      <select id="select-irish_exit" class="vote-select">
-        <option value="">Select a person…</option>
-      </select>
-    </section>
+    <div id="voteQuestions" class="vote-questions" aria-live="polite"></div>
   </main>
 
   <div class="vote-submit-bar">
