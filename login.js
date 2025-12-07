@@ -1,5 +1,6 @@
-import { db } from './firebase.js';
+import { auth, db } from './firebase.js';
 import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
 import { createAvatarElement, createAvatarName, getAvatarUrl } from './src/utils/avatarMap.js';
 
 const avatarGrid = document.getElementById('avatarGrid');
@@ -17,7 +18,9 @@ const loginForm = document.getElementById('loginForm');
 let activeCard = null;
 let selectedUserId = '';
 let selectedUserName = '';
+let selectedUserFirebaseUid = '';
 let lastSelectedUserId = '';
+let selectedUser = null;
 let focusTimeoutId;
 let highlightTimeoutId;
 
@@ -97,10 +100,18 @@ function selectAvatarCard(card) {
     const userId = card.dataset.userId;
     selectedUserId = userId;
     selectedUserName = card.dataset.userName;
+    selectedUserFirebaseUid = card.dataset.firebaseUid;
+
+    selectedUser = {
+        name: selectedUserName,
+        firebaseUid: selectedUserFirebaseUid,
+        legacyId: selectedUserId,
+    };
 
     if (loginForm) {
         loginForm.dataset.selectedUserId = selectedUserId;
         loginForm.dataset.selectedUserName = selectedUserName;
+        loginForm.dataset.selectedUserUid = selectedUserFirebaseUid;
     }
 
     const isNewSelection = userId !== lastSelectedUserId;
@@ -183,6 +194,7 @@ async function populateUsers() {
             card.className = 'avatar-card';
             card.dataset.userId = user.id;
             card.dataset.userName = user.name;
+            card.dataset.firebaseUid = user.uid || "";
             card.setAttribute('role', 'listitem');
             card.setAttribute('aria-pressed', 'false');
             card.setAttribute('aria-label', `Select ${user.name}`);
@@ -264,25 +276,56 @@ async function handleLogin(event) {
             return;
         }
 
-        const expectedPin = userSnap.data().password;
+        const userData = userSnap.data();
+        const expectedPin = userData.password;
 
         if (pin !== expectedPin) {
             handleAccessDenied();
             return;
         }
 
-        setSpinnerVisible(false);
-        setLoginError('');
-        setPinErrorState(false);
-        if (loginBtn) {
-            loginBtn.disabled = false;
-            loginBtn.innerHTML = loginBtnDefaultText || 'CHECK LIST';
+        const firebaseUid = userData?.uid || loginForm?.dataset.selectedUserUid || selectedUserFirebaseUid;
+
+        if (!firebaseUid) {
+            console.error('No Firebase UID associated with user', userId);
+            resetLoginUiWithError('Unable to sign you in. Please contact the organiser.');
+            setPinErrorState(true);
+            return;
         }
 
-        localStorage.setItem("xmasUser", userSnap.id);
-        // Keep a secondary key for compatibility with older pages/modules
-        localStorage.setItem("currentUser", userSnap.id);
-        window.location.href = 'choices.html';
+        const email = `${firebaseUid}@xmasapp.internal`;
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, pin)
+                .catch(async (authError) => {
+                    if (authError?.code === 'auth/user-not-found') {
+                        return createUserWithEmailAndPassword(auth, email, pin);
+                    }
+                    throw authError;
+                });
+
+            const signedInUid = userCredential?.user?.uid || firebaseUid;
+
+            setSpinnerVisible(false);
+            setLoginError('');
+            setPinErrorState(false);
+            if (loginBtn) {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = loginBtnDefaultText || 'CHECK LIST';
+            }
+
+            localStorage.setItem("xmasUser", signedInUid);
+            localStorage.setItem("xmasUserUid", signedInUid);
+            localStorage.setItem("currentUser", signedInUid);
+            localStorage.setItem("xmasUserName", userData?.name || selectedUserName || userId);
+            localStorage.setItem("xmasUserLegacyId", userId);
+            localStorage.setItem("xmasUserIsAdmin", userData?.admin ? 'true' : 'false');
+
+            window.location.href = 'choices.html';
+        } catch (authError) {
+            console.error('Authentication failed:', authError);
+            handleAccessDenied();
+        }
     } catch (err) {
         console.error('Login failed:', err);
         resetLoginUiWithError('Something went wrong, please try again.');
