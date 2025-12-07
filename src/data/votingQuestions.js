@@ -18,7 +18,7 @@ export const VOTING_QUESTIONS = [
     alt: "Most drunk illustration"
   },
   {
-    id: "ninja_exit",
+    id: "ghost_exit",
     question: "Who will disappear without saying goodbye?",
     icon: "public/voting-icons/voting-ninja-exit.png",
     alt: "Ninja exit illustration"
