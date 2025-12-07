@@ -37,7 +37,7 @@ export function createAvatarElement(name, size = 36, options = {}) {
   const isPending = status === "pending";
   const isOverBudget = Boolean(options?.overBudget);
 
-  const url = getAvatarUrl(name);
+  const url = options?.image || getAvatarUrl(name);
   if (url) {
     avatar.classList.add("avatar--image");
     avatar.style.backgroundImage = `url(${url})`;

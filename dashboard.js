@@ -9,6 +9,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
+import { TEAM } from "./team.js";
 
 const MAX_BUDGET_PER_PERSON = 20;
 const TOTAL_KITTY = 200;
@@ -84,9 +85,9 @@ function buildCategoryMap(menu) {
   return map;
 }
 
-function summarisePerson(data, docId, categoryMap) {
-  const selections = normalizeSelections(data?.items || data?.selections || data?.choices);
-  const name = data?.name || docId;
+function summarisePerson(docId, data, user, categoryMap) {
+  const selections = normalizeSelections(data?.choices || data?.items || data?.selections);
+  const name = user?.name || data?.name || docId;
 
   let totalSpend = Number(data?.totalSpend ?? data?.total);
   const shouldRecalculateTotal = !Number.isFinite(totalSpend);
@@ -119,6 +120,7 @@ function summarisePerson(data, docId, categoryMap) {
   return {
     id: docId,
     name,
+    image: user?.image,
     selections,
     totalSpend: Number.isFinite(totalSpend) ? totalSpend : 0,
     drinkCount,
@@ -143,6 +145,7 @@ function renderSubmissionOverview(people) {
     row.className = "submission-row";
 
     const nameEl = createAvatarName(person.name, 34, {
+      image: person.image,
       status: person.hasSubmitted ? "submitted" : "pending",
       overBudget: person.isOverBudget
     });
@@ -198,6 +201,7 @@ function renderPeopleBreakdown(people) {
     title.className = "accordion-title";
 
     const personLabel = createAvatarName(person.name, 42, {
+      image: person.image,
       status: person.hasSubmitted ? "submitted" : "pending",
       overBudget: person.isOverBudget
     });
@@ -446,21 +450,16 @@ async function handleHardReset() {
   }
 }
 
-function renderDashboard(allChoices, categoryMap) {
-  const people = allChoices.map((doc) =>
-    summarisePerson(doc, doc.id || doc.uid || "", categoryMap)
-  );
-
+function renderDashboard(people) {
   renderSubmissionOverview(people);
   renderPeopleBreakdown(people);
   renderItemTotals(aggregateItems(people));
 
-  const spent = allChoices
-    .filter((choice) => choice?.submitted || choice?.hasSubmitted)
-    .reduce((sum, choice) => sum + (Number(choice.total) || 0), 0);
+  const spent = people
+    .filter((person) => person.hasSubmitted)
+    .reduce((sum, person) => sum + (Number(person.totalSpend) || 0), 0);
 
-  const fallbackSpent = people.reduce((sum, person) => sum + person.totalSpend, 0);
-  updateKittyBar(Number.isFinite(spent) ? spent : fallbackSpent);
+  updateKittyBar(Number.isFinite(spent) ? spent : 0);
 }
 
 async function loadDashboard() {
@@ -474,12 +473,18 @@ async function loadDashboard() {
   }
 
   try {
-    const snapshot = await getDocs(collection(db, "choices"));
-    const allChoices = [];
-    snapshot.forEach((docSnapshot) => {
-      allChoices.push({ id: docSnapshot.id, ...docSnapshot.data() });
+    const snap = await getDocs(collection(db, "choices"));
+    const people = [];
+
+    snap.forEach((docSnapshot) => {
+      const id = docSnapshot.id;
+      const user = TEAM[id];
+      const data = docSnapshot.data();
+
+      people.push(summarisePerson(id, data, user, categoryMap));
     });
-    renderDashboard(allChoices, categoryMap);
+
+    renderDashboard(people);
   } catch (error) {
     console.error("Unable to load dashboard", error);
     if (submissionRows) {
@@ -512,11 +517,6 @@ document.addEventListener("keydown", (event) => {
 });
 
 function startDashboard() {
-  if (!currentUserId) {
-    window.location.href = "index.html";
-    return;
-  }
-
   if (hasLoadedDashboard) {
     evaluateAdminAccess();
     return;
