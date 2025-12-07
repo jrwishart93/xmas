@@ -1,17 +1,18 @@
+import { db } from "../firebase.js";
 import {
   collection,
   getDocs,
   doc,
+  getDoc,
   serverTimestamp,
   writeBatch
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-import { db } from "./firebase.js";
+} from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 import { fetchMenu } from "./src/data/loadMenu.js";
 import { createAvatarName } from "./src/utils/avatarMap.js";
 import { TEAM } from "./team.js";
 
 const MAX_BUDGET_PER_PERSON = 20;
-const TOTAL_USERS = Object.keys(TEAM).length;
+const TOTAL_USERS = 9; // Ensure kitty calculation and team mapping stay in sync
 const MAX_KITTY = TOTAL_USERS * MAX_BUDGET_PER_PERSON;
 
 const submissionRows = document.getElementById("submissionRows");
@@ -26,6 +27,10 @@ const hardResetError = document.getElementById("hardResetError");
 const hardResetModalError = document.getElementById("hardResetModalError");
 const hardResetProgress = document.getElementById("hardResetProgress");
 const dashboardToast = document.getElementById("dashboardToast");
+
+if (!db) {
+  console.error("Firestore DB not initialised.");
+}
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",
