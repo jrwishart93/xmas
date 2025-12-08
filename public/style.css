@@ -399,6 +399,42 @@ label {
   animation-delay: var(--avatar-delay, 0s);
 }
 
+.avatar-card--unavailable {
+  position: relative;
+  cursor: not-allowed;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.avatar-card--unavailable::before,
+.avatar-card--unavailable::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 12px;
+  background: linear-gradient(
+      135deg,
+      transparent 47%,
+      rgba(214, 69, 69, 0.9) 47%,
+      rgba(214, 69, 69, 0.9) 53%,
+      transparent 53%
+    ),
+    linear-gradient(
+      45deg,
+      transparent 47%,
+      rgba(214, 69, 69, 0.9) 47%,
+      rgba(214, 69, 69, 0.9) 53%,
+      transparent 53%
+    );
+  box-shadow: inset 0 0 0 1px rgba(214, 69, 69, 0.4);
+  pointer-events: none;
+}
+
+.avatar-card--unavailable img,
+.avatar-card--unavailable .avatar-image {
+  filter: grayscale(0.65) brightness(0.75);
+}
+
 .avatar-card:nth-child(1) { --avatar-delay: 0s; }
 .avatar-card:nth-child(2) { --avatar-delay: 0.06s; }
 .avatar-card:nth-child(3) { --avatar-delay: 0.12s; }

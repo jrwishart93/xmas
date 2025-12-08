@@ -62,6 +62,7 @@ export const TEAM = {
     name: "Adam B",
     pin: "7120",
     avatar: buildAvatarPath("adam_b"),
+    unavailable: true,
   },
   adam_j: {
     id: "adam_j",

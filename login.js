@@ -194,6 +194,14 @@ async function populateUsers() {
         nameLabel.className = 'avatar-name';
         nameLabel.textContent = displayName;
 
+        const isUnavailable = Boolean(remoteData.unavailable || data.unavailable);
+        if (isUnavailable) {
+            card.classList.add('avatar-card--unavailable');
+            card.disabled = true;
+            card.setAttribute('aria-disabled', 'true');
+            card.setAttribute('title', `${displayName} is not attending`);
+        }
+
         card.append(avatarVisual, nameLabel);
         avatarGrid.appendChild(card);
     });
