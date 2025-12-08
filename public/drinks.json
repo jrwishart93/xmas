@@ -175,5 +175,90 @@
     { "name": "Paulaner Weissbier 0.0", "price": 5.5 },
     { "name": "Old Mout AF", "price": 5.5 },
     { "name": "Budvar Nealko", "price": 5.5 }
+  ],
+  "sections": [
+    {
+      "title": "Beer Palace Snacks — Sharers",
+      "category": "Sharers",
+      "type": "food",
+      "items": [
+        {
+          "name": "Baked Camembert",
+          "price": 18,
+          "description": "Pretzel, walnuts, truffle oil, crudités, honey"
+        },
+        {
+          "name": "Antipasti Board",
+          "price": 18,
+          "description": "Scottish cheeses, cured meats, oatcakes, pickles, olives"
+        }
+      ]
+    },
+    {
+      "title": "Beer Palace Snacks — Bites",
+      "category": "Bites",
+      "type": "food",
+      "offerNote": "£10 each, any 3 for £25",
+      "items": [
+        {
+          "name": "Trio of Fries",
+          "price": 10,
+          "description": "Salt & rosemary, truffle oil & parmesan, curried ketchup"
+        },
+        {
+          "name": "Hummus",
+          "price": 10,
+          "description": "Greek flatbread, preserved lemon, chillies, pomegranate, micro herbs"
+        },
+        {
+          "name": "Bangers",
+          "price": 10,
+          "description": "German wurst bites, senf mustard, Brewhemia sauce"
+        },
+        {
+          "name": "Rabbie’s Croquettes",
+          "price": 10,
+          "description": "Haggis, neeps & tatties croquettes, peppercorn sauce, whisky crème fraîche"
+        },
+        {
+          "name": "Garlic Ciabatta",
+          "price": 10,
+          "description": "Olive oil, sea salt, parsley"
+        },
+        {
+          "name": "Pretzel Duo",
+          "price": 10,
+          "description": "One classic, one cheese, pickles & dip"
+        },
+        {
+          "name": "Cauliflower Wings",
+          "price": 10,
+          "description": "Sesame & soy sticky sauce, chillies"
+        }
+      ]
+    },
+    {
+      "title": "Beer Palace Snacks — Sourdough Pizza",
+      "category": "Sourdough Pizza",
+      "type": "food",
+      "offerNote": "£14.50 each, any 2 for £25",
+      "items": [
+        {
+          "name": "Mozzarella Pizza",
+          "price": 14.5,
+          "description": "Mozzarella, basil, passata sauce"
+        },
+        {
+          "name": "Alpine Pizza",
+          "price": 14.5,
+          "description": "Crème fraîche, gruyère, salami, marjoram"
+        },
+        {
+          "name": "Prosciutto Pizza",
+          "price": 14.5,
+          "description": "Mozzarella, prosciutto, olives, passata sauce"
+        }
+      ]
+    }
   ]
 }
