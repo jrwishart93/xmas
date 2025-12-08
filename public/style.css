@@ -1429,17 +1429,31 @@ button.btn-green:hover:not(:disabled) {
   text-align: left;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   letter-spacing: 0.3px;
   text-transform: none;
   box-shadow: none;
 }
 
+.menu-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
 .category-header .menu-title {
   margin: 0;
   font-size: 1.06rem;
   font-weight: 700;
+}
+
+.menu-section-note {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin: 0.2rem 0 0;
+  color: #ffd8a6;
 }
 
 .category-header .menu-title {

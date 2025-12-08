@@ -49,6 +49,26 @@ const createVariants = (items = [], sizeLabels = []) => {
 const normalizeSimpleItems = (items = []) =>
   items.map((item) => ({ name: item?.name, price: asNumberOrNull(item?.price) }));
 
+const normalizeCustomSection = (section = {}) => {
+  const items = (section.items || [])
+    .map((item) => ({
+      name: item?.name,
+      price: asNumberOrNull(item?.price),
+      description: item?.description,
+    }))
+    .filter((item) => item.name);
+
+  if (!items.length) return null;
+
+  return {
+    category: section.category || section.title || "Snacks",
+    title: section.title,
+    type: section.type,
+    offerNote: section.offerNote,
+    items,
+  };
+};
+
 const normalizeSpirits = (spirits = {}) => {
   const sections = [];
   Object.entries(spirits).forEach(([key, items]) => {
@@ -71,6 +91,16 @@ const normalizeMenu = (rawMenu = {}) => {
 
   Object.entries(rawMenu).forEach(([key, value]) => {
     const categoryLabel = CATEGORY_LABELS[key];
+
+    if (key === "sections") {
+      if (Array.isArray(value)) {
+        value.forEach((section) => {
+          const normalized = normalizeCustomSection(section);
+          if (normalized) sections.push(normalized);
+        });
+      }
+      return;
+    }
 
     if (key === "spirits") {
       sections.push(...normalizeSpirits(value));

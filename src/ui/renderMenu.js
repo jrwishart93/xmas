@@ -19,6 +19,9 @@ const iconFor = (cat) => {
     "Schnapps": "🍶",
     "Alcohol-Free Cocktails": "🫗",
     "Alcohol-Free Beers": "🍺",
+    "Sharers": "🥨",
+    "Bites": "🍟",
+    "Sourdough Pizza": "🍕",
   };
   if (cat?.startsWith("Spirits")) return "🥃";
   if (cat?.startsWith("Alcohol-Free")) return "🫗";
@@ -41,7 +44,24 @@ export async function renderMenu(container) {
     header.type = "button";
     header.className = "category-header";
     header.setAttribute("aria-expanded", "false");
-    header.innerHTML = `<span class="menu-title">${iconFor(cat.category)} ${cat.category}</span>`;
+
+    const headingWrap = document.createElement("div");
+    headingWrap.className = "menu-heading";
+
+    const label = cat.title || cat.category;
+    const title = document.createElement("span");
+    title.className = "menu-title";
+    title.textContent = `${iconFor(cat.category)} ${label}`;
+    headingWrap.appendChild(title);
+
+    if (cat.offerNote) {
+      const note = document.createElement("p");
+      note.className = "menu-section-note";
+      note.textContent = cat.offerNote;
+      headingWrap.appendChild(note);
+    }
+
+    header.appendChild(headingWrap);
 
     const content = document.createElement("div");
     content.className = "category-content";
