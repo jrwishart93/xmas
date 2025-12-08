@@ -39,6 +39,11 @@ let QUESTIONS = VOTING_QUESTIONS.map(createQuestionShape);
 
 const votesState = {};
 let participants = { ...TEAM };
+const unavailableIds = new Set(
+  Object.entries(TEAM)
+    .filter(([, person]) => person?.unavailable)
+    .map(([id]) => id)
+);
 const userId = normaliseTeamId(sessionStorage.getItem("loggedInUser"));
 const voteLoading = document.getElementById("voteLoading");
 const submitButton = document.getElementById("submitVotes");
@@ -197,7 +202,11 @@ async function loadParticipants() {
     };
   });
 
-  participants = merged;
+  const availableEntries = Object.entries(merged).filter(
+    ([id, person]) => !unavailableIds.has(id) && !person?.unavailable
+  );
+
+  participants = Object.fromEntries(availableEntries);
   renderAvatarGrids();
 }
 
