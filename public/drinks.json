@@ -176,6 +176,17 @@
     { "name": "Old Mout AF", "price": 5.5 },
     { "name": "Budvar Nealko", "price": 5.5 }
   ],
+  "soft_drinks": [
+    { "name": "Pepsi (330ml)", "price": 3.8 },
+    { "name": "Pepsi Max (330ml)", "price": 3.8 },
+    { "name": "Irn Bru (330ml)", "price": 3.8 },
+    { "name": "Irn Bru Sugar Free (330ml)", "price": 3.8 },
+    { "name": "Fever Tree Raspberry Lemonade (275ml)", "price": 4.95 },
+    { "name": "Fever Tree British Elderflower (275ml)", "price": 4.95 },
+    { "name": "Red Bull (275ml)", "price": 4.95 },
+    { "name": "San Pellegrino Limonata (330ml)", "price": 4.95 },
+    { "name": "San Pellegrino Aranciata (330ml)", "price": 4.95 }
+  ],
   "sections": [
     {
       "title": "Beer Palace Snacks — Sharers",

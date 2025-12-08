@@ -11,6 +11,7 @@ const CATEGORY_LABELS = {
   schnapps: "Schnapps",
   alcohol_free_cocktails: "Alcohol-Free Cocktails",
   alcohol_free_beers: "Alcohol-Free Beers",
+  soft_drinks: "Soft Drinks",
 };
 
 const SPIRIT_LABELS = {
