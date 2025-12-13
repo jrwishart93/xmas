@@ -10,7 +10,7 @@ import { fetchMenu } from "./src/data/loadMenu.js";
 import { TEAM, getAvatarSrc, normaliseTeamId } from "./team.js";
 
 const MAX_BUDGET_PER_PERSON = 20;
-const TOTAL_USERS = 9; // Ensure kitty calculation and team mapping stay in sync
+const TOTAL_USERS = 8; // Adam B not attending; keep kitty calculation and team mapping in sync
 const MAX_KITTY = TOTAL_USERS * MAX_BUDGET_PER_PERSON;
 
 const submissionList = document.getElementById("submissionList");
