@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="/styles/main.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body>
+<body class="auth-page">
 <header class="site-header">
   <div class="site-shell">
     <p class="brand">Team Social Fund</p>
@@ -18,18 +18,69 @@
     </nav>
   </div>
 </header>
-<main class="site-shell with-fixed-header">
-  <section class="card">
-    <h1>Sign In (Phase 1 Placeholder)</h1>
-    <p>Firebase Auth sign-in UI will be added in a later phase.</p>
-    <p class="muted">For now, this route exists as the primary sign-in destination from public pages.</p>
+<main class="auth-layout with-fixed-header">
+  <section class="auth-card" data-auth-card data-mode="sign-in">
+    <header class="auth-header">
+      <i data-lucide="shield-check" class="auth-logo" aria-hidden="true"></i>
+      <h1>Team Portal</h1>
+      <p class="muted">Secure access for members.</p>
+    </header>
+
+    <div class="auth-toggle" role="tablist" aria-label="Authentication mode">
+      <button type="button" class="auth-tab active" data-auth-tab="sign-in" aria-selected="true">Sign In</button>
+      <button type="button" class="auth-tab" data-auth-tab="sign-up" aria-selected="false">Sign Up</button>
+    </div>
+
+    <p class="auth-status" data-auth-status data-state="info" aria-live="polite"></p>
+
+    <form data-auth-pane="sign-in" data-sign-in-form>
+      <label for="signin-email">Email</label>
+      <input id="signin-email" name="email" type="email" autocomplete="email" required />
+
+      <label for="signin-password">Password</label>
+      <input id="signin-password" name="password" type="password" autocomplete="current-password" required />
+
+      <label class="checkbox-row">
+        <input type="checkbox" name="remember" checked />
+        <span>Keep me signed in</span>
+      </label>
+
+      <button type="submit" class="btn auth-btn" data-default-label="Sign In">
+        <span class="spinner" aria-hidden="true"></span>
+        <span data-btn-label>Sign In</span>
+      </button>
+
+      <a href="#" class="auth-link">Forgot password?</a>
+    </form>
+
+    <form data-auth-pane="sign-up" data-sign-up-form hidden>
+      <label for="signup-name">Full name</label>
+      <input id="signup-name" name="fullName" type="text" autocomplete="name" required />
+
+      <label for="signup-email">Email</label>
+      <input id="signup-email" name="email" type="email" autocomplete="email" required />
+
+      <label for="signup-password">Password</label>
+      <input id="signup-password" name="password" type="password" autocomplete="new-password" minlength="8" required />
+
+      <label for="signup-confirm-password">Confirm password</label>
+      <input id="signup-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" minlength="8" required />
+
+      <label class="checkbox-row">
+        <input type="checkbox" name="remember" checked />
+        <span>Keep me signed in</span>
+      </label>
+
+      <button type="submit" class="btn auth-btn" data-default-label="Create Account">
+        <span class="spinner" aria-hidden="true"></span>
+        <span data-btn-label>Create Account</span>
+      </button>
+    </form>
+
+    <p class="auth-security-note">🔐 Your data is securely encrypted</p>
   </section>
 </main>
-<footer class="site-footer">
-  <div class="site-shell">
-    <small>© Team Social Fund</small>
-  </div>
-</footer>
+<script type="module" src="/js/login-page.js"></script>
 <script>
   lucide.createIcons();
 </script>

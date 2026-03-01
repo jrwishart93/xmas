@@ -3,8 +3,11 @@ import {
   getAuth,
   setPersistence,
   browserLocalPersistence,
+  browserSessionPersistence,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
   signOut,
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import {
@@ -51,7 +54,12 @@ export {
   runTransaction,
   increment,
   serverTimestamp,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
   signOut,
 };
