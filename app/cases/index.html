@@ -1,9 +1,75 @@
-<!doctype html><html><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Cases</title><link rel="stylesheet" href="/styles/main.css" /></head>
-<body><header><h1>SCN Cases</h1><nav><a href="/app/dashboard/">Dashboard</a><a href="/app/leaderboard/">Leaderboard</a><a href="/app/cases/">Cases</a><a href="/app/act/">Act</a><a href="#" id="logoutLink">Logout</a></nav></header>
-<main>
-<section class="card"><h2>Confess an Offence</h2><form id="confessForm"><label>Clause<select id="confessClause"></select></label><label>Brief<textarea id="confessBrief"></textarea></label><button type="submit">Submit Confession</button></form></section>
-<section class="card"><h2>Allege Offence</h2><form id="allegeForm"><label>Member<select id="accusedUser"></select></label><label>Clause<select id="allegeClause"></select></label><label>Brief<textarea id="allegeBrief"></textarea></label><button type="submit">Raise Allegation</button></form></section>
-<section class="card"><h2>Allegations Against Me</h2><div id="againstMe"></div></section>
-<section class="card"><h2>Allegations I Raised</h2><div id="iRaised"></div></section>
-<section class="card"><h2>Resolved Cases</h2><div id="resolved"></div></section>
-</main><script type="module" src="/js/cases-page.js"></script></body></html>
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cases</title>
+  <link rel="stylesheet" href="/styles/main.css" />
+</head>
+<body>
+<header class="site-header">
+  <div class="site-shell">
+    <p class="brand">SCN Control Room</p>
+    <div class="app-nav-meta">
+      <nav aria-label="App navigation">
+        <a href="/app/dashboard/">Dashboard</a>
+        <a href="/app/leaderboard/">Leaderboard</a>
+        <a href="/app/cases/">Cases</a>
+        <a href="/app/act/">Act</a>
+        <a href="#" id="logoutLink">Logout</a>
+      </nav>
+      <span class="avatar-dot" aria-hidden="true"></span>
+    </div>
+  </div>
+</header>
+
+<main class="site-shell with-fixed-header">
+  <section class="card glass-panel">
+    <p class="eyebrow">Issue Notice</p>
+    <h1>Structured SCN Issuing</h1>
+    <p class="muted">Select a clause, choose disposal method, and confirm contribution terms.</p>
+  </section>
+
+  <section class="form-grid">
+    <section class="card">
+      <h2>⚖️ Confess an Offence</h2>
+      <form id="confessForm">
+        <label>Clause<select id="confessClause"></select></label>
+
+        <fieldset class="disposal-options">
+          <label class="disposal-option"><input type="radio" name="confessDisposal" checked /> Monetary (Preferred)</label>
+          <label class="disposal-option"><input type="radio" name="confessDisposal" /> Cakes (Alternative)</label>
+          <label class="disposal-option"><input type="radio" name="confessDisposal" /> Combined</label>
+        </fieldset>
+
+        <label>Brief<textarea id="confessBrief" placeholder="Provide context for this incident."></textarea></label>
+        <button type="submit">Issue SCN</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>🧾 Allege Offence</h2>
+      <form id="allegeForm">
+        <label>Member<select id="accusedUser"></select></label>
+        <label>Clause<select id="allegeClause"></select></label>
+
+        <fieldset class="disposal-options">
+          <label class="disposal-option"><input type="radio" name="allegeDisposal" checked /> Monetary (Preferred)</label>
+          <label class="disposal-option"><input type="radio" name="allegeDisposal" /> Cakes (Alternative)</label>
+          <label class="disposal-option"><input type="radio" name="allegeDisposal" /> Combined</label>
+        </fieldset>
+
+        <label>Brief<textarea id="allegeBrief" placeholder="Why this clause applies."></textarea></label>
+        <button type="submit">Issue SCN</button>
+      </form>
+    </section>
+  </section>
+
+  <section class="card"><h2>Allegations Against Me</h2><div id="againstMe"></div></section>
+  <section class="card"><h2>Allegations I Raised</h2><div id="iRaised"></div></section>
+  <section class="card"><h2>Resolved Cases</h2><div id="resolved"></div></section>
+</main>
+
+<script type="module" src="/js/cases-page.js"></script>
+</body>
+</html>

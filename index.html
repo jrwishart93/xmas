@@ -17,37 +17,54 @@
     </nav>
   </div>
 </header>
+
 <main class="site-shell with-fixed-header">
-  <section class="hero card">
-    <h1>Welcome to the Team Social Fund</h1>
-    <p>
-      A private team social contributions tracker. Team members log light-hearted breaches and
-      contribute to the shared fund. Participation is voluntary and this has no disciplinary meaning.
+  <section class="hero card glass-panel fade-in">
+    <p class="eyebrow">Modern Judicial Dashboard</p>
+    <h1>The Summary Justice (Social Contributions) Act 2025</h1>
+    <p class="hero-subheading">
+      A private, voluntary team contribution system for light-hearted breaches. Built like a proper product,
+      operated with common sense, and absolutely not a real court.
     </p>
-    <small>Voluntary participation. Unofficial team system.</small>
 
     <div class="actions cta-actions">
       <a class="btn" href="/login/">Sign In</a>
       <a class="btn secondary" href="/act/">View the Act</a>
     </div>
+
+    <small>Voluntary participation only. Unofficial team social system.</small>
   </section>
 
-  <section class="card leaderboard-panel" id="publicSummary" aria-live="polite"></section>
+  <section class="card leaderboard-panel glass-panel fade-in" id="publicSummary" aria-live="polite"></section>
 
-  <section class="card">
-    <h2>How it works</h2>
-    <ul>
-      <li>Browse the Act to see contributable breaches.</li>
-      <li>Sign in to log a breach and contribute.</li>
-      <li>Leaderboard shows contributions over the last 90 days.</li>
-    </ul>
+  <section class="card fade-in how-it-works">
+    <h2>How It Works</h2>
+    <div class="workflow-grid">
+      <article class="workflow-step">
+        <p class="workflow-icon" aria-hidden="true">⚖️</p>
+        <h3>Log an SCN</h3>
+        <p>Choose the applicable clause and record a short brief summary.</p>
+      </article>
+      <article class="workflow-step">
+        <p class="workflow-icon" aria-hidden="true">💷</p>
+        <h3>Choose Disposal</h3>
+        <p>Settle with a monetary contribution, cakes, or a combined arrangement.</p>
+      </article>
+      <article class="workflow-step">
+        <p class="workflow-icon" aria-hidden="true">📊</p>
+        <h3>Build the Fund</h3>
+        <p>Contributions accumulate and appear in the 90-day leaderboard.</p>
+      </article>
+    </div>
   </section>
 </main>
+
 <footer class="site-footer">
   <div class="site-shell">
     <small>© Team Social Fund · The Summary Justice (Social Contributions) Act 2025</small>
   </div>
 </footer>
+
 <script type="module" src="/js/landing.js"></script>
 </body>
 </html>

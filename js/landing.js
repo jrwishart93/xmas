@@ -3,6 +3,20 @@ import { renderLeaderboardSummary } from '/js/components-leaderboard.js';
 
 const publicSummary = document.getElementById('publicSummary');
 
+function animateCurrencyValue(node, valuePence = 0) {
+  const duration = 900;
+  const start = performance.now();
+
+  const tick = (now) => {
+    const progress = Math.min(1, (now - start) / duration);
+    const currentPence = Math.round(valuePence * progress);
+    node.textContent = money(currentPence);
+    if (progress < 1) requestAnimationFrame(tick);
+  };
+
+  requestAnimationFrame(tick);
+}
+
 async function loadPublicSummary() {
   const response = await fetch('/api/public-summary');
   if (!response.ok) throw new Error('Unable to load public summary');
@@ -14,8 +28,12 @@ async function loadPublicSummary() {
     entries: (data.leaderboard || []).map((entry) => ({
       name: entry.displayName,
       amount: money(entry.totalPence),
+      amountPence: entry.totalPence,
     })),
   });
+
+  const fundAmount = document.getElementById('fundAmount');
+  if (fundAmount) animateCurrencyValue(fundAmount, data.socialFundTotalPence || 0);
 }
 
 loadPublicSummary().catch((error) => {
