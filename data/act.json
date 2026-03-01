@@ -1,56 +1,206 @@
-[
-  {
-    "section": "Section 1",
-    "title": "Punctuality & Attendance",
-    "clauses": [
-      {
-        "id": "S1-1",
-        "title": "Late for duty",
-        "description": "Arriving late to scheduled duty without prior agreement.",
-        "typicalAmountPence": 100
-      },
-      {
-        "id": "S1-2",
-        "title": "Missed briefing",
-        "description": "Failure to attend required operational briefing.",
-        "typicalAmountPence": 250
-      }
-    ]
-  },
-  {
-    "section": "Section 2",
-    "title": "Kit & Conduct",
-    "clauses": [
-      {
-        "id": "S2-1",
-        "title": "Incorrect kit state",
-        "description": "Presenting for work with avoidable kit deficiencies.",
-        "typicalAmountPence": 200
-      },
-      {
-        "id": "S2-2",
-        "title": "Radio etiquette lapse",
-        "description": "Repeated avoidable breaches of radio discipline.",
-        "typicalAmountPence": 150
-      }
-    ]
-  },
-  {
-    "section": "Section 3",
-    "title": "Mess & Admin",
-    "clauses": [
-      {
-        "id": "S3-1",
-        "title": "Failure to brew up",
-        "description": "Neglecting agreed tea/coffee rotation duties.",
-        "typicalAmountPence": 100
-      },
-      {
-        "id": "S3-2",
-        "title": "Admin shortcut",
-        "description": "Creating avoidable admin rework for colleagues.",
-        "typicalAmountPence": 300
-      }
-    ]
-  }
-]
+{
+  "title": "The Summary Justice (Social Contributions) Act 2025",
+  "version": "As Amended from Time to Time",
+  "lastUpdated": "2026-03-01T00:00:00.000Z",
+  "parts": [
+    {
+      "partNumber": 1,
+      "title": "Administrative & Attendance Breaches",
+      "operationallySensitive": false,
+      "sections": [
+        {
+          "code": "1.1",
+          "title": "Late for Duty",
+          "description": "Applies where an officer reports for duty after their scheduled commencement time. The applicable contribution may increase proportionate to the duration of lateness."
+        },
+        {
+          "code": "1.2",
+          "title": "Attendance on Incorrect Day",
+          "description": "Applies where an officer attends for duty on a rest day or non-working day in error."
+        },
+        {
+          "code": "1.3",
+          "title": "Pre-Annual Leave Contribution",
+          "description": "Applies to the final tour of duty immediately preceding a period of annual leave."
+        },
+        {
+          "code": "1.4",
+          "title": "Transfer Out Contribution",
+          "description": "Applies where an officer departs the team for another department, division, or posting."
+        },
+        {
+          "code": "1.5",
+          "title": "Arrival from Elsewhere Contribution",
+          "description": "Applies where an officer joins the team from another department, division, or posting."
+        }
+      ]
+    },
+    {
+      "partNumber": 2,
+      "title": "Life Events & Personal Milestones",
+      "operationallySensitive": false,
+      "sections": [
+        {
+          "code": "2.1",
+          "title": "Birthday (Personal)",
+          "description": "Applies on the occasion of an officer’s birthday."
+        },
+        {
+          "code": "2.2",
+          "title": "Birthday (Work Anniversary)",
+          "description": "Applies on the anniversary of joining the service or team."
+        },
+        {
+          "code": "2.3",
+          "title": "Return from Prolonged Absence",
+          "description": "Applies where an officer returns to duty following extended sickness, leave, or other authorised absence."
+        },
+        {
+          "code": "2.4",
+          "title": "Relationship Status Alteration",
+          "description": "Applies upon marriage, engagement, divorce, or other significant and publicly acknowledged relationship change."
+        },
+        {
+          "code": "2.5",
+          "title": "Birth of Child",
+          "description": "Applies upon the arrival of a child into the officer’s household."
+        }
+      ]
+    },
+    {
+      "partNumber": 3,
+      "title": "Operational Conduct & Performance",
+      "operationallySensitive": false,
+      "sections": [
+        {
+          "code": "3.1",
+          "title": "Resolved Complaint",
+          "description": "Applies where a complaint has been concluded in the officer’s favour or otherwise resolved."
+        },
+        {
+          "code": "3.2",
+          "title": "Unlawful or Regrettable Arrest",
+          "description": "Applies where an arrest is subsequently deemed inappropriate, unlawful, or otherwise ill-advised."
+        },
+        {
+          "code": "3.3",
+          "title": "General Operational Error",
+          "description": "Applies to minor but notable mistakes, lapses in judgement, or administrative mishaps."
+        },
+        {
+          "code": "3.4",
+          "title": "Speeding Notice (On or Off Duty)",
+          "description": "Applies where an officer receives a speeding notice or is otherwise detected exceeding lawful limits."
+        },
+        {
+          "code": "3.5",
+          "title": "Excessive Personal Calls",
+          "description": "Applies where more than three personal calls are made or received during a single tour of duty."
+        }
+      ]
+    },
+    {
+      "partNumber": 4,
+      "title": "Operational Incidents & Tactical Events",
+      "operationallySensitive": true,
+      "sections": [
+        {
+          "code": "4.1",
+          "title": "False Activation of Emergency Button",
+          "description": "Applies where the emergency activation red button is activated without sufficient operational cause."
+        },
+        {
+          "code": "4.2",
+          "title": "Tactical Deployment (Stinger)",
+          "description": "Applies where a stinger device is deployed during operational duties."
+        },
+        {
+          "code": "4.3",
+          "title": "Vehicle Collision",
+          "description": "Applies where a police vehicle is involved in a collision or impact event, regardless of fault."
+        },
+        {
+          "code": "4.4",
+          "title": "Escape of Detainee",
+          "description": "Applies where a detained person escapes lawful custody."
+        },
+        {
+          "code": "4.5",
+          "title": "Loss of Equipment",
+          "description": "Applies where issued equipment is misplaced, lost, or otherwise unaccounted for."
+        }
+      ]
+    },
+    {
+      "partNumber": 5,
+      "title": "Significant Incidents & Notable Events",
+      "operationallySensitive": false,
+      "sections": [
+        {
+          "code": "5.1",
+          "title": "Notable Death Attendance",
+          "description": "Applies following attendance at a death presenting unusual or particularly memorable circumstances."
+        },
+        {
+          "code": "5.2",
+          "title": "Saving of Life",
+          "description": "Applies where an officer’s actions contribute directly to the preservation of life."
+        },
+        {
+          "code": "5.3",
+          "title": "Serious or Complex Arrest",
+          "description": "Applies where an arrest is of particular seriousness, complexity, or notoriety."
+        },
+        {
+          "code": "5.4",
+          "title": "PAVA or Taser Deployment",
+          "description": "Applies where incapacitant spray or Taser is deployed during operational duties. Contribution level may increase proportionate to accidental colleague exposure."
+        }
+      ]
+    },
+    {
+      "partNumber": 6,
+      "title": "Recognition, Opportunity & Advantage",
+      "operationallySensitive": true,
+      "sections": [
+        {
+          "code": "6.1",
+          "title": "Lottery or Financial Windfall",
+          "description": "Applies upon the receipt of significant unexpected financial gain."
+        },
+        {
+          "code": "6.2",
+          "title": "Award or Commendation",
+          "description": "Applies upon receipt of formal recognition or commendation."
+        },
+        {
+          "code": "6.3",
+          "title": "Promotion",
+          "description": "Applies upon advancement in rank or role."
+        }
+      ]
+    },
+    {
+      "partNumber": 7,
+      "title": "Miscellaneous & Conduct Matters",
+      "operationallySensitive": false,
+      "sections": [
+        {
+          "code": "7.1",
+          "title": "Amendment of the Act",
+          "description": "Applies where an officer proposes or enacts an amendment to this Act."
+        },
+        {
+          "code": "7.2",
+          "title": "COVID-Related Absence",
+          "description": "Applies where time off is taken due to COVID-related absence."
+        },
+        {
+          "code": "7.3",
+          "title": "Minor Fabrication (Non-Serious Context)",
+          "description": "Applies where an officer is found to have exaggerated, embellished, or misrepresented matters in a clearly non-serious context."
+        }
+      ]
+    }
+  ]
+}
