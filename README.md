@@ -10,3 +10,9 @@ Refactored into a team-based Social Team Fund system with:
 - Admin-only Kangaroo Court resolution
 
 Legacy Brewhemia 2025 pages and assets are archived in `/archive/brewhemia-2025`.
+
+
+## Data seeding
+
+- Seed team document: `node scripts/seed-team.mjs`
+- Seed the Act document: `node scripts/seed-act.mjs`
