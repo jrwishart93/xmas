@@ -1,3 +1,4 @@
+import { initIcons } from '/js/app-common.js';
 import { money } from '/js/constants.js';
 import { renderLeaderboardSummary } from '/js/components-leaderboard.js';
 
@@ -47,3 +48,5 @@ loadPublicSummary().catch((error) => {
   warning.textContent = `Unable to load summary: ${error.message}`;
   publicSummary.appendChild(warning);
 });
+
+initIcons();

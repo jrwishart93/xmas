@@ -5,15 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Team Social Fund</title>
   <link rel="stylesheet" href="/styles/main.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <header class="site-header">
-  <div class="site-shell">
+  <div class="site-shell header-row">
     <p class="brand">Team Social Fund</p>
-    <nav aria-label="Main navigation">
-      <a href="/">Home</a>
-      <a href="/act/">The Act</a>
-      <a href="/login/">Sign In</a>
+    <nav aria-label="Main navigation" class="site-nav">
+      <a href="/" class="nav-link"><i data-lucide="scale" class="icon"></i>Home</a>
+      <a href="/act/" class="nav-link"><i data-lucide="scroll-text" class="icon"></i>The Act</a>
+      <a href="/login/" class="nav-link"><i data-lucide="user" class="icon"></i>Sign In</a>
     </nav>
   </div>
 </header>
@@ -28,8 +29,8 @@
     </p>
 
     <div class="actions cta-actions">
-      <a class="btn" href="/login/">Sign In</a>
-      <a class="btn secondary" href="/act/">View the Act</a>
+      <a class="btn" href="/login/"><i data-lucide="user" class="icon icon-btn"></i>Sign In</a>
+      <a class="btn secondary" href="/act/"><i data-lucide="scroll-text" class="icon icon-btn"></i>View the Act</a>
     </div>
 
     <small>Voluntary participation only. Unofficial team social system.</small>
@@ -38,20 +39,20 @@
   <section class="card leaderboard-panel glass-panel fade-in" id="publicSummary" aria-live="polite"></section>
 
   <section class="card fade-in how-it-works">
-    <h2>How It Works</h2>
+    <h2 class="section-header"><i data-lucide="scale" class="icon"></i>How It Works</h2>
     <div class="workflow-grid">
       <article class="workflow-step">
-        <p class="workflow-icon" aria-hidden="true">⚖️</p>
+        <p class="workflow-icon" aria-hidden="true"><i data-lucide="gavel" class="icon icon-hero"></i></p>
         <h3>Log an SCN</h3>
         <p>Choose the applicable clause and record a short brief summary.</p>
       </article>
       <article class="workflow-step">
-        <p class="workflow-icon" aria-hidden="true">💷</p>
+        <p class="workflow-icon" aria-hidden="true"><i data-lucide="wallet" class="icon icon-hero"></i></p>
         <h3>Choose Disposal</h3>
         <p>Settle with a monetary contribution, cakes, or a combined arrangement.</p>
       </article>
       <article class="workflow-step">
-        <p class="workflow-icon" aria-hidden="true">📊</p>
+        <p class="workflow-icon" aria-hidden="true"><i data-lucide="bar-chart-3" class="icon icon-hero"></i></p>
         <h3>Build the Fund</h3>
         <p>Contributions accumulate and appear in the 90-day leaderboard.</p>
       </article>
