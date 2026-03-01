@@ -27,7 +27,7 @@ export default function ActSearch() {
 
   return (
     <div className="mb-12">
-      <label htmlFor="act-search" className="mb-2 block text-sm text-neutral-600">
+      <label htmlFor="act-search" className="mb-2 block text-sm text-[#6b6b6b]">
         Search offences
       </label>
       <input
@@ -36,7 +36,7 @@ export default function ActSearch() {
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="Search offences..."
-        className="w-full rounded-xl border border-neutral-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-neutral-800"
+        className="w-full rounded-md border border-[#e4e2dd] bg-white px-4 py-3 text-[#1c1c1c] focus:outline-none focus:ring-2 focus:ring-[#8b6f3d]/40"
       />
     </div>
   );
