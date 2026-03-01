@@ -1,152 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0a0f1f" />
-  <title>Work Xmas Night Out — Login</title>
-  <link rel="stylesheet" href="public/style.css" />
-  <link rel="preload" href="public/style.css" as="style" />
-  <noscript><style>.js-only{display:none!important}</style></noscript>
+  <title>Social Team Fund</title>
+  <link rel="stylesheet" href="/styles/main.css" />
 </head>
-
 <body>
-  <div class="gold-dust js-only" aria-hidden="true"></div>
-
-  <main class="container" role="main">
-    
-    <header class="neon-header">
-      <div class="neon-title">
-        <div class="neon-sign flicker-slow">
-          <span class="neon-text-pink">BREWHEMIA</span>
-          <span class="neon-text-blue">XMAS BASH</span>
-        </div>
-      </div>
-      <p class="vip-subtitle">VIP GUEST LIST CHECK-IN</p>
-    </header>
-
-    <section class="card glass vip-card">
-      <form id="loginForm" novalidate>
-        <div class="avatar-picker">
-          <p class="vip-label avatar-heading">Select your avatar to choose your drinks</p>
-          <p class="muted-text">Tap your face to continue.</p>
-          <div id="avatarGrid" class="avatar-grid" role="list" aria-label="Guest list"></div>
-        </div>
-
-        <div id="selectedUserAnnouncement" class="sr-only" aria-live="polite"></div>
-
-        <div id="pinSection" class="pin-section hidden">
-          <div id="selectedUserCard" class="selected-user-card hidden" aria-live="polite"></div>
-
-          <div class="pin-label-row">
-            <label for="pinInput" class="vip-label">Passcode</label>
-            <div id="pinHint" class="pin-hint">?</div>
-          </div>
-          <div class="field field-inline">
-            <input
-              type="password"
-              id="pinInput"
-              class="vip-input"
-              inputmode="numeric"
-              pattern="\d{4}"
-              maxlength="4"
-              placeholder="••••"
-              required
-            />
-            <button type="button" id="togglePin" class="btn-text-gold">Reveal</button>
-          </div>
-
-          <div class="bouncer-status">
-            <div id="pinError" class="pin-error" aria-live="polite"></div>
-            <p id="successMsg" class="success-msg hidden">ACCESS GRANTED</p>
-          </div>
-
-          <div class="actions">
-            <div id="loginSpinner" class="spinner hidden" aria-hidden="true"></div>
-            <button id="loginBtn" class="btn-neon" type="submit" disabled>
-              CHECK LIST
-            </button>
-          </div>
-        </div>
-      </form>
-    </section>
-
-    <footer class="muted footer-minimal">
-      <small>Strictly Invite Only • 18+ • No Scrooges</small>
-    </footer>
-  </main>
-
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-  <script>
-    (function () {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      const wrap = document.querySelector('.gold-dust');
-      if (!wrap) return;
-      const count = 50; 
-      const frag = document.createDocumentFragment();
-      for (let i = 0; i < count; i++) {
-        const s = document.createElement('div');
-        s.className = 'dust-particle';
-        const size = 2 + Math.random() * 4;
-        s.style.width = size + 'px';
-        s.style.height = size + 'px';
-        s.style.left = Math.random() * 100 + '%';
-        s.style.animationDuration = (5 + Math.random() * 10).toFixed(2) + 's';
-        s.style.animationDelay = (Math.random() * 5).toFixed(2) + 's';
-        frag.appendChild(s);
-      }
-      wrap.appendChild(frag);
-    })();
-  </script>
-
-  <script type="module">
-    const loginForm = document.getElementById('loginForm');
-    const pinInput = document.getElementById('pinInput');
-    const btn = document.getElementById('loginBtn');
-    const successMsg = document.getElementById('successMsg');
-    const togglePin = document.getElementById('togglePin');
-    const pinSection = document.getElementById('pinSection');
-    const pinHint = document.getElementById('pinHint');
-    const toast = document.getElementById('toast');
-
-    function showToast(message) {
-      if (!toast) return;
-      toast.textContent = message;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2800);
-    }
-
-    // UI Validation
-    const validate = () => {
-      const hasUser = Boolean(loginForm?.dataset.selectedUserId);
-      if (hasUser) {
-        pinSection?.classList.remove('hidden');
-      }
-
-      const isValid = hasUser && /^\d{4}$/.test(pinInput.value);
-      btn.disabled = !isValid;
-      btn.classList.toggle('btn-neon-active', isValid);
-    };
-
-    pinInput.addEventListener('input', () => {
-      pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 4);
-      validate();
-    });
-
-    togglePin.addEventListener('click', () => {
-      const isPass = pinInput.type === 'password';
-      pinInput.type = isPass ? 'text' : 'password';
-      togglePin.textContent = isPass ? 'Hide' : 'Reveal';
-    });
-
-    pinHint?.addEventListener('click', () => {
-      showToast('Your PIN is the last 4 digits of your mobile number.');
-    });
-
-    document.addEventListener('userSelectionChanged', validate);
-  </script>
-
-  <script type="module" src="login.js"></script>
+<header>
+  <h1>Social Team Fund</h1>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/act/">Act</a>
+  </nav>
+</header>
+<main>
+  <section class="card"><h2>What this is</h2><p>A structured, team-run social fund for light-hearted workplace standards and transparent contributions.</p></section>
+  <section class="card"><h2>How it works</h2><p>Members raise SCNs, accused users enter a plea, and admins resolve Kangaroo Court cases. Resolved money outcomes feed the rolling leaderboard and fund total.</p><small>Participation is voluntary and intended for positive team culture only.</small></section>
+  <section class="card">
+    <h2>Get Started</h2>
+    <div class="actions">
+      <a href="/act/"><button type="button" class="secondary">View the Act</button></a>
+    </div>
+    <form id="loginForm">
+      <label>Email<input id="email" type="email" required></label>
+      <label>Password<input id="password" type="password" required></label>
+      <button type="submit">Sign In</button>
+      <p id="loginError" class="muted"></p>
+    </form>
+  </section>
+  <section class="card">
+    <h2>Public Summary</h2>
+    <p>Social Team Fund Total: <strong id="fundTotal">£0.00</strong></p>
+    <h3>Top 5 (Last 90 Days)</h3>
+    <ol id="leaderboard"></ol>
+  </section>
+</main>
+<script type="module" src="/js/landing.js"></script>
 </body>
 </html>
