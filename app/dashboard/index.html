@@ -15,8 +15,10 @@
       <nav aria-label="App navigation" class="site-nav">
         <a href="/app/dashboard/" class="nav-link" aria-current="page"><i data-lucide="bar-chart-3" class="icon"></i>Dashboard</a>
         <a href="/app/leaderboard/" class="nav-link"><i data-lucide="trophy" class="icon"></i>Leaderboard</a>
-        <a href="/app/cases/" class="nav-link"><i data-lucide="gavel" class="icon"></i>Cases</a>
+        <a href="/app/issue/" class="nav-link"><i data-lucide="gavel" class="icon"></i>Issue</a>
+        <a href="/app/disbursements/" class="nav-link" data-preview-route><i data-lucide="wallet" class="icon"></i>Disbursements</a>
         <a href="/app/act/" class="nav-link"><i data-lucide="scroll-text" class="icon"></i>Act</a>
+        <a href="#" id="settingsLink" class="nav-link" data-preview-gate><i data-lucide="settings" class="icon"></i>Settings</a>
         <a href="#" id="logoutLink" class="nav-link"><i data-lucide="x-circle" class="icon"></i>Logout</a>
       </nav>
       <span class="avatar-dot" aria-hidden="true"></span>
@@ -35,7 +37,7 @@
     <article class="card stat-card p-responsive">
       <h2 class="section-header"><i data-lucide="wallet" class="icon"></i>Team Fund Balance</h2>
       <p id="fundTotal" class="metric">£0.00</p>
-      <button class="secondary btn-responsive" type="button"><i data-lucide="coins" class="icon icon-btn"></i>Pay Outstanding</button>
+      <button class="secondary btn-responsive" type="button" data-preview-gate><i data-lucide="coins" class="icon icon-btn"></i>Pay Outstanding</button>
     </article>
 
     <article class="card stat-card p-responsive">
@@ -52,8 +54,9 @@
     <article class="card p-responsive">
       <h2 class="section-header"><i data-lucide="gavel" class="icon"></i>Quick Actions</h2>
       <div class="actions">
-        <a href="/app/cases/" class="btn btn-responsive"><i data-lucide="check-circle-2" class="icon icon-btn"></i>Issue SCN</a>
-        <a href="/app/cases/" class="btn secondary btn-responsive"><i data-lucide="bar-chart-3" class="icon icon-btn"></i>Review Cases</a>
+        <a href="/app/issue/" class="btn btn-responsive" data-preview-gate><i data-lucide="check-circle-2" class="icon icon-btn"></i>Issue SCN</a>
+        <a href="/app/issue/" class="btn secondary btn-responsive" data-preview-gate><i data-lucide="bar-chart-3" class="icon icon-btn"></i>Review Cases</a>
+        <a href="/app/act/" class="btn secondary btn-responsive" data-preview-gate><i data-lucide="file-pen-line" class="icon icon-btn"></i>Amend Act</a>
       </div>
     </article>
   </section>

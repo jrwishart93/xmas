@@ -1,7 +1,10 @@
-import { bootProtectedPage } from '/js/app-common.js';
+import { bootProtectedPage, initPreviewGates } from '/js/app-common.js';
 import { loadAct, flattenClauses } from '/js/act.js';
 import { createScn, getMembers, getCasesForUser, resolvePlea, resolveCourt } from '/js/data.js';
 import { money, STAGE_LABELS } from '/js/constants.js';
+import { PREVIEW_MODE } from '/js/config.js';
+import { TEAM } from '/archive/brewhemia-2025/team.js';
+import { getPreviewRecentActivityFromArchive } from '/js/preview-data.js';
 
 let currentUser;
 let membership;
@@ -49,6 +52,43 @@ function caseCard(item, canPlea, canCourt) {
   return div;
 }
 
+function renderPreviewCards() {
+  const sections = getPreviewRecentActivityFromArchive();
+  const against = document.getElementById('againstMe');
+  const raised = document.getElementById('iRaised');
+  const resolved = document.getElementById('resolved');
+
+  against.innerHTML = '';
+  raised.innerHTML = '';
+  resolved.innerHTML = '';
+
+  sections.slice(0, 2).forEach((entry) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.setAttribute('data-preview-gate', 'case-preview');
+    card.innerHTML = `<p><span class="badge">Awaiting Plea</span></p><p>${entry}</p>`;
+    against.appendChild(card);
+  });
+
+  sections.slice(2, 4).forEach((entry) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.setAttribute('data-preview-gate', 'case-preview');
+    card.innerHTML = `<p><span class="badge">Court Requested</span></p><p>${entry}</p>`;
+    raised.appendChild(card);
+  });
+
+  sections.slice(4, 6).forEach((entry) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.setAttribute('data-preview-gate', 'case-preview');
+    card.innerHTML = `<p><span class="badge">Resolved</span></p><p>${entry}</p>`;
+    resolved.appendChild(card);
+  });
+
+  initPreviewGates();
+}
+
 async function refreshCases() {
   const data = await getCasesForUser(currentUser.uid);
   const against = document.getElementById('againstMe');
@@ -66,12 +106,34 @@ async function refreshCases() {
 bootProtectedPage(async (ctx) => {
   currentUser = ctx.user;
   membership = ctx.membership;
-  [members, clauses] = await Promise.all([getMembers(), loadAct().then(flattenClauses)]);
+  clauses = await loadAct().then(flattenClauses);
 
   fillClauses(document.getElementById('confessClause'));
   fillClauses(document.getElementById('allegeClause'));
 
   const accusedSelect = document.getElementById('accusedUser');
+
+  if (PREVIEW_MODE) {
+    const previewMembers = Object.values(TEAM).map((m) => ({ uid: m.id, displayName: m.name }));
+    accusedSelect.innerHTML = previewMembers.map((m) => `<option value="${m.uid}">${m.displayName}</option>`).join('');
+
+    document.querySelectorAll('#confessForm button, #allegeForm button').forEach((button) => {
+      button.setAttribute('data-preview-gate', 'issue-scn');
+    });
+
+    document.querySelectorAll('#confessForm, #allegeForm').forEach((form) => {
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        window.location.href = '/under-construction/';
+      });
+    });
+
+    renderPreviewCards();
+    initPreviewGates();
+    return;
+  }
+
+  members = await getMembers();
   accusedSelect.innerHTML = [...members.values()].map((m) => `<option value="${m.uid}">${m.displayName}</option>`).join('');
 
   document.getElementById('confessForm').onsubmit = async (e) => {
