@@ -1,11 +1,32 @@
-import { bootProtectedPage, initIcons } from '/js/app-common.js';
+import { bootProtectedPage, initIcons, initPreviewGates } from '/js/app-common.js';
 import { getLeaderboard, getMembers } from '/js/data.js';
 import { money } from '/js/constants.js';
+import { PREVIEW_MODE } from '/js/config.js';
+import { getPreviewLeaderboardFromArchive } from '/js/preview-data.js';
 
 bootProtectedPage(async () => {
-  const [rows, members] = await Promise.all([getLeaderboard(), getMembers()]);
   const container = document.getElementById('rows');
   container.innerHTML = '';
+
+  if (PREVIEW_MODE) {
+    getPreviewLeaderboardFromArchive().forEach((row, index) => {
+      const card = document.createElement('article');
+      card.className = 'card leaderboard-card p-responsive';
+      card.setAttribute('data-preview-gate', 'leaderboard-detail');
+      card.innerHTML = `
+        <h2 class="section-header"><i data-lucide="user" class="icon"></i>${row.name}</h2>
+        <p class="metric">${row.amount}</p>
+        <p class="muted">Rank #${index + 1}</p>
+      `;
+      container.appendChild(card);
+    });
+
+    initPreviewGates(container);
+    initIcons();
+    return;
+  }
+
+  const [rows, members] = await Promise.all([getLeaderboard(), getMembers()]);
 
   rows.forEach((row, index) => {
     const card = document.createElement('article');
