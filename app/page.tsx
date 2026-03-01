@@ -5,7 +5,7 @@ import HeroImage from "@/app/images/Hero-book-hammer.png";
 
 export default function HomePage() {
   return (
-    <main className="bg-neutral-900 text-neutral-100">
+    <main className="relative z-0 text-neutral-100">
       <section className="relative h-[60vh] w-full overflow-hidden md:h-[70vh]">
         <Image
           src={HeroImage}
