@@ -105,7 +105,7 @@ export default function ActPart() {
   );
 
   if (!filteredParts.length) {
-    return <p className="text-neutral-600">No offences match your search.</p>;
+    return <p className="text-[#6b6b6b]">No offences match your search.</p>;
   }
 
   return (
@@ -114,35 +114,35 @@ export default function ActPart() {
         const isOpen = open[part.id] ?? true;
 
         return (
-          <section key={part.id} id={part.id} className="mb-20 scroll-mt-28">
+          <section key={part.id} id={part.id} className="mb-16 scroll-mt-24">
             <button
               onClick={() => setOpen((previous) => ({ ...previous, [part.id]: !isOpen }))}
               className="w-full text-left"
               aria-expanded={isOpen}
               aria-controls={`${part.id}-offences`}
             >
-              <h2 className="flex items-center justify-between text-2xl font-semibold">
+              <h2 className="flex items-center justify-between text-2xl font-semibold tracking-[0.01em] text-[#1c1c1c]">
                 {part.title}
-                <span className="text-lg text-neutral-500">{isOpen ? "−" : "+"}</span>
+                <span className="text-lg text-[#6b6b6b]">{isOpen ? "−" : "+"}</span>
               </h2>
             </button>
 
-            <div className="mt-6 h-px bg-neutral-200" />
+            <div className="mt-5 h-px bg-[#e4e2dd]" />
 
             <div
               id={`${part.id}-offences`}
-              className={`grid transition-all duration-300 ${isOpen ? "mt-8 grid-rows-[1fr] opacity-100" : "mt-0 grid-rows-[0fr] opacity-0"}`}
+              className={`grid transition-all duration-300 ${
+                isOpen ? "mt-8 grid-rows-[1fr] opacity-100" : "mt-0 grid-rows-[0fr] opacity-0"
+              }`}
             >
               <div className="overflow-hidden">
-                <div className="space-y-6">
-                  {part.offences.map((offence) => (
-                    <ActOffenceCard key={offence.code} {...offence} />
-                  ))}
-                </div>
+                {part.offences.map((offence) => (
+                  <ActOffenceCard key={offence.code} {...offence} />
+                ))}
               </div>
             </div>
 
-            {index < filteredParts.length - 1 && <div className="mt-16 h-px bg-neutral-200" />}
+            {index < filteredParts.length - 1 && <div className="mt-4 h-px bg-[#e4e2dd]" />}
           </section>
         );
       })}
