@@ -5,15 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sign In | Team Social Fund</title>
   <link rel="stylesheet" href="/styles/main.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <header class="site-header">
   <div class="site-shell">
     <p class="brand">Team Social Fund</p>
-    <nav aria-label="Main navigation">
-      <a href="/">Home</a>
-      <a href="/act/">The Act</a>
-      <a href="/login/">Sign In</a>
+    <nav aria-label="Main navigation" class="site-nav">
+      <a href="/" class="nav-link"><i data-lucide="scale" class="icon"></i>Home</a>
+      <a href="/act/" class="nav-link"><i data-lucide="scroll-text" class="icon"></i>The Act</a>
+      <a href="/login/" class="nav-link" aria-current="page"><i data-lucide="user" class="icon"></i>Sign In</a>
     </nav>
   </div>
 </header>
@@ -29,5 +30,8 @@
     <small>© Team Social Fund</small>
   </div>
 </footer>
+<script>
+  lucide.createIcons();
+</script>
 </body>
 </html>
