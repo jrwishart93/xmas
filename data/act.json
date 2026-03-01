@@ -1,0 +1,56 @@
+[
+  {
+    "section": "Section 1",
+    "title": "Punctuality & Attendance",
+    "clauses": [
+      {
+        "id": "S1-1",
+        "title": "Late for duty",
+        "description": "Arriving late to scheduled duty without prior agreement.",
+        "typicalAmountPence": 100
+      },
+      {
+        "id": "S1-2",
+        "title": "Missed briefing",
+        "description": "Failure to attend required operational briefing.",
+        "typicalAmountPence": 250
+      }
+    ]
+  },
+  {
+    "section": "Section 2",
+    "title": "Kit & Conduct",
+    "clauses": [
+      {
+        "id": "S2-1",
+        "title": "Incorrect kit state",
+        "description": "Presenting for work with avoidable kit deficiencies.",
+        "typicalAmountPence": 200
+      },
+      {
+        "id": "S2-2",
+        "title": "Radio etiquette lapse",
+        "description": "Repeated avoidable breaches of radio discipline.",
+        "typicalAmountPence": 150
+      }
+    ]
+  },
+  {
+    "section": "Section 3",
+    "title": "Mess & Admin",
+    "clauses": [
+      {
+        "id": "S3-1",
+        "title": "Failure to brew up",
+        "description": "Neglecting agreed tea/coffee rotation duties.",
+        "typicalAmountPence": 100
+      },
+      {
+        "id": "S3-2",
+        "title": "Admin shortcut",
+        "description": "Creating avoidable admin rework for colleagues.",
+        "typicalAmountPence": 300
+      }
+    ]
+  }
+]

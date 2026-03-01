@@ -1,78 +1,47 @@
-// -------------------------------------
-// Firestore Security Rules (Full File)
-// -------------------------------------
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ----------------------------
-    // TEAM USER WHITELIST
-    // ----------------------------
-    function isValidUser(userId) {
-      return userId in [
-        "adamb",
-        "adamj",
-        "chrisb",
-        "derekn",
-        "jamiew",
-        "jom",
-        "lawriec",
-        "paule",
-        "steveh"
-      ];
+    function signedIn() {
+      return request.auth != null;
     }
 
-    // ----------------------------
-    // USERS COLLECTION (avatars)
-    // ----------------------------
-    match /users/{uid} {
-      allow read: if true;
-      allow write: if false;
+    function isTeamMember(teamId) {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/teams/$(teamId)/members/$(request.auth.uid));
     }
 
-    // ----------------------------
-    // DRINK CHOICES COLLECTION
-    // choices/{userId}
-    // ----------------------------
-    match /choices/{userId} {
-
-      // Results page & dashboard require public read
-      allow read: if true;
-
-      // Write rules:
-      //  - Document ID must be one of the known team members
-      //  - Incoming data must contain ONLY the allowed fields
-      //  - No authentication required for this app
-      allow write: if isValidUser(userId)
-                   && request.resource.data.keys().hasOnly([
-                        // Menu selections and totals
-                        "choices", "selections", "totalSpend",
-                        // User metadata
-                        "name", "legacyId", "admin",
-                        // Status and timestamps
-                        "submitted", "timestamp", "updatedAt"
-                      ]);
+    function isAdmin(teamId) {
+      return isTeamMember(teamId) &&
+        get(/databases/$(database)/documents/teams/$(teamId)/members/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // ----------------------------
-    // VOTING COLLECTION
-    // votes/{userId}
-    // ----------------------------
-    match /votes/{userId} {
+    match /teams/{teamId} {
+      allow read: if isTeamMember(teamId);
+      allow create, update: if isAdmin(teamId);
 
-      allow read: if true;
+      match /members/{uid} {
+        allow read: if isTeamMember(teamId);
+        allow write: if isAdmin(teamId);
+      }
 
-      // Allow writes when:
-      //  - userId is within TEAM list
-      //  - body contains only valid QIDs (matching your VOTING_QUESTIONS)
-      allow write: if isValidUser(userId)
-                   && request.resource.data.keys().hasOnly([
-                        "firstHome",
-                        "lastStanding",
-                        "mostDrunk",
-                        "mostAlcohol",
-                        "ninjaExit"
-                      ]);
+      match /scns/{scnId} {
+        allow read: if isTeamMember(teamId);
+
+        allow create: if isTeamMember(teamId)
+          && request.resource.data.issuedByUserId == request.auth.uid
+          && request.resource.data.stage == 'awaiting_plea';
+
+        allow update: if (
+          request.auth.uid == resource.data.accusedUserId
+          && resource.data.stage == 'awaiting_plea'
+          && request.resource.data.stage in ['pleaded_guilty', 'court_requested']
+        ) || (
+          isAdmin(teamId)
+          && resource.data.stage == 'court_requested'
+          && request.resource.data.stage in ['court_convicted', 'court_acquitted']
+        );
+      }
     }
   }
 }
