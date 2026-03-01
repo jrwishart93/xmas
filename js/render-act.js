@@ -15,17 +15,23 @@ export function renderAct(container, act) {
   container.innerHTML = '';
   container.classList.add('act-view');
 
+  const frame = document.createElement('section');
+  frame.className = 'act-frame';
+
   const hero = document.createElement('section');
   hero.className = 'act-hero';
+  const parts = act.parts || [];
   hero.innerHTML = `
     <h2>${act.title}</h2>
     <p class="act-subtitle">Read-Only Rulebook</p>
-    <p class="act-meta">Version: ${act.version}</p>
-    <p class="act-meta">Last updated: ${formatLastUpdated(act.lastUpdated)}</p>
+    <div class="act-meta-row">
+      <p class="act-meta">Version: ${act.version}</p>
+      <p class="act-meta">Last updated: ${formatLastUpdated(act.lastUpdated)}</p>
+      <p class="act-meta">Parts: ${parts.length}</p>
+    </div>
   `;
-  container.appendChild(hero);
+  frame.appendChild(hero);
 
-  const parts = act.parts || [];
   parts.forEach((part, index) => {
     const details = document.createElement('details');
     details.className = 'act-part';
@@ -37,13 +43,6 @@ export function renderAct(container, act) {
     const title = document.createElement('span');
     title.textContent = `Part ${part.partNumber} – ${part.title}`;
     summary.appendChild(title);
-
-    if (part.operationallySensitive) {
-      const badge = document.createElement('span');
-      badge.className = 'act-sensitive-badge';
-      badge.textContent = 'Operationally Sensitive';
-      summary.appendChild(badge);
-    }
 
     details.appendChild(summary);
 
@@ -60,6 +59,8 @@ export function renderAct(container, act) {
       details.appendChild(article);
     });
 
-    container.appendChild(details);
+    frame.appendChild(details);
   });
+
+  container.appendChild(frame);
 }
