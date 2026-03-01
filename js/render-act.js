@@ -21,16 +21,26 @@ export function renderAct(container, act) {
   const hero = document.createElement('section');
   hero.className = 'act-hero';
   const parts = act.parts || [];
+  const totalSections = parts.reduce((count, part) => count + (part.sections?.length || 0), 0);
   hero.innerHTML = `
+    <p class="act-eyebrow">Public rulebook</p>
     <h2>${act.title}</h2>
-    <p class="act-subtitle">Read-Only Rulebook</p>
-    <div class="act-meta-row">
-      <p class="act-meta">Version: ${act.version}</p>
-      <p class="act-meta">Last updated: ${formatLastUpdated(act.lastUpdated)}</p>
-      <p class="act-meta">Parts: ${parts.length}</p>
+    <p class="act-subtitle">Browse all sections and clauses in a cleaner, searchable-by-eye format.</p>
+    <div class="act-meta-row" role="list" aria-label="Act summary">
+      <p class="act-meta" role="listitem"><span class="meta-label">Version</span><strong>${act.version}</strong></p>
+      <p class="act-meta" role="listitem"><span class="meta-label">Last updated</span><strong>${formatLastUpdated(act.lastUpdated)}</strong></p>
+      <p class="act-meta" role="listitem"><span class="meta-label">Parts</span><strong>${parts.length}</strong></p>
+      <p class="act-meta" role="listitem"><span class="meta-label">Sections</span><strong>${totalSections}</strong></p>
     </div>
   `;
   frame.appendChild(hero);
+
+  if (!parts.length) {
+    const emptyState = document.createElement('p');
+    emptyState.className = 'act-empty';
+    emptyState.textContent = 'No published parts are available yet.';
+    frame.appendChild(emptyState);
+  }
 
   parts.forEach((part, index) => {
     const details = document.createElement('details');
@@ -40,9 +50,10 @@ export function renderAct(container, act) {
     const summary = document.createElement('summary');
     summary.className = 'act-part-summary';
 
-    const title = document.createElement('span');
-    title.textContent = `Part ${part.partNumber} – ${part.title}`;
-    summary.appendChild(title);
+    summary.innerHTML = `
+      <span class="act-part-title">Part ${part.partNumber} – ${part.title}</span>
+      <span class="act-part-count">${(part.sections || []).length} ${(part.sections || []).length === 1 ? 'section' : 'sections'}</span>
+    `;
 
     details.appendChild(summary);
 
