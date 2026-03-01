@@ -254,7 +254,7 @@ const showSuccessOptions = () => {
 
   modal.innerHTML = `
         <div class="success-box">
-            <h2>🎉 Choice Saved!</h2>
+            <h2> Choice Saved!</h2>
             <p>Your selection has been recorded. Want to share your predictions?</p>
 
             <button id="goDashboard">View Dashboard</button>

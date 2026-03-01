@@ -5,18 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard</title>
   <link rel="stylesheet" href="/styles/main.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <header class="site-header">
-  <div class="site-shell">
+  <div class="site-shell header-row">
     <p class="brand">Judicial Dashboard</p>
     <div class="app-nav-meta">
-      <nav aria-label="App navigation">
-        <a href="/app/dashboard/">Dashboard</a>
-        <a href="/app/leaderboard/">Leaderboard</a>
-        <a href="/app/cases/">Cases</a>
-        <a href="/app/act/">Act</a>
-        <a href="#" id="logoutLink">Logout</a>
+      <nav aria-label="App navigation" class="site-nav">
+        <a href="/app/dashboard/" class="nav-link"><i data-lucide="bar-chart-3" class="icon"></i>Dashboard</a>
+        <a href="/app/leaderboard/" class="nav-link"><i data-lucide="trophy" class="icon"></i>Leaderboard</a>
+        <a href="/app/cases/" class="nav-link"><i data-lucide="gavel" class="icon"></i>Cases</a>
+        <a href="/app/act/" class="nav-link"><i data-lucide="scroll-text" class="icon"></i>Act</a>
+        <a href="#" id="logoutLink" class="nav-link"><i data-lucide="x-circle" class="icon"></i>Logout</a>
       </nav>
       <span class="avatar-dot" aria-hidden="true"></span>
     </div>
@@ -24,35 +25,35 @@
 </header>
 
 <main class="site-shell with-fixed-header">
-  <section class="card glass-panel fade-in">
+  <section class="card glass-panel fade-in p-responsive">
     <p class="eyebrow">Overview</p>
     <h1>Operational Dashboard</h1>
     <p class="muted">Track fund status, monitor outstanding SCNs, and issue new notices.</p>
   </section>
 
-  <section class="dashboard-grid">
-    <article class="card stat-card">
-      <h2>Team Fund Balance</h2>
+  <section class="dashboard-grid content-grid">
+    <article class="card stat-card p-responsive">
+      <h2 class="section-header"><i data-lucide="wallet" class="icon"></i>Team Fund Balance</h2>
       <p id="fundTotal" class="metric">£0.00</p>
-      <button class="secondary" type="button">Pay Outstanding</button>
+      <button class="secondary btn-responsive" type="button"><i data-lucide="coins" class="icon icon-btn"></i>Pay Outstanding</button>
     </article>
 
-    <article class="card stat-card">
-      <h2>Outstanding SCNs</h2>
+    <article class="card stat-card p-responsive">
+      <h2 class="section-header"><i data-lucide="alert-triangle" class="icon"></i>Outstanding SCNs</h2>
       <p id="outstandingCount" class="metric">0</p>
       <p class="muted">Awaiting plea or court result.</p>
     </article>
 
-    <article class="card">
-      <h2>Recent Findings</h2>
+    <article class="card p-responsive">
+      <h2 class="section-header"><i data-lucide="scroll-text" class="icon"></i>Recent Findings</h2>
       <ul id="recentFindings" class="list-clean"></ul>
     </article>
 
-    <article class="card">
-      <h2>Quick Actions</h2>
+    <article class="card p-responsive">
+      <h2 class="section-header"><i data-lucide="gavel" class="icon"></i>Quick Actions</h2>
       <div class="actions">
-        <a href="/app/cases/" class="btn">Issue SCN</a>
-        <a href="/app/cases/" class="btn secondary">Review Cases</a>
+        <a href="/app/cases/" class="btn btn-responsive"><i data-lucide="check-circle-2" class="icon icon-btn"></i>Issue SCN</a>
+        <a href="/app/cases/" class="btn secondary btn-responsive"><i data-lucide="bar-chart-3" class="icon icon-btn"></i>Review Cases</a>
       </div>
     </article>
   </section>

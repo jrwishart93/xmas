@@ -4,28 +4,28 @@ import { fetchMenu } from "../data/loadMenu.js";
 // optional: a tiny icon map for fun
 const iconFor = (cat) => {
   const m = {
-    "Tank & Tap Beers": "🍺",
-    "Beer Bottles & Cans": "🧴",
-    "Beer Flights": "🧪",
-    "Sparkling Wine": "🥂",
-    "White Wine": "🍷",
-    "Red Wine": "🍷",
-    "Rosé / Orange Wine": "🌸",
-    "Cocktails": "🍸",
-    "Spirits – Speciality": "🥃",
-    "Spirits – Tequila": "🪅",
-    "Spirits – Vodka": "❄️",
-    "Spirits – Rum": "🏴‍☠️",
-    "Schnapps": "🍶",
-    "Alcohol-Free Cocktails": "🫗",
-    "Alcohol-Free Beers": "🍺",
-    "Sharers": "🥨",
-    "Bites": "🍟",
-    "Sourdough Pizza": "🍕",
+    "Tank & Tap Beers": "Beer",
+    "Beer Bottles & Cans": "Cans",
+    "Beer Flights": "Flight",
+    "Sparkling Wine": "Sparkling",
+    "White Wine": "Wine",
+    "Red Wine": "Wine",
+    "Rosé / Orange Wine": "Rose",
+    "Cocktails": "Cocktail",
+    "Spirits – Speciality": "Spirits",
+    "Spirits – Tequila": "Tequila",
+    "Spirits – Vodka": "Vodka",
+    "Spirits – Rum": "Rum",
+    "Schnapps": "Schnapps",
+    "Alcohol-Free Cocktails": "AF",
+    "Alcohol-Free Beers": "Beer",
+    "Sharers": "Sharers",
+    "Bites": "Bites",
+    "Sourdough Pizza": "Pizza",
   };
-  if (cat?.startsWith("Spirits")) return "🥃";
-  if (cat?.startsWith("Alcohol-Free")) return "🫗";
-  return m[cat] || "🎄";
+  if (cat?.startsWith("Spirits")) return "Spirits";
+  if (cat?.startsWith("Alcohol-Free")) return "AF";
+  return m[cat] || "Menu";
 };
 
 const formatPrice = (price) =>

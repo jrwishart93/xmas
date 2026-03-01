@@ -166,7 +166,7 @@ function renderTallies() {
           const badge = document.createElement("span");
           badge.className = "result-row__medal";
           badge.setAttribute("aria-hidden", "true");
-          badge.textContent = jointLeaders.length > 1 ? "🤝" : "🏆";
+          badge.textContent = jointLeaders.length > 1 ? "Tie" : "Winner";
           avatarName.prepend(badge);
 
           if (jointLeaders.length > 1) {

@@ -5,18 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cases</title>
   <link rel="stylesheet" href="/styles/main.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <header class="site-header">
-  <div class="site-shell">
+  <div class="site-shell header-row">
     <p class="brand">SCN Control Room</p>
     <div class="app-nav-meta">
-      <nav aria-label="App navigation">
-        <a href="/app/dashboard/">Dashboard</a>
-        <a href="/app/leaderboard/">Leaderboard</a>
-        <a href="/app/cases/">Cases</a>
-        <a href="/app/act/">Act</a>
-        <a href="#" id="logoutLink">Logout</a>
+      <nav aria-label="App navigation" class="site-nav">
+        <a href="/app/dashboard/" class="nav-link"><i data-lucide="bar-chart-3" class="icon"></i>Dashboard</a>
+        <a href="/app/leaderboard/" class="nav-link"><i data-lucide="trophy" class="icon"></i>Leaderboard</a>
+        <a href="/app/cases/" class="nav-link"><i data-lucide="gavel" class="icon"></i>Cases</a>
+        <a href="/app/act/" class="nav-link"><i data-lucide="scroll-text" class="icon"></i>Act</a>
+        <a href="#" id="logoutLink" class="nav-link"><i data-lucide="x-circle" class="icon"></i>Logout</a>
       </nav>
       <span class="avatar-dot" aria-hidden="true"></span>
     </div>
@@ -30,9 +31,9 @@
     <p class="muted">Select a clause, choose disposal method, and confirm contribution terms.</p>
   </section>
 
-  <section class="form-grid">
-    <section class="card">
-      <h2>⚖️ Confess an Offence</h2>
+  <section class="form-grid content-grid">
+    <section class="card p-responsive">
+      <h2 class="section-header"><i data-lucide="scale" class="icon"></i>Confess an Offence</h2>
       <form id="confessForm">
         <label>Clause<select id="confessClause"></select></label>
 
@@ -43,12 +44,12 @@
         </fieldset>
 
         <label>Brief<textarea id="confessBrief" placeholder="Provide context for this incident."></textarea></label>
-        <button type="submit">Issue SCN</button>
+        <button type="submit" class="btn-responsive"><i data-lucide="check-circle-2" class="icon icon-btn"></i>Issue SCN</button>
       </form>
     </section>
 
-    <section class="card">
-      <h2>🧾 Allege Offence</h2>
+    <section class="card p-responsive">
+      <h2 class="section-header"><i data-lucide="scroll-text" class="icon"></i>Allege Offence</h2>
       <form id="allegeForm">
         <label>Member<select id="accusedUser"></select></label>
         <label>Clause<select id="allegeClause"></select></label>
@@ -60,14 +61,14 @@
         </fieldset>
 
         <label>Brief<textarea id="allegeBrief" placeholder="Why this clause applies."></textarea></label>
-        <button type="submit">Issue SCN</button>
+        <button type="submit" class="btn-responsive"><i data-lucide="check-circle-2" class="icon icon-btn"></i>Issue SCN</button>
       </form>
     </section>
   </section>
 
-  <section class="card"><h2>Allegations Against Me</h2><div id="againstMe"></div></section>
-  <section class="card"><h2>Allegations I Raised</h2><div id="iRaised"></div></section>
-  <section class="card"><h2>Resolved Cases</h2><div id="resolved"></div></section>
+  <section class="card"><h2 class="section-header"><i data-lucide="alert-triangle" class="icon"></i>Allegations Against Me</h2><div id="againstMe"></div></section>
+  <section class="card"><h2 class="section-header"><i data-lucide="user" class="icon"></i>Allegations I Raised</h2><div id="iRaised"></div></section>
+  <section class="card"><h2 class="section-header"><i data-lucide="check-circle-2" class="icon"></i>Resolved Cases</h2><div id="resolved"></div></section>
 </main>
 
 <script type="module" src="/js/cases-page.js"></script>
