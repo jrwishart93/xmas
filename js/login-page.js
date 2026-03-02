@@ -1,4 +1,5 @@
-import { login, register } from '/js/auth.js';
+import { auth } from '/firebase.js';
+import { login, register, requestPasswordReset } from '/js/auth.js';
 
 const authCard = document.querySelector('[data-auth-card]');
 const tabButtons = [...document.querySelectorAll('[data-auth-tab]')];
@@ -6,6 +7,13 @@ const panes = [...document.querySelectorAll('[data-auth-pane]')];
 const formStateMessage = document.querySelector('[data-auth-status]');
 const signInForm = document.querySelector('[data-sign-in-form]');
 const signUpForm = document.querySelector('[data-sign-up-form]');
+const forgotPasswordLink = document.querySelector('[data-forgot-password]');
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if (auth.currentUser) {
+  window.location.replace('/dashboard/');
+}
 
 function setStatus(message = '', type = 'info') {
   formStateMessage.textContent = message;
@@ -39,17 +47,46 @@ function validatePasswordLength(password) {
   return password.trim().length >= 8;
 }
 
+function validateEmail(email) {
+  return EMAIL_REGEX.test(email);
+}
+
+function toAuthMessage(error) {
+  const code = error?.code || '';
+  const fallback = error?.message || 'Authentication failed. Please try again.';
+
+  if (code.includes('invalid-email')) return 'Please enter a valid email address.';
+  if (code.includes('user-not-found') || code.includes('invalid-credential')) return 'Incorrect email or password.';
+  if (code.includes('wrong-password')) return 'Incorrect email or password.';
+  if (code.includes('email-already-in-use')) return 'An account already exists with this email. Please sign in instead.';
+  if (code.includes('weak-password')) return 'Use a stronger password (minimum 8 characters).';
+  if (code.includes('too-many-requests')) return 'Too many attempts. Please wait a minute and try again.';
+  if (code.includes('network-request-failed')) return 'Network error. Check your connection and try again.';
+
+  return fallback;
+}
+
+function shakeForm(form) {
+  form.classList.add('form-shake');
+  setTimeout(() => form.classList.remove('form-shake'), 350);
+}
+
 signInForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const formData = new FormData(signInForm);
-  const email = String(formData.get('email') || '').trim();
+  const email = String(formData.get('email') || '').trim().toLowerCase();
   const password = String(formData.get('password') || '');
   const remember = formData.get('remember') === 'on';
 
   if (!email || !password) {
     setStatus('Please enter your email and password.', 'error');
-    signInForm.classList.add('form-shake');
-    setTimeout(() => signInForm.classList.remove('form-shake'), 350);
+    shakeForm(signInForm);
+    return;
+  }
+
+  if (!validateEmail(email)) {
+    setStatus('Please enter a valid email address.', 'error');
+    shakeForm(signInForm);
     return;
   }
 
@@ -61,9 +98,8 @@ signInForm.addEventListener('submit', async (event) => {
     setStatus('Signed in successfully. Redirecting...', 'success');
     window.location.href = '/dashboard/';
   } catch (error) {
-    setStatus(error?.message || 'Sign in failed. Please try again.', 'error');
-    signInForm.classList.add('form-shake');
-    setTimeout(() => signInForm.classList.remove('form-shake'), 350);
+    setStatus(toAuthMessage(error), 'error');
+    shakeForm(signInForm);
   } finally {
     setLoading(signInForm, false);
   }
@@ -73,15 +109,19 @@ signUpForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const formData = new FormData(signUpForm);
   const fullName = String(formData.get('fullName') || '').trim();
-  const email = String(formData.get('email') || '').trim();
+  const email = String(formData.get('email') || '').trim().toLowerCase();
   const password = String(formData.get('password') || '');
   const confirmPassword = String(formData.get('confirmPassword') || '');
   const remember = formData.get('remember') === 'on';
 
   if (!fullName || !email || !password || !confirmPassword) {
     setStatus('Please complete all sign-up fields.', 'error');
-    signUpForm.classList.add('form-shake');
-    setTimeout(() => signUpForm.classList.remove('form-shake'), 350);
+    shakeForm(signUpForm);
+    return;
+  }
+
+  if (!validateEmail(email)) {
+    setStatus('Please enter a valid email address.', 'error');
     return;
   }
 
@@ -100,14 +140,30 @@ signUpForm.addEventListener('submit', async (event) => {
 
   try {
     await register({ fullName, email, password, remember });
-    setStatus('Account created successfully. Redirecting...', 'success');
+    setStatus('Account ready. Redirecting...', 'success');
     window.location.href = '/dashboard/';
   } catch (error) {
-    setStatus(error?.message || 'Could not create account.', 'error');
-    signUpForm.classList.add('form-shake');
-    setTimeout(() => signUpForm.classList.remove('form-shake'), 350);
+    setStatus(toAuthMessage(error), 'error');
+    shakeForm(signUpForm);
   } finally {
     setLoading(signUpForm, false);
+  }
+});
+
+forgotPasswordLink?.addEventListener('click', async (event) => {
+  event.preventDefault();
+  const email = String(signInForm.querySelector('input[name="email"]').value || '').trim().toLowerCase();
+
+  if (!validateEmail(email)) {
+    setStatus('Enter your email in the sign-in form first, then click Forgot password.', 'error');
+    return;
+  }
+
+  try {
+    await requestPasswordReset(email);
+    setStatus('Password reset email sent. Check your inbox.', 'success');
+  } catch (error) {
+    setStatus(toAuthMessage(error), 'error');
   }
 });
 
