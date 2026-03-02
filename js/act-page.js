@@ -1,8 +1,9 @@
-import { initIcons } from '/js/app-common.js';
+import { initIcons, initMobileNav } from '/js/app-common.js';
 import { loadLocalAct } from '/js/act.js';
 import { renderAct } from '/js/render-act.js';
 
 const container = document.getElementById('actContainer');
+initMobileNav();
 initIcons();
 
 loadLocalAct()
