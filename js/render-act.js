@@ -23,9 +23,9 @@ export function renderAct(container, act) {
   const parts = act.parts || [];
   const totalSections = parts.reduce((count, part) => count + (part.sections?.length || 0), 0);
   hero.innerHTML = `
-    <p class="act-eyebrow">Public rulebook</p>
+    <p class="act-eyebrow">⚖️ Public rulebook</p>
     <h2>${act.title}</h2>
-    <p class="act-subtitle">Browse all sections and clauses in a cleaner, searchable-by-eye format.</p>
+    <p class="act-subtitle">Browse all sections and clauses in an elevated, easy-to-scan format.</p>
     <div class="act-meta-row" role="list" aria-label="Act summary">
       <p class="act-meta" role="listitem"><span class="meta-label">Version</span><strong>${act.version}</strong></p>
       <p class="act-meta" role="listitem"><span class="meta-label">Last updated</span><strong>${formatLastUpdated(act.lastUpdated)}</strong></p>
@@ -51,7 +51,7 @@ export function renderAct(container, act) {
     summary.className = 'act-part-summary';
 
     summary.innerHTML = `
-      <span class="act-part-title">Part ${part.partNumber} – ${part.title}</span>
+      <span class="act-part-title"><span class="act-part-pill">Part ${part.partNumber}</span> ${part.title}</span>
       <span class="act-part-count">${(part.sections || []).length} ${(part.sections || []).length === 1 ? 'section' : 'sections'}</span>
     `;
 
