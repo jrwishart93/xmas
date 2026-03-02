@@ -1,0 +1,151 @@
+.actPage {
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  background: linear-gradient(to bottom, #2b2118, #1e1711);
+  padding: 60px 20px;
+  color: #f3e8d0;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  overflow-x: clip;
+}
+
+.top {
+  width: 100%;
+  max-width: 900px;
+  height: 160px;
+  background-image: url('/images/scroll-top.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: top center;
+}
+
+.middle {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  box-sizing: border-box;
+  background-image: linear-gradient(rgba(245, 235, 209, 0.78), rgba(245, 235, 209, 0.78)), url('/images/scroll-middle.png');
+  background-repeat: repeat-y;
+  background-size: 100% auto;
+  background-blend-mode: multiply;
+  padding: 60px 80px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+  overflow-x: hidden;
+}
+
+.middle::before,
+.middle::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.middle::before {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(70, 50, 30, 0.18), transparent);
+}
+
+.middle::after {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(70, 50, 30, 0.18), transparent);
+}
+
+.bottom {
+  width: 100%;
+  max-width: 900px;
+  height: 160px;
+  background-image: url('/images/scroll-bottom.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: bottom center;
+}
+
+.contentGrid {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.contentMain {
+  min-width: 0;
+}
+
+.middle h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  color: #3a2d1f;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.middle h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  margin-top: 40px;
+  color: #4a3828;
+}
+
+.middle p {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  line-height: 1.8;
+  color: #4a3828;
+}
+
+@media (min-width: 1024px) {
+  .contentGrid {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 48px;
+  }
+
+  .contentMain {
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .actPage {
+    padding: 36px 10px;
+  }
+
+  .middle {
+    padding: 40px 25px;
+    background-size: 100% auto;
+  }
+
+  .top,
+  .bottom {
+    height: 110px;
+  }
+}
+
+@media (max-width: 480px) {
+  .middle {
+    padding: 32px 20px;
+  }
+
+  .middle h1 {
+    font-size: 28px;
+  }
+
+  .middle h2 {
+    font-size: 20px;
+  }
+
+  .middle p {
+    font-size: 17px;
+    line-height: 1.7;
+  }
+}
