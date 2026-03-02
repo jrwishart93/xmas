@@ -878,6 +878,7 @@ body {
   }
 
   .header-row {
+    position: relative;
     align-items: center;
     justify-content: space-between;
     flex-direction: row;
@@ -900,12 +901,18 @@ body {
 
   .header-row.has-mobile-nav .nav-toggle {
     display: inline-flex;
-    align-self: center;
+    position: absolute;
+    top: .2rem;
+    right: .35rem;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    opacity: .78;
   }
 
   .header-row.has-mobile-nav .site-nav {
     display: none;
-    margin-top: .65rem;
+    margin-top: 2.1rem;
     width: 100%;
     border-radius: 12px;
     padding: .4rem;
