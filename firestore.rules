@@ -35,16 +35,21 @@ service cloud.firestore {
 
         allow create: if isTeamMember(teamId)
           && request.resource.data.issuedByUserId == request.auth.uid
-          && request.resource.data.stage == 'awaiting_plea';
+          && request.resource.data.status == 'issued';
 
         allow update: if (
-          request.auth.uid == resource.data.accusedUserId
-          && resource.data.stage == 'awaiting_plea'
-          && request.resource.data.stage in ['pleaded_guilty', 'court_requested']
+          isTeamMember(teamId)
+          && resource.data.accusedUserId == request.auth.uid
+          && request.resource.data.paymentMethod in ['bank_transfer', 'stripe']
+          && request.resource.data.status == 'awaiting_payment'
+          && resource.data.status in ['issued', 'awaiting_payment']
+          && request.resource.data.diff(resource.data).changedKeys().hasOnly(['paymentMethod', 'status', 'bankReference', 'stripeSessionId'])
         ) || (
           isAdmin(teamId)
-          && resource.data.stage == 'court_requested'
-          && request.resource.data.stage in ['court_convicted', 'court_acquitted']
+          && resource.data.paymentMethod == 'bank_transfer'
+          && resource.data.status == 'awaiting_payment'
+          && request.resource.data.status == 'paid'
+          && request.resource.data.diff(resource.data).changedKeys().hasOnly(['status', 'paidAt'])
         );
       }
     }

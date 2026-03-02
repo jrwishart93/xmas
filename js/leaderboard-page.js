@@ -1,5 +1,5 @@
 import { bootProtectedPage, initIcons, initPreviewGates } from '/js/app-common.js';
-import { getLeaderboard, getMembers } from '/js/data.js';
+import { subscribeLeaderboard, getMembers } from '/js/data.js';
 import { money } from '/js/constants.js';
 import { PREVIEW_MODE } from '/js/config.js';
 import { getPreviewLeaderboardFromArchive } from '/js/preview-data.js';
@@ -26,18 +26,21 @@ bootProtectedPage(async () => {
     return;
   }
 
-  const [rows, members] = await Promise.all([getLeaderboard(), getMembers()]);
+  const members = await getMembers();
 
-  rows.forEach((row, index) => {
-    const card = document.createElement('article');
-    card.className = 'card leaderboard-card p-responsive';
-    card.innerHTML = `
-      <h2 class="section-header"><i data-lucide="user" class="icon"></i>${members.get(row.uid)?.displayName || row.uid}</h2>
-      <p class="metric">${money(row.totalPence)}</p>
-      <p class="muted">Rank #${index + 1}</p>
-    `;
-    container.appendChild(card);
+  subscribeLeaderboard((rows) => {
+    container.innerHTML = '';
+    rows.forEach((row, index) => {
+      const card = document.createElement('article');
+      card.className = 'card leaderboard-card p-responsive';
+      card.innerHTML = `
+        <h2 class="section-header"><i data-lucide="user" class="icon"></i>${members.get(row.uid)?.displayName || row.uid}</h2>
+        <p class="metric">${money(row.totalPence)}</p>
+        <p class="muted">Rank #${index + 1}</p>
+      `;
+      container.appendChild(card);
+    });
+
+    initIcons();
   });
-
-  initIcons();
 });

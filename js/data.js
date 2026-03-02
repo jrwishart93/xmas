@@ -5,12 +5,14 @@ import {
   collection,
   addDoc,
   getDocs,
+  onSnapshot,
   query,
   where,
   orderBy,
   runTransaction,
   increment,
   serverTimestamp,
+  updateDoc
 } from '/firebase.js';
 import { TEAM_ID, RESOLVED_STAGES, ninetyDaysAgo } from '/js/constants.js';
 
@@ -28,7 +30,13 @@ function membersRef() {
 
 export async function getTeamSummary() {
   const snap = await getDoc(teamRef());
-  return snap.exists() ? snap.data() : { moneyBalancePence: 0 };
+  return snap.exists() ? snap.data() : { confirmedBalancePence: 0, pendingBalancePence: 0 };
+}
+
+export function subscribeTeamSummary(onData) {
+  return onSnapshot(teamRef(), (snap) => {
+    onData(snap.exists() ? snap.data() : { confirmedBalancePence: 0, pendingBalancePence: 0 });
+  });
 }
 
 export async function getMembers() {
@@ -65,6 +73,92 @@ export async function getCasesForUser(uid) {
     allegationsIRaised: raised.docs.map((d) => ({ id: d.id, ...d.data() })),
     resolvedCases: resolved.docs.map((d) => ({ id: d.id, ...d.data() })),
   };
+}
+
+export function subscribeOutstandingScnCount(uid, onData) {
+  return onSnapshot(query(scnsRef(), where('accusedUserId', '==', uid)), (snap) => {
+    const count = snap.docs.filter((docSnap) => {
+      const status = docSnap.data().status || 'issued';
+      return status !== 'paid';
+    }).length;
+    onData(count);
+  });
+}
+
+export function subscribeLeaderboard(onData) {
+  const cutoff = ninetyDaysAgo();
+  return onSnapshot(
+    query(scnsRef(), where('createdAt', '>=', cutoff), where('status', '==', 'paid'), orderBy('createdAt', 'desc')),
+    (snap) => {
+      const totals = new Map();
+      snap.forEach((item) => {
+        const data = item.data();
+        totals.set(data.accusedUserId, (totals.get(data.accusedUserId) || 0) + (data.amountPence || 0));
+      });
+
+      const rows = [...totals.entries()]
+        .map(([uid, totalPence]) => ({ uid, totalPence }))
+        .sort((a, b) => b.totalPence - a.totalPence);
+
+      onData(rows);
+    }
+  );
+}
+
+export async function getScnById(scnId) {
+  const snap = await getDoc(doc(db, 'teams', TEAM_ID, 'scns', scnId));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
+export function subscribeScnById(scnId, onData) {
+  return onSnapshot(doc(db, 'teams', TEAM_ID, 'scns', scnId), (snap) => {
+    onData(snap.exists() ? { id: snap.id, ...snap.data() } : null);
+  });
+}
+
+export async function setScnPaymentMethod({ scnId, paymentMethod, bankReference = null }) {
+  const scnDoc = doc(db, 'teams', TEAM_ID, 'scns', scnId);
+  await updateDoc(scnDoc, {
+    paymentMethod,
+    status: 'awaiting_payment',
+    bankReference,
+  });
+}
+
+export async function markBankTransferAsReceived({ idToken, scnId }) {
+  const response = await fetch('/api/admin/mark-bank-transfer-received', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify({ scnId }),
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(payload.error || 'Unable to mark bank transfer as received');
+  }
+
+  return response.json();
+}
+
+export async function createCheckoutSession({ idToken, scnId }) {
+  const response = await fetch('/api/create-checkout-session', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify({ scnId }),
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(payload.error || 'Unable to create checkout session');
+  }
+
+  return response.json();
 }
 
 export async function resolvePlea({ scnId, action }) {

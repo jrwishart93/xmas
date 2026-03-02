@@ -30,24 +30,30 @@
   <section class="card glass-panel fade-in p-responsive">
     <p class="eyebrow">Overview</p>
     <h1>Operational Dashboard</h1>
-    <p class="muted">Track fund status, monitor outstanding SCNs, and issue new notices.</p>
+    <p class="muted">Track confirmed and pending balances, monitor outstanding contributions, and issue new notices.</p>
   </section>
 
   <section class="dashboard-grid content-grid">
     <article class="card stat-card p-responsive">
-      <h2 class="section-header"><i data-lucide="wallet" class="icon"></i>Team Fund Balance</h2>
-      <p id="fundTotal" class="metric">£0.00</p>
-      <button class="secondary btn-responsive" type="button" data-preview-gate><i data-lucide="coins" class="icon icon-btn"></i>Pay Outstanding</button>
+      <h2 class="section-header"><i data-lucide="wallet" class="icon"></i>Confirmed Balance</h2>
+      <p id="confirmedTotal" class="metric">£0.00</p>
+      <p class="muted">Available in team fund.</p>
     </article>
 
     <article class="card stat-card p-responsive">
-      <h2 class="section-header"><i data-lucide="alert-triangle" class="icon"></i>Outstanding SCNs</h2>
-      <p id="outstandingCount" class="metric">0</p>
-      <p class="muted">Awaiting plea or court result.</p>
+      <h2 class="section-header"><i data-lucide="clock-3" class="icon"></i>Pending Contributions</h2>
+      <p id="pendingTotal" class="metric">£0.00</p>
+      <p class="muted">Awaiting payment confirmation.</p>
     </article>
 
     <article class="card p-responsive">
-      <h2 class="section-header"><i data-lucide="scroll-text" class="icon"></i>Recent Findings</h2>
+      <h2 class="section-header"><i data-lucide="alert-triangle" class="icon"></i>Outstanding Contributions</h2>
+      <p id="outstandingCount" class="metric">0</p>
+      <p class="muted">Unpaid SCNs assigned to you.</p>
+    </article>
+
+    <article class="card p-responsive">
+      <h2 class="section-header"><i data-lucide="scroll-text" class="icon"></i>Leaderboard (Live)</h2>
       <ul id="recentFindings" class="list-clean"></ul>
     </article>
 
