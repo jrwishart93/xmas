@@ -603,6 +603,36 @@ summary { cursor: pointer; font-weight: 600; }
   color: #384d78;
 }
 
+.act-search-wrap {
+  display: grid;
+  gap: .45rem;
+  margin: 0 0 1rem;
+}
+
+.act-search-label {
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: #2f4a84;
+}
+
+.act-search-input {
+  width: 100%;
+  padding: .75rem .85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(92, 116, 188, 0.4);
+  background: #fff;
+  color: #18315c;
+  font: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.act-search-input:focus {
+  outline: 2px solid rgba(86, 120, 216, 0.28);
+  border-color: rgba(71, 103, 190, 0.74);
+}
+
 .act-part {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(249, 251, 255, 0.92));
   border: 1px solid rgba(107, 128, 199, 0.24);
