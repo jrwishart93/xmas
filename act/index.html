@@ -19,10 +19,22 @@
   </div>
 </header>
 <main class="site-shell with-fixed-header">
-  <section class="card act-intro p-responsive">
-    <h1 class="section-header"><i data-lucide="scroll-text" class="icon"></i>The Summary Justice (Social Contributions) Act 2025</h1>
-    <p>Public read-only rulebook. Browse sections and clauses without signing in.</p>
-    <a class="btn btn-responsive" href="/login/"><i data-lucide="user" class="icon icon-btn"></i>Sign In</a>
+  <section class="public-act-hero" aria-labelledby="actHeroTitle">
+    <img class="public-act-hero-image" src="/app/images/Open-book.png" alt="Open legal book on a wooden desk" />
+    <div class="public-act-hero-overlay"></div>
+
+    <div class="public-act-hero-content">
+      <p class="public-act-hero-kicker"><i data-lucide="sparkles" class="icon"></i>Public Rulebook</p>
+      <h1 id="actHeroTitle" class="section-header">The Summary Justice (Social Contributions) Act 2025</h1>
+      <p>
+        A playful but structured framework for team social contributions. Explore every part and clause in full,
+        without signing in.
+      </p>
+      <div class="public-act-hero-actions">
+        <a class="btn btn-responsive" href="/login/"><i data-lucide="user" class="icon icon-btn"></i>Sign In</a>
+        <a class="btn secondary btn-responsive" href="#actContainer"><i data-lucide="book-open" class="icon icon-btn"></i>Read the Act</a>
+      </div>
+    </div>
   </section>
   <div id="actContainer"></div>
 </main>
