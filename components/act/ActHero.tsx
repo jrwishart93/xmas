@@ -5,44 +5,41 @@ import OpenBook from "@/app/images/Open-book.png";
 
 export default function ActHero() {
   return (
-    <section className="relative h-[55vh] min-h-[420px] w-full overflow-hidden md:h-[65vh] md:min-h-[480px]">
+    <section className="relative min-h-[460px] w-full overflow-hidden border-b border-[#cfbe9d]/70 bg-[#2d2517] md:min-h-[560px]">
       <div className="absolute inset-0">
         <Image
           src={OpenBook}
           alt="Open Law Book"
           fill
           priority
-          className="scale-105 object-cover object-center"
+          className="scale-110 object-cover object-center"
         />
 
-        <div className="absolute inset-0 backdrop-blur-sm" />
-
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-[#f8f6f2] md:from-black/60 md:via-black/40" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(249,239,214,0.38),transparent_45%),linear-gradient(to_bottom,rgba(23,17,8,0.88),rgba(44,32,18,0.72),#f4efdf)]" />
       </div>
 
-      <div className="relative z-10 flex h-full items-center">
-        <div className="mx-auto w-full max-w-5xl px-8 text-center md:px-6 md:text-left">
-          <div className="max-w-2xl md:max-w-none">
-            <h1
-              className="text-4xl tracking-[0.02em] text-white md:text-5xl"
-              style={{ fontFamily: "var(--font-playfair)" }}
-            >
-              The Summary Justice
-            </h1>
+      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-center px-6 py-20 text-[#f6f0e0] md:px-10">
+        <p className="mb-3 w-fit border border-[#d6bf8b]/70 bg-[#271f13]/70 px-4 py-1 text-xs uppercase tracking-[0.22em] text-[#e8d4ad]">
+          Statute Register
+        </p>
 
-            <p className="mt-2 text-xl text-neutral-200 md:text-2xl">(Social Contributions) Act 2025</p>
+        <h1 className="max-w-3xl text-4xl leading-tight tracking-[0.02em] md:text-6xl" style={{ fontFamily: "var(--font-playfair)" }}>
+          The Summary Justice (Social Contributions) Act 2025
+        </h1>
 
-            <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-neutral-200 md:mx-0">
-              A voluntary framework establishing structured contributions, fairness, and accountability within
-              the team.
-            </p>
+        <p className="mt-5 max-w-2xl text-sm leading-relaxed text-[#e3d9c4] md:text-base">
+          Consolidated provisions, schedules, and sanctions presented in a formal register layout inspired by
+          traditional bound law volumes.
+        </p>
 
-            <div className="mx-auto mt-8 h-px w-24 bg-neutral-300 md:mx-0" />
-          </div>
+        <div className="mt-8 flex flex-wrap gap-3 text-xs uppercase tracking-[0.14em] text-[#ead7af] md:text-sm">
+          <span className="border border-[#c8ab74]/60 bg-[#231a10]/65 px-3 py-2">3 Parts</span>
+          <span className="border border-[#c8ab74]/60 bg-[#231a10]/65 px-3 py-2">6 Listed Acts</span>
+          <span className="border border-[#c8ab74]/60 bg-[#231a10]/65 px-3 py-2">Searchable Register</span>
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 h-32 w-full bg-gradient-to-b from-transparent to-[#f8f6f2]" />
+      <div className="absolute bottom-0 left-0 h-28 w-full bg-gradient-to-b from-transparent to-[#f4efdf]" />
     </section>
   );
 }
