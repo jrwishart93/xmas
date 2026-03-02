@@ -7,6 +7,37 @@ export function initIcons() {
   }
 }
 
+export function initMobileNav() {
+  document.querySelectorAll('.header-row').forEach((headerRow, index) => {
+    const nav = headerRow.querySelector('.site-nav');
+    if (!nav || headerRow.querySelector('.nav-toggle')) return;
+
+    const toggle = document.createElement('button');
+    const navId = nav.id || `site-nav-${index + 1}`;
+    nav.id = navId;
+
+    toggle.className = 'nav-toggle';
+    toggle.type = 'button';
+    toggle.setAttribute('aria-controls', navId);
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Toggle navigation menu');
+    toggle.innerHTML = `
+      <span class="nav-toggle-line"></span>
+      <span class="nav-toggle-line"></span>
+      <span class="nav-toggle-line"></span>
+    `;
+
+    toggle.addEventListener('click', () => {
+      const open = nav.dataset.open === 'true';
+      nav.dataset.open = open ? 'false' : 'true';
+      toggle.setAttribute('aria-expanded', String(!open));
+    });
+
+    headerRow.classList.add('has-mobile-nav');
+    headerRow.insertBefore(toggle, nav);
+  });
+}
+
 export function showPreviewModeIndicator() {
   if (!PREVIEW_MODE || document.getElementById('previewModeBadge')) return;
 
@@ -47,6 +78,7 @@ export function bootProtectedPage(onReady) {
 
   initPreviewNavigation();
   showPreviewModeIndicator();
+  initMobileNav();
   initIcons();
   requireAuth({ onReady });
 }

@@ -1,4 +1,4 @@
-import { initIcons } from '/js/app-common.js';
+import { initIcons, initMobileNav } from '/js/app-common.js';
 import { money } from '/js/constants.js';
 import { renderLeaderboardSummary } from '/js/components-leaderboard.js';
 
@@ -49,4 +49,5 @@ loadPublicSummary().catch((error) => {
   publicSummary.appendChild(warning);
 });
 
+initMobileNav();
 initIcons();

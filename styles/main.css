@@ -751,6 +751,28 @@ body {
 
 .site-shell { padding: 0 1rem; }
 .header-row { display: flex; flex-direction: column; align-items: flex-start; gap: .75rem; }
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: .25rem;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
+}
+
+.nav-toggle-line {
+  display: block;
+  width: 20px;
+  height: 2px;
+  border-radius: 999px;
+  background: #d4dcff;
+}
 .site-nav {
   display: flex;
   flex-wrap: wrap;
@@ -816,6 +838,27 @@ body {
 .workflow-icon { margin: 0; display: flex; justify-content: center; }
 .workflow-step { border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: 1rem; }
 .workflow-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+
+
+@media (max-width: 767px) {
+  .header-row {
+    align-items: stretch;
+  }
+
+  .header-row.has-mobile-nav .nav-toggle {
+    display: inline-flex;
+    align-self: flex-end;
+  }
+
+  .header-row.has-mobile-nav .site-nav {
+    display: none;
+  }
+
+  .header-row.has-mobile-nav .site-nav[data-open="true"] {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
 
 @media (min-width: 768px) {
   .header-row { flex-direction: row; align-items: center; justify-content: space-between; }

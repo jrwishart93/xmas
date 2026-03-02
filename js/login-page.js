@@ -1,3 +1,4 @@
+import { initMobileNav } from '/js/app-common.js';
 import { auth } from '/firebase.js';
 import { login, register, requestPasswordReset } from '/js/auth.js';
 
@@ -10,6 +11,8 @@ const signUpForm = document.querySelector('[data-sign-up-form]');
 const forgotPasswordLink = document.querySelector('[data-forgot-password]');
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+initMobileNav();
 
 if (auth.currentUser) {
   window.location.replace('/dashboard/');
