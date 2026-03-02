@@ -1063,3 +1063,50 @@ body {
   60% { transform: translateX(-2px); }
   80% { transform: translateX(2px); }
 }
+
+.payment-card {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.payment-section {
+  margin-bottom: 1rem;
+}
+
+.payment-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.payment-option {
+  transition: transform .15s ease, border-color .2s ease;
+}
+
+.payment-option:hover {
+  transform: translateY(-3px);
+  border-color: #556188;
+}
+
+.payment-selected {
+  border-color: #6174b7;
+  box-shadow: 0 14px 28px rgba(65, 84, 161, 0.26);
+}
+
+.badge-awaiting {
+  background: rgba(197, 139, 42, 0.2);
+  color: #ffd78a;
+  border: 1px solid rgba(197, 139, 42, 0.45);
+}
+
+.badge-paid {
+  background: rgba(46, 125, 50, 0.2);
+  color: #a4f1a9;
+  border: 1px solid rgba(46, 125, 50, 0.45);
+}
+
+@media (max-width: 800px) {
+  .payment-options-grid {
+    grid-template-columns: 1fr;
+  }
+}

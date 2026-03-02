@@ -1,5 +1,10 @@
 import { bootProtectedPage, initPreviewGates } from '/js/app-common.js';
-import { getTeamSummary, getLeaderboard, getMembers, getCasesForUser } from '/js/data.js';
+import {
+  getMembers,
+  subscribeTeamSummary,
+  subscribeLeaderboard,
+  subscribeOutstandingScnCount,
+} from '/js/data.js';
 import { money } from '/js/constants.js';
 import { PREVIEW_MODE } from '/js/config.js';
 import {
@@ -25,7 +30,8 @@ bootProtectedPage(async (ctx) => {
   if (PREVIEW_MODE) {
     const previewBalance = getPreviewBalanceFromArchive();
     const findings = document.getElementById('recentFindings');
-    document.getElementById('fundTotal').textContent = previewBalance.formatted;
+    document.getElementById('confirmedTotal').textContent = previewBalance.formatted;
+    document.getElementById('pendingTotal').textContent = '£6.00';
     document.getElementById('outstandingCount').textContent = '3';
 
     findings.innerHTML = '';
@@ -40,26 +46,25 @@ bootProtectedPage(async (ctx) => {
     return;
   }
 
-  const [team, leaderboardRows, members, caseData] = await Promise.all([
-    getTeamSummary(),
-    getLeaderboard(),
-    getMembers(),
-    getCasesForUser(ctx.user.uid),
-  ]);
+  const [members] = await Promise.all([getMembers()]);
 
-  const totalPence = team.moneyBalancePence || 0;
-  animateCurrency(document.getElementById('fundTotal'), totalPence);
+  subscribeTeamSummary((team) => {
+    animateCurrency(document.getElementById('confirmedTotal'), team.confirmedBalancePence || 0);
+    document.getElementById('pendingTotal').textContent = money(team.pendingBalancePence || 0);
+  });
 
-  const outstanding = (caseData.allegationsAgainstMe || []).filter((item) => item.stage !== 'resolved').length;
-  document.getElementById('outstandingCount').textContent = String(outstanding);
+  subscribeOutstandingScnCount(ctx.user.uid, (count) => {
+    document.getElementById('outstandingCount').textContent = String(count);
+  });
 
   const findings = document.getElementById('recentFindings');
-  findings.innerHTML = '';
-
-  leaderboardRows.slice(0, 4).forEach((row, index) => {
-    const li = document.createElement('li');
-    li.innerHTML = `<span>#${index + 1} ${members.get(row.uid)?.displayName || row.uid}</span><strong>${money(row.totalPence)}</strong>`;
-    findings.appendChild(li);
+  subscribeLeaderboard((leaderboardRows) => {
+    findings.innerHTML = '';
+    leaderboardRows.slice(0, 4).forEach((row, index) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span>#${index + 1} ${members.get(row.uid)?.displayName || row.uid}</span><strong>${money(row.totalPence)}</strong>`;
+      findings.appendChild(li);
+    });
   });
 
   initPreviewGates();
