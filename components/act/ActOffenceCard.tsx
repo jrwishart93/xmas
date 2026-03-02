@@ -7,14 +7,15 @@ type ActOffenceCardProps = {
 
 export default function ActOffenceCard({ code, title, description, tag }: ActOffenceCardProps) {
   return (
-    <article className="mb-10 border-b border-[#e4e2dd] pb-8">
-      <span className="font-mono text-sm text-[#8b6f3d]">Section {code}</span>
+    <article className="mb-5 rounded-md border border-[#dbcaa9] bg-[#fffaf0] px-4 py-5 shadow-[0_5px_18px_rgba(45,32,14,0.06)] sm:px-5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-mono text-xs text-[#856534] sm:text-sm">Section {code}</span>
+        <p className="text-[11px] uppercase tracking-[0.14em] text-[#6a5636] sm:text-xs">{tag}</p>
+      </div>
 
-      <h3 className="mt-2 text-xl font-semibold tracking-[0.01em] text-[#1c1c1c]">{title}</h3>
+      <h3 className="mt-2 text-lg font-semibold tracking-[0.01em] text-[#1f1a14] sm:text-xl">{title}</h3>
 
-      <p className="mt-4 max-w-2xl leading-relaxed text-neutral-700">{description}</p>
-
-      <p className="mt-4 text-xs uppercase tracking-[0.08em] text-[#6b6b6b]">{tag}</p>
+      <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[#4f4333] sm:text-base">{description}</p>
     </article>
   );
 }
