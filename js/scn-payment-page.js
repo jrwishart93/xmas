@@ -15,7 +15,7 @@ const DEFAULT_PAYMENT_CONFIG = {
     accountNumber: '74984172',
   },
   paymentMethods: {
-    openBanking: true,
+    openBanking: false,
     bankTransfer: true,
   },
 };
@@ -164,15 +164,37 @@ bootProtectedPage(async (ctx) => {
     document.getElementById('copyRef')?.addEventListener('click', () => copyText(ref, 'Reference'));
 
     document.getElementById('setBank')?.addEventListener('click', async () => {
-      await setScnPaymentMethod({ scnId: scn.id, paymentMethod: 'bank_transfer', bankReference: ref });
+      const button = document.getElementById('setBank');
+      if (button) button.disabled = true;
+      try {
+        const idToken = await ctx.user.getIdToken();
+        await setScnPaymentMethod({
+          idToken,
+          scnId: scn.id,
+          paymentMethod: 'bank_transfer',
+          bankReference: ref,
+        });
+      } catch (error) {
+        alert(error?.message || 'Unable to switch to bank transfer.');
+        if (button) button.disabled = false;
+      }
     });
 
     document.getElementById('markPaid')?.addEventListener('click', async () => {
-      const idToken = await ctx.user.getIdToken();
-      await markBankTransferAsReceived({ idToken, scnId: scn.id });
+      const button = document.getElementById('markPaid');
+      if (button) button.disabled = true;
+      try {
+        const idToken = await ctx.user.getIdToken();
+        await markBankTransferAsReceived({ idToken, scnId: scn.id });
+      } catch (error) {
+        alert(error?.message || 'Unable to mark bank transfer as received.');
+        if (button) button.disabled = false;
+      }
     });
 
     document.getElementById('payNow')?.addEventListener('click', async () => {
+      const button = document.getElementById('payNow');
+      if (button) button.disabled = true;
       try {
         const idToken = await ctx.user.getIdToken();
         const result = await createOpenBankingPayment({ idToken, scnId: scn.id });
@@ -181,8 +203,10 @@ bootProtectedPage(async (ctx) => {
           return;
         }
         alert('Unable to start Open Banking payment.');
+        if (button) button.disabled = false;
       } catch (error) {
         alert(error?.message || 'Unable to start Open Banking payment.');
+        if (button) button.disabled = false;
       }
     });
 

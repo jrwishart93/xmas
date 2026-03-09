@@ -185,8 +185,9 @@ export async function createConsentUrl(params: {
   authUrl.searchParams.set('response_type', 'code');
   authUrl.searchParams.set('client_id', config.clientId);
   authUrl.searchParams.set('redirect_uri', config.redirectUri);
-  authUrl.searchParams.set('scope', 'accounts balance transactions');
-  authUrl.searchParams.set('providers', 'monzo');
+  authUrl.searchParams.set('scope', 'accounts balance offline_access');
+  authUrl.searchParams.set('providers', 'uk-ob-all');
+  authUrl.searchParams.set('provider_id', 'ob-monzo');
   authUrl.searchParams.set('state', state);
 
   return authUrl.toString();

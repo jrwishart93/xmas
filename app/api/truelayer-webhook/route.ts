@@ -74,22 +74,26 @@ export async function POST(request: Request) {
         throw new Error('SCN amount is invalid.');
       }
 
+      const pendingDelta =
+        scn.pendingBalanceReserved === true || scn.paymentMethod === 'truelayer' ? -1 * amountPence : 0;
+
       tx.update(scnRef, {
         status: 'paid',
         paymentMethod: 'truelayer',
         truelayerPaymentStatus: eventType,
         truelayerEventId: payload.event_id || null,
         paidAt: FieldValue.serverTimestamp(),
+        pendingBalanceReserved: false,
       });
 
-      tx.set(
-        teamRef,
-        {
-          confirmedBalancePence: FieldValue.increment(amountPence),
-          pendingBalancePence: FieldValue.increment(-1 * amountPence),
-        },
-        { merge: true }
-      );
+      const teamUpdate: Record<string, unknown> = {
+        confirmedBalancePence: FieldValue.increment(amountPence),
+      };
+      if (pendingDelta !== 0) {
+        teamUpdate.pendingBalancePence = FieldValue.increment(pendingDelta);
+      }
+
+      tx.set(teamRef, teamUpdate, { merge: true });
     });
   } catch (error) {
     console.error('TrueLayer webhook processing failed:', error);

@@ -24,34 +24,44 @@ export async function POST(request: Request) {
   const scnRef = adminDb.doc(`teams/${teamId}/scns/${scnId}`);
   const teamRef = adminDb.doc(`teams/${teamId}`);
 
-  await adminDb.runTransaction(async (tx) => {
-    const scnSnap = await tx.get(scnRef);
-    if (!scnSnap.exists) throw new Error('SCN not found');
+  try {
+    await adminDb.runTransaction(async (tx) => {
+      const scnSnap = await tx.get(scnRef);
+      if (!scnSnap.exists) throw new Error('SCN not found.');
 
-    const scn = scnSnap.data()!;
-    const amountPence = getScnAmountPence(scn);
-    if (amountPence <= 0) {
-      throw new Error('SCN amount is invalid.');
-    }
+      const scn = scnSnap.data()!;
+      const amountPence = getScnAmountPence(scn);
+      if (amountPence <= 0) {
+        throw new Error('SCN amount is invalid.');
+      }
 
-    if (scn.paymentMethod !== 'bank_transfer' || scn.status !== 'awaiting_payment') {
-      throw new Error('SCN is not awaiting bank transfer confirmation');
-    }
+      if (scn.paymentMethod !== 'bank_transfer' || scn.status !== 'awaiting_payment') {
+        throw new Error('SCN is not awaiting bank transfer confirmation.');
+      }
 
-    tx.update(scnRef, {
-      status: 'paid',
-      paidAt: FieldValue.serverTimestamp(),
+      const pendingDelta = scn.pendingBalanceReserved === true ? -1 * amountPence : 0;
+
+      tx.update(scnRef, {
+        status: 'paid',
+        paidAt: FieldValue.serverTimestamp(),
+        pendingBalanceReserved: false,
+      });
+
+      const teamUpdate: Record<string, unknown> = {
+        confirmedBalancePence: FieldValue.increment(amountPence),
+      };
+      if (pendingDelta !== 0) {
+        teamUpdate.pendingBalancePence = FieldValue.increment(pendingDelta);
+      }
+
+      tx.set(teamRef, teamUpdate, { merge: true });
     });
 
-    tx.set(
-      teamRef,
-      {
-        confirmedBalancePence: FieldValue.increment(amountPence),
-        pendingBalancePence: FieldValue.increment(-1 * amountPence),
-      },
-      { merge: true }
-    );
-  });
-
-  return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unable to confirm bank transfer.';
+    const status =
+      message.includes('not found') || message.includes('invalid.') || message.includes('not awaiting') ? 400 : 500;
+    return NextResponse.json({ error: message }, { status });
+  }
 }

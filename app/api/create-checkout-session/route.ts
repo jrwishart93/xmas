@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminAuth, adminDb } from '../_lib/firebaseAdmin';
@@ -50,6 +51,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'SCN is already paid.' }, { status: 400 });
   }
 
+  const existingPaymentId = typeof scn.truelayerPaymentId === 'string' ? scn.truelayerPaymentId : null;
+  const existingRedirectUrl = typeof scn.truelayerRedirectUrl === 'string' ? scn.truelayerRedirectUrl : null;
+  if (scn.status === 'awaiting_payment' && scn.paymentMethod === 'truelayer' && existingPaymentId && existingRedirectUrl) {
+    return NextResponse.json({ url: existingRedirectUrl, paymentId: existingPaymentId, reused: true });
+  }
+
   const amountPence = getScnAmountPence(scn);
   if (amountPence <= 0) {
     return NextResponse.json(
@@ -60,8 +67,42 @@ export async function POST(request: Request) {
 
   const member = memberSnap.data() as { displayName?: string; email?: string } | undefined;
   const baseUrl = process.env.APP_BASE_URL || new URL(request.url).origin;
+  const requestKey = crypto.randomUUID();
 
   try {
+    await adminDb.runTransaction(async (tx) => {
+      const latestSnap = await tx.get(scnRef);
+      if (!latestSnap.exists) throw new Error('SCN not found.');
+
+      const latestScn = latestSnap.data()!;
+      if (latestScn.status === 'paid') {
+        throw new Error('SCN is already paid.');
+      }
+
+      const latestPaymentId =
+        typeof latestScn.truelayerPaymentId === 'string' ? latestScn.truelayerPaymentId : null;
+      const latestRedirectUrl =
+        typeof latestScn.truelayerRedirectUrl === 'string' ? latestScn.truelayerRedirectUrl : null;
+
+      if (
+        latestScn.status === 'awaiting_payment' &&
+        latestScn.paymentMethod === 'truelayer' &&
+        latestPaymentId &&
+        latestRedirectUrl
+      ) {
+        throw new Error('An Open Banking payment is already awaiting completion for this SCN.');
+      }
+
+      if (typeof latestScn.truelayerRequestKey === 'string' && latestScn.truelayerRequestKey.length > 0) {
+        throw new Error('An Open Banking payment is already being prepared for this SCN.');
+      }
+
+      tx.update(scnRef, {
+        truelayerRequestKey: requestKey,
+        truelayerRequestedAt: FieldValue.serverTimestamp(),
+      });
+    });
+
     const result = await createHostedPayment({
       amountInMinor: amountPence,
       currency: 'GBP',
@@ -79,22 +120,28 @@ export async function POST(request: Request) {
 
     await adminDb.runTransaction(async (tx) => {
       const latestSnap = await tx.get(scnRef);
-      if (!latestSnap.exists) throw new Error('SCN not found');
+      if (!latestSnap.exists) throw new Error('SCN not found.');
 
       const latestScn = latestSnap.data()!;
       if (latestScn.status === 'paid') {
         throw new Error('SCN is already paid.');
       }
 
-      const pendingIncrement = latestScn.status === 'awaiting_payment' ? 0 : amountPence;
+      if (latestScn.truelayerRequestKey !== requestKey) {
+        throw new Error('An Open Banking payment is already being prepared for this SCN.');
+      }
+
+      const pendingIncrement = latestScn.pendingBalanceReserved === true ? 0 : amountPence;
 
       tx.update(scnRef, {
         paymentMethod: 'truelayer',
         status: 'awaiting_payment',
+        pendingBalanceReserved: true,
         truelayerPaymentId: result.paymentId,
         truelayerPaymentStatus: 'authorization_required',
         truelayerRedirectUrl: result.hostedPageUrl,
         truelayerRequestedAt: FieldValue.serverTimestamp(),
+        truelayerRequestKey: FieldValue.delete(),
       });
 
       if (pendingIncrement > 0) {
@@ -110,9 +157,27 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ url: result.hostedPageUrl, paymentId: result.paymentId });
   } catch (error) {
+    await adminDb
+      .runTransaction(async (tx) => {
+        const latestSnap = await tx.get(scnRef);
+        if (!latestSnap.exists) return;
+
+        const latestScn = latestSnap.data()!;
+        if (latestScn.truelayerRequestKey !== requestKey) return;
+
+        tx.update(scnRef, {
+          truelayerRequestKey: FieldValue.delete(),
+        });
+      })
+      .catch(() => null);
+
     console.error('TrueLayer payment creation failed:', error);
     const message = error instanceof Error ? error.message : 'Unable to create payment.';
-    const status = message.includes('already paid') ? 400 : 500;
+    const status = message.includes('already paid')
+      ? 400
+      : message.includes('already awaiting completion') || message.includes('already being prepared')
+        ? 409
+        : 500;
     return NextResponse.json({ error: message }, { status });
   }
 }

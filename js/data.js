@@ -12,7 +12,6 @@ import {
   runTransaction,
   increment,
   serverTimestamp,
-  updateDoc
 } from '/firebase.js';
 import { TEAM_ID, RESOLVED_STAGES, ninetyDaysAgo } from '/js/constants.js';
 
@@ -122,13 +121,26 @@ export function subscribeScnById(scnId, onData) {
   });
 }
 
-export async function setScnPaymentMethod({ scnId, paymentMethod, bankReference = null }) {
-  const scnDoc = doc(db, 'teams', TEAM_ID, 'scns', scnId);
-  await updateDoc(scnDoc, {
-    paymentMethod,
-    status: 'awaiting_payment',
-    bankReference,
+export async function setScnPaymentMethod({ idToken, scnId, paymentMethod, bankReference = null }) {
+  const response = await fetch('/api/scn/payment-method', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify({
+      scnId,
+      paymentMethod,
+      bankReference,
+    }),
   });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw buildApiError(payload, 'Unable to update payment method');
+  }
+
+  return response.json();
 }
 
 export async function markBankTransferAsReceived({ idToken, scnId }) {
