@@ -1,39 +1,35 @@
-type ScnRecord = Record<string, unknown> | null | undefined;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const DEFAULT_LATE_PENALTY_MULTIPLIER = 2;
 const DEFAULT_LATE_PENALTY_AFTER_DAYS = 3;
 
-function parsePositivePence(value: unknown): number | null {
+function parsePositivePence(value) {
   const parsed = Number(value);
-  if (!Number.isFinite(parsed)) return null;
-  if (parsed <= 0) return null;
+  if (!Number.isFinite(parsed) || parsed <= 0) return null;
   return Math.round(parsed);
 }
 
-function parsePositiveInteger(value: unknown): number | null {
+function parsePositiveInteger(value) {
   const parsed = Number(value);
-  if (!Number.isFinite(parsed)) return null;
-  if (parsed <= 0) return null;
+  if (!Number.isFinite(parsed) || parsed <= 0) return null;
   return Math.round(parsed);
 }
 
-function parseNonNegativeInteger(value: unknown): number | null {
+function parseNonNegativeInteger(value) {
   const parsed = Number(value);
-  if (!Number.isFinite(parsed)) return null;
-  if (parsed < 0) return null;
+  if (!Number.isFinite(parsed) || parsed < 0) return null;
   return Math.round(parsed);
 }
 
-function parseTimestampMs(value: unknown): number | null {
+function parseTimestampMs(value) {
   if (!value) return null;
 
-  if (typeof value === 'object' && value && 'toDate' in value && typeof value.toDate === 'function') {
+  if (typeof value === 'object' && typeof value.toDate === 'function') {
     const date = value.toDate();
     return date instanceof Date && !Number.isNaN(date.getTime()) ? date.getTime() : null;
   }
 
   if (typeof value === 'object' && value && '_seconds' in value) {
-    const seconds = Number((value as { _seconds?: number })._seconds);
+    const seconds = Number(value._seconds);
     if (Number.isFinite(seconds)) return seconds * 1000;
   }
 
@@ -45,36 +41,18 @@ function parseTimestampMs(value: unknown): number | null {
   return Number.isNaN(date.getTime()) ? null : date.getTime();
 }
 
-export function getScnOriginalAmountPence(scn: ScnRecord): number {
-  if (!scn) return 0;
-
-  const candidates = [scn.originalAmountPence, scn.finalAmountPence, scn.baseAmountPence, scn.amountPence];
-
+export function getScnOriginalAmountPence(scn) {
+  const candidates = [scn?.originalAmountPence, scn?.finalAmountPence, scn?.baseAmountPence, scn?.amountPence];
   for (const candidate of candidates) {
     const amount = parsePositivePence(candidate);
     if (amount !== null) return amount;
   }
-
   return 0;
 }
 
-export function getScnPaymentBreakdown(
-  scn: ScnRecord,
-  options: { now?: number; statusOverride?: string } = {}
-): {
-  originalAmountPence: number;
-  currentAmountPence: number;
-  latePenaltyMultiplier: number;
-  latePenaltyAfterDays: number;
-  dueAtMs: number | null;
-  latePenaltyAmountPence: number;
-  latePenaltyDeltaPence: number;
-  isLatePenaltyEligible: boolean;
-  isLatePenaltyApplied: boolean;
-  shouldPersistLatePenalty: boolean;
-} {
+export function getScnPaymentBreakdown(scn, { now = Date.now(), statusOverride } = {}) {
   const originalAmountPence = getScnOriginalAmountPence(scn);
-  if (!scn || originalAmountPence <= 0) {
+  if (originalAmountPence <= 0) {
     return {
       originalAmountPence: 0,
       currentAmountPence: 0,
@@ -89,19 +67,17 @@ export function getScnPaymentBreakdown(
     };
   }
 
-  const parsedLatePenaltyMultiplier = parsePositiveInteger(scn.latePenaltyMultiplier);
-  const parsedLatePenaltyAfterDays = parseNonNegativeInteger(scn.latePenaltyAfterDays);
+  const parsedLatePenaltyMultiplier = parsePositiveInteger(scn?.latePenaltyMultiplier);
+  const parsedLatePenaltyAfterDays = parseNonNegativeInteger(scn?.latePenaltyAfterDays);
   const latePenaltyMultiplier =
     parsedLatePenaltyMultiplier ?? DEFAULT_LATE_PENALTY_MULTIPLIER;
   const latePenaltyAfterDays =
     parsedLatePenaltyAfterDays ?? DEFAULT_LATE_PENALTY_AFTER_DAYS;
-  const issuedAtMs = parseTimestampMs(scn.createdAt);
+  const issuedAtMs = parseTimestampMs(scn?.createdAt);
   const dueAtMs = issuedAtMs ? issuedAtMs + latePenaltyAfterDays * DAY_MS : null;
-  const status = options.statusOverride || String(scn.status || '');
-  const now = options.now || Date.now();
-
+  const status = statusOverride || String(scn?.status || '');
   const storedCurrentAmount =
-    parsePositivePence(scn.amountPaidPence) || parsePositivePence(scn.amountPence) || originalAmountPence;
+    parsePositivePence(scn?.amountPaidPence) || parsePositivePence(scn?.amountPence) || originalAmountPence;
   const latePenaltyAmountPence = Math.round(originalAmountPence * latePenaltyMultiplier);
   const isLatePenaltyEligible =
     status === 'awaiting_payment' &&
@@ -111,7 +87,7 @@ export function getScnPaymentBreakdown(
   const shouldPersistLatePenalty = isLatePenaltyEligible && storedCurrentAmount < latePenaltyAmountPence;
   const currentAmountPence = shouldPersistLatePenalty ? latePenaltyAmountPence : storedCurrentAmount;
   const isLatePenaltyApplied =
-    Boolean(scn.latePenaltyAppliedAt) || currentAmountPence > originalAmountPence || shouldPersistLatePenalty;
+    Boolean(scn?.latePenaltyAppliedAt) || currentAmountPence > originalAmountPence || shouldPersistLatePenalty;
 
   return {
     originalAmountPence,
@@ -127,6 +103,6 @@ export function getScnPaymentBreakdown(
   };
 }
 
-export function getScnAmountPence(scn: ScnRecord, options?: { now?: number; statusOverride?: string }): number {
+export function getScnAmountPence(scn, options) {
   return getScnPaymentBreakdown(scn, options).currentAmountPence;
 }

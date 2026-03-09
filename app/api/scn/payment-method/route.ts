@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminAuth, adminDb } from '../../_lib/firebaseAdmin';
-import { getScnAmountPence } from '../../_lib/scnAmount';
+import { getScnPaymentBreakdown } from '../../_lib/scnAmount';
 
 type SetPaymentMethodBody = {
   scnId?: string;
@@ -44,8 +44,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
   }
 
-  const amountPence = getScnAmountPence(scn);
-  if (amountPence <= 0) {
+  const paymentBreakdown = getScnPaymentBreakdown(scn, { statusOverride: 'awaiting_payment' });
+  if (paymentBreakdown.originalAmountPence <= 0) {
     return NextResponse.json(
       { error: 'SCN amount is invalid. Ensure the case has a monetary amount.' },
       { status: 400 }
@@ -62,16 +62,33 @@ export async function POST(request: Request) {
         throw new Error('SCN is already paid.');
       }
 
-      const pendingIncrement = latestScn.pendingBalanceReserved === true ? 0 : amountPence;
+      const latestPaymentBreakdown = getScnPaymentBreakdown(latestScn, { statusOverride: 'awaiting_payment' });
+      const reservedAmount = latestScn.pendingBalanceReserved
+        ? Math.round(Number(latestScn.amountPence || latestPaymentBreakdown.originalAmountPence || 0))
+        : 0;
+      const pendingIncrement = latestScn.pendingBalanceReserved
+        ? Math.max(0, latestPaymentBreakdown.currentAmountPence - reservedAmount)
+        : latestPaymentBreakdown.currentAmountPence;
 
-      tx.update(scnRef, {
+      const scnUpdate: Record<string, unknown> = {
         paymentMethod: 'bank_transfer',
         status: 'awaiting_payment',
         bankReference: normalizeBankReference(bankReference),
+        amountPence: latestPaymentBreakdown.currentAmountPence,
         pendingBalanceReserved: true,
+        truelayerPaymentId: FieldValue.delete(),
+        truelayerRedirectUrl: FieldValue.delete(),
+        truelayerPaymentStatus: FieldValue.delete(),
+        truelayerEventId: FieldValue.delete(),
         truelayerRequestedAt: FieldValue.delete(),
         truelayerRequestKey: FieldValue.delete(),
-      });
+      };
+
+      if (latestPaymentBreakdown.shouldPersistLatePenalty) {
+        scnUpdate.latePenaltyAppliedAt = FieldValue.serverTimestamp();
+      }
+
+      tx.update(scnRef, scnUpdate);
 
       if (pendingIncrement > 0) {
         tx.set(

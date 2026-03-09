@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { adminDb } from '../_lib/firebaseAdmin';
+import { getScnAmountPence } from '../_lib/scnAmount';
 
 const TEAM_ID = 'rpu-social-fund';
 
@@ -16,13 +17,13 @@ export async function GET() {
   let socialFundTotalPence = 0;
   scnSnap.forEach((doc) => {
     const data = doc.data();
-    const finalAmountPence = Number(data.finalAmountPence || 0);
-    socialFundTotalPence += finalAmountPence;
+    const currentAmountPence = getScnAmountPence(data);
+    socialFundTotalPence += currentAmountPence;
 
     const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
     if (!createdAt || createdAt < ninetyDaysAgo) return;
 
-    totals.set(data.accusedUserId, (totals.get(data.accusedUserId) || 0) + finalAmountPence);
+    totals.set(data.accusedUserId, (totals.get(data.accusedUserId) || 0) + currentAmountPence);
   });
 
   const leaderboard = [...totals.entries()]

@@ -12,7 +12,9 @@ let members;
 let clauses;
 
 function fillClauses(select) {
-  select.innerHTML = clauses.map((c) => `<option value="${c.id}">${c.id} — ${c.title} (${money(c.typicalAmountPence)})</option>`).join('');
+  select.innerHTML = clauses
+    .map((c) => `<option value="${c.id}">${c.id} — ${c.title} (${money(c.amountPence)})</option>`)
+    .join('');
 }
 
 function caseCard(item, canPlea, canCourt) {
@@ -139,7 +141,16 @@ bootProtectedPage(async (ctx) => {
   document.getElementById('confessForm').onsubmit = async (e) => {
     e.preventDefault();
     const clause = clauses.find((c) => c.id === document.getElementById('confessClause').value);
-    await createScn({ issuedByUserId: currentUser.uid, accusedUserId: currentUser.uid, clauseId: clause.id, brief: document.getElementById('confessBrief').value, baseAmountPence: clause.typicalAmountPence });
+    await createScn({
+      issuedByUserId: currentUser.uid,
+      accusedUserId: currentUser.uid,
+      clauseId: clause.id,
+      clauseTitle: clause.title,
+      brief: document.getElementById('confessBrief').value,
+      baseAmountPence: clause.amountPence,
+      latePenaltyMultiplier: clause.latePenaltyMultiplier,
+      latePenaltyAfterDays: clause.latePenaltyAfterDays,
+    });
     e.target.reset();
     fillClauses(document.getElementById('confessClause'));
     await refreshCases();
@@ -148,7 +159,16 @@ bootProtectedPage(async (ctx) => {
   document.getElementById('allegeForm').onsubmit = async (e) => {
     e.preventDefault();
     const clause = clauses.find((c) => c.id === document.getElementById('allegeClause').value);
-    await createScn({ issuedByUserId: currentUser.uid, accusedUserId: accusedSelect.value, clauseId: clause.id, brief: document.getElementById('allegeBrief').value, baseAmountPence: clause.typicalAmountPence });
+    await createScn({
+      issuedByUserId: currentUser.uid,
+      accusedUserId: accusedSelect.value,
+      clauseId: clause.id,
+      clauseTitle: clause.title,
+      brief: document.getElementById('allegeBrief').value,
+      baseAmountPence: clause.amountPence,
+      latePenaltyMultiplier: clause.latePenaltyMultiplier,
+      latePenaltyAfterDays: clause.latePenaltyAfterDays,
+    });
     e.target.reset();
     fillClauses(document.getElementById('allegeClause'));
     await refreshCases();

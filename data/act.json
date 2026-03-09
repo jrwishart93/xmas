@@ -1,7 +1,7 @@
 {
   "title": "The Summary Justice (Social Contributions) Act 2025",
   "version": "As Amended from Time to Time",
-  "lastUpdated": "2026-03-01T00:00:00.000Z",
+  "lastUpdated": "2026-03-09T00:00:00.000Z",
   "parts": [
     {
       "partNumber": 1,
@@ -11,27 +11,47 @@
         {
           "code": "1.1",
           "title": "Late for Duty",
-          "description": "Applies where an officer reports for duty after their scheduled commencement time. The applicable contribution may increase proportionate to the duration of lateness."
+          "description": "Applies where an officer reports for duty after their scheduled commencement time. The applicable contribution may increase proportionate to the duration of lateness.",
+          "amountGBP": 1,
+          "amountPence": 100,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "1.2",
           "title": "Attendance on Incorrect Day",
-          "description": "Applies where an officer attends for duty on a rest day or non-working day in error."
+          "description": "Applies where an officer attends for duty on a rest day or non-working day in error.",
+          "amountGBP": 2,
+          "amountPence": 200,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "1.3",
           "title": "Pre-Annual Leave Contribution",
-          "description": "Applies to the final tour of duty immediately preceding a period of annual leave."
+          "description": "Applies to the final tour of duty immediately preceding a period of annual leave.",
+          "amountGBP": 1,
+          "amountPence": 100,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "1.4",
           "title": "Transfer Out Contribution",
-          "description": "Applies where an officer departs the team for another department, division, or posting."
+          "description": "Applies where an officer departs the team for another department, division, or posting.",
+          "amountGBP": 3,
+          "amountPence": 300,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "1.5",
           "title": "Arrival from Elsewhere Contribution",
-          "description": "Applies where an officer joins the team from another department, division, or posting."
+          "description": "Applies where an officer joins the team from another department, division, or posting.",
+          "amountGBP": 2,
+          "amountPence": 200,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         }
       ]
     },
@@ -43,27 +63,47 @@
         {
           "code": "2.1",
           "title": "Birthday (Personal)",
-          "description": "Applies on the occasion of an officer’s birthday."
+          "description": "Applies on the occasion of an officer’s birthday.",
+          "amountGBP": 2,
+          "amountPence": 200,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "2.2",
           "title": "Birthday (Work Anniversary)",
-          "description": "Applies on the anniversary of joining the service or team."
+          "description": "Applies on the anniversary of joining the service or team.",
+          "amountGBP": 1,
+          "amountPence": 100,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "2.3",
           "title": "Return from Prolonged Absence",
-          "description": "Applies where an officer returns to duty following extended sickness, leave, or other authorised absence."
+          "description": "Applies where an officer returns to duty following extended sickness, leave, or other authorised absence.",
+          "amountGBP": 2,
+          "amountPence": 200,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "2.4",
           "title": "Relationship Status Alteration",
-          "description": "Applies upon marriage, engagement, divorce, or other significant and publicly acknowledged relationship change."
+          "description": "Applies upon marriage, engagement, divorce, or other significant and publicly acknowledged relationship change.",
+          "amountGBP": 3,
+          "amountPence": 300,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "2.5",
           "title": "Birth of Child",
-          "description": "Applies upon the arrival of a child into the officer’s household."
+          "description": "Applies upon the arrival of a child into the officer’s household.",
+          "amountGBP": 5,
+          "amountPence": 500,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         }
       ]
     },
@@ -75,27 +115,47 @@
         {
           "code": "3.1",
           "title": "Resolved Complaint",
-          "description": "Applies where a complaint has been concluded in the officer’s favour or otherwise resolved."
+          "description": "Applies where a complaint has been concluded in the officer’s favour or otherwise resolved.",
+          "amountGBP": 2,
+          "amountPence": 200,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "3.2",
           "title": "Unlawful or Regrettable Arrest",
-          "description": "Applies where an arrest is subsequently deemed inappropriate, unlawful, or otherwise ill-advised."
+          "description": "Applies where an arrest is subsequently deemed inappropriate, unlawful, or otherwise ill-advised.",
+          "amountGBP": 3,
+          "amountPence": 300,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "3.3",
           "title": "General Operational Error",
-          "description": "Applies to minor but notable mistakes, lapses in judgement, or administrative mishaps."
+          "description": "Applies to minor but notable mistakes, lapses in judgement, or administrative mishaps.",
+          "amountGBP": 1,
+          "amountPence": 100,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "3.4",
           "title": "Speeding Notice (On or Off Duty)",
-          "description": "Applies where an officer receives a speeding notice or is otherwise detected exceeding lawful limits."
+          "description": "Applies where an officer receives a speeding notice or is otherwise detected exceeding lawful limits.",
+          "amountGBP": 2,
+          "amountPence": 200,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "3.5",
           "title": "Excessive Personal Calls",
-          "description": "Applies where more than three personal calls are made or received during a single tour of duty."
+          "description": "Applies where more than three personal calls are made or received during a single tour of duty.",
+          "amountGBP": 1,
+          "amountPence": 100,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         }
       ]
     },
@@ -107,27 +167,47 @@
         {
           "code": "4.1",
           "title": "False Activation of Emergency Button",
-          "description": "Applies where the emergency activation red button is activated without sufficient operational cause."
+          "description": "Applies where the emergency activation red button is activated without sufficient operational cause.",
+          "amountGBP": 3,
+          "amountPence": 300,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "4.2",
           "title": "Tactical Deployment (Stinger)",
-          "description": "Applies where a stinger device is deployed during operational duties."
+          "description": "Applies where a stinger device is deployed during operational duties.",
+          "amountGBP": 3,
+          "amountPence": 300,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "4.3",
           "title": "Vehicle Collision",
-          "description": "Applies where a police vehicle is involved in a collision or impact event, regardless of fault."
+          "description": "Applies where a police vehicle is involved in a collision or impact event, regardless of fault.",
+          "amountGBP": 2,
+          "amountPence": 200,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "4.4",
           "title": "Escape of Detainee",
-          "description": "Applies where a detained person escapes lawful custody."
+          "description": "Applies where a detained person escapes lawful custody.",
+          "amountGBP": 3,
+          "amountPence": 300,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "4.5",
           "title": "Loss of Equipment",
-          "description": "Applies where issued equipment is misplaced, lost, or otherwise unaccounted for."
+          "description": "Applies where issued equipment is misplaced, lost, or otherwise unaccounted for.",
+          "amountGBP": 2,
+          "amountPence": 200,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         }
       ]
     },
@@ -139,22 +219,38 @@
         {
           "code": "5.1",
           "title": "Notable Death Attendance",
-          "description": "Applies following attendance at a death presenting unusual or particularly memorable circumstances."
+          "description": "Applies following attendance at a death presenting unusual or particularly memorable circumstances.",
+          "amountGBP": 2,
+          "amountPence": 200,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "5.2",
           "title": "Saving of Life",
-          "description": "Applies where an officer’s actions contribute directly to the preservation of life."
+          "description": "Applies where an officer’s actions contribute directly to the preservation of life.",
+          "amountGBP": 3,
+          "amountPence": 300,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "5.3",
           "title": "Serious or Complex Arrest",
-          "description": "Applies where an arrest is of particular seriousness, complexity, or notoriety."
+          "description": "Applies where an arrest is of particular seriousness, complexity, or notoriety.",
+          "amountGBP": 3,
+          "amountPence": 300,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "5.4",
           "title": "PAVA or Taser Deployment",
-          "description": "Applies where incapacitant spray or Taser is deployed during operational duties. Contribution level may increase proportionate to accidental colleague exposure."
+          "description": "Applies where incapacitant spray or Taser is deployed during operational duties. Contribution level may increase proportionate to accidental colleague exposure.",
+          "amountGBP": 3,
+          "amountPence": 300,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         }
       ]
     },
@@ -166,17 +262,29 @@
         {
           "code": "6.1",
           "title": "Lottery or Financial Windfall",
-          "description": "Applies upon the receipt of significant unexpected financial gain."
+          "description": "Applies upon the receipt of significant unexpected financial gain.",
+          "amountGBP": 5,
+          "amountPence": 500,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "6.2",
           "title": "Award or Commendation",
-          "description": "Applies upon receipt of formal recognition or commendation."
+          "description": "Applies upon receipt of formal recognition or commendation.",
+          "amountGBP": 3,
+          "amountPence": 300,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "6.3",
           "title": "Promotion",
-          "description": "Applies upon advancement in rank or role."
+          "description": "Applies upon advancement in rank or role.",
+          "amountGBP": 5,
+          "amountPence": 500,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         }
       ]
     },
@@ -188,17 +296,29 @@
         {
           "code": "7.1",
           "title": "Amendment of the Act",
-          "description": "Applies where an officer proposes or enacts an amendment to this Act."
+          "description": "Applies where an officer proposes or enacts an amendment to this Act.",
+          "amountGBP": 1,
+          "amountPence": 100,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "7.2",
           "title": "COVID-Related Absence",
-          "description": "Applies where time off is taken due to COVID-related absence."
+          "description": "Applies where time off is taken due to COVID-related absence.",
+          "amountGBP": 1,
+          "amountPence": 100,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         },
         {
           "code": "7.3",
           "title": "Minor Fabrication (Non-Serious Context)",
-          "description": "Applies where an officer is found to have exaggerated, embellished, or misrepresented matters in a clearly non-serious context."
+          "description": "Applies where an officer is found to have exaggerated, embellished, or misrepresented matters in a clearly non-serious context.",
+          "amountGBP": 1,
+          "amountPence": 100,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         }
       ]
     }

@@ -7,6 +7,7 @@ import {
   subscribeScnById,
 } from '/js/data.js';
 import { money } from '/js/constants.js';
+import { getScnPaymentBreakdown } from '/js/scn-amount.js';
 
 const DEFAULT_PAYMENT_CONFIG = {
   bankDetails: {
@@ -52,8 +53,22 @@ function getScnIdFromPath() {
   return idx >= 0 ? parts[idx + 1] : null;
 }
 
-function contributionAmountPence(scn) {
-  return Number(scn.amountPence || scn.finalAmountPence || scn.baseAmountPence || 0);
+function formatDueWindow(breakdown) {
+  if (!breakdown?.latePenaltyAfterDays) return 'No deadline';
+  if (!breakdown?.dueAtMs) return `${breakdown.latePenaltyAfterDays} days from issue`;
+
+  const dueDate = new Date(breakdown.dueAtMs);
+  if (breakdown.isLatePenaltyApplied) {
+    return `Expired on ${dueDate.toLocaleDateString()} at ${dueDate.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    })}`;
+  }
+
+  return `${breakdown.latePenaltyAfterDays} days, by ${dueDate.toLocaleDateString()} ${dueDate.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  })}`;
 }
 
 function paymentStatusBadge(status) {
@@ -71,7 +86,7 @@ async function copyText(value, label) {
   alert(`${label} copied.`);
 }
 
-function renderPaymentOptions({ scn, isAdmin, ref, amount, paymentConfig }) {
+function renderPaymentOptions({ scn, isAdmin, ref, breakdown, paymentConfig }) {
   const cards = [];
   const bank = paymentConfig.bankDetails;
 
@@ -99,7 +114,7 @@ function renderPaymentOptions({ scn, isAdmin, ref, amount, paymentConfig }) {
       <article class="card payment-option ${scn.paymentMethod === 'truelayer' ? 'payment-selected' : ''}">
         <p class="section-header">Open Banking (TrueLayer) <span class="badge badge-paid">No Processing Fee</span></p>
         <p class="muted">Pay securely from your bank app (including Monzo) using TrueLayer.</p>
-        <p><strong>Total: ${money(amount)}</strong></p>
+        <p><strong>Total: ${money(breakdown.currentAmountPence)}</strong></p>
         <div class="actions">
           <button type="button" id="payNow">Pay by Bank App</button>
         </div>
@@ -139,20 +154,36 @@ bootProtectedPage(async (ctx) => {
     }
 
     const ref = scn.bankReference || buildReference(scn.id, scn.accusedUserId || ctx.user.uid);
-    const amount = contributionAmountPence(scn);
+    const breakdown = getScnPaymentBreakdown(scn);
     const clauseTitle = scn.clauseTitle || scn.clauseId || 'Unspecified Clause';
+    const penaltySummary =
+      breakdown.latePenaltyAmountPence > breakdown.originalAmountPence
+        ? `doubles to ${money(breakdown.latePenaltyAmountPence)}`
+        : 'no increase';
+    const latePenaltyNotice = breakdown.isLatePenaltyApplied
+      ? `
+        <article class="card payment-option">
+          <p class="section-header">Late Penalty Applied</p>
+          <p><strong>Original:</strong> ${money(breakdown.originalAmountPence)}</p>
+          <p><strong>Current:</strong> ${money(breakdown.currentAmountPence)}</p>
+        </article>
+      `
+      : '';
 
     card.innerHTML = `
       <section class="payment-section">
         <p class="eyebrow">SCN Details</p>
         <h2 class="section-header">${escapeHtml(clauseTitle)}</h2>
-        <p><strong>Amount:</strong> ${money(amount)}</p>
+        <p><strong>Contribution:</strong> ${money(breakdown.currentAmountPence)}</p>
+        <p><strong>Due within:</strong> ${escapeHtml(formatDueWindow(breakdown))}</p>
+        <p><strong>Late penalty:</strong> ${escapeHtml(penaltySummary)}</p>
         <p><strong>Status:</strong> ${paymentStatusBadge(scn.status || 'issued')}</p>
         <p class="muted"><strong>Issued:</strong> ${scn.createdAt?.toDate ? scn.createdAt.toDate().toLocaleString() : 'Pending timestamp'}</p>
       </section>
 
       <section class="payment-options-grid">
-        ${renderPaymentOptions({ scn, isAdmin, ref, amount, paymentConfig })}
+        ${latePenaltyNotice}
+        ${renderPaymentOptions({ scn, isAdmin, ref, breakdown, paymentConfig })}
       </section>
     `;
 

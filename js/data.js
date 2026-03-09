@@ -13,6 +13,7 @@ import {
   serverTimestamp,
 } from '/firebase.js';
 import { TEAM_ID, RESOLVED_STAGES, ninetyDaysAgo } from '/js/constants.js';
+import { getScnAmountPence } from '/js/scn-amount.js';
 
 function teamRef() {
   return doc(db, 'teams', TEAM_ID);
@@ -50,16 +51,28 @@ export async function getMembers() {
   return users;
 }
 
-export async function createScn({ issuedByUserId, accusedUserId, clauseId, brief, baseAmountPence }) {
+export async function createScn({
+  issuedByUserId,
+  accusedUserId,
+  clauseId,
+  clauseTitle,
+  brief,
+  baseAmountPence,
+  latePenaltyMultiplier = 2,
+  latePenaltyAfterDays = 3,
+}) {
   await addDoc(scnsRef(), {
     createdAt: serverTimestamp(),
     issuedByUserId,
     accusedUserId,
     clauseId,
+    clauseTitle: clauseTitle || clauseId,
     brief: brief || null,
     stage: 'awaiting_plea',
     baseAmountPence,
     finalAmountPence: 0,
+    latePenaltyMultiplier,
+    latePenaltyAfterDays,
     disposalType: null,
     resolvedAt: null,
   });
@@ -97,7 +110,10 @@ export function subscribeLeaderboard(onData) {
       const totals = new Map();
       snap.forEach((item) => {
         const data = item.data();
-        totals.set(data.accusedUserId, (totals.get(data.accusedUserId) || 0) + (data.amountPence || 0));
+        totals.set(
+          data.accusedUserId,
+          (totals.get(data.accusedUserId) || 0) + getScnAmountPence(data)
+        );
       });
 
       const rows = [...totals.entries()]
@@ -295,7 +311,7 @@ export async function getLeaderboard() {
   const totals = new Map();
   snap.forEach((item) => {
     const data = item.data();
-    totals.set(data.accusedUserId, (totals.get(data.accusedUserId) || 0) + (data.finalAmountPence || 0));
+    totals.set(data.accusedUserId, (totals.get(data.accusedUserId) || 0) + getScnAmountPence(data));
   });
 
   return [...totals.entries()]

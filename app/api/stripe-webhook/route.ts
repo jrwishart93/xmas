@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb } from '../_lib/firebaseAdmin';
+import { getScnPaymentBreakdown } from '../_lib/scnAmount';
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
@@ -62,18 +63,32 @@ export async function POST(request: Request) {
     const scn = scnSnap.data()!;
     if (scn.status === 'paid') return;
 
-    tx.update(scnRef, {
+    const paymentBreakdown = getScnPaymentBreakdown(scn);
+    const reservedAmount = scn.pendingBalanceReserved
+      ? Math.round(Number(scn.amountPence || paymentBreakdown.originalAmountPence || 0))
+      : 0;
+
+    const scnUpdate: Record<string, unknown> = {
       status: 'paid',
       paymentMethod: 'stripe',
+      amountPence: paymentBreakdown.currentAmountPence,
+      amountPaidPence: paymentBreakdown.currentAmountPence,
       stripePaymentIntentId: hydrated.payment_intent || null,
       paidAt: FieldValue.serverTimestamp(),
-    });
+      pendingBalanceReserved: false,
+    };
+
+    if (paymentBreakdown.shouldPersistLatePenalty) {
+      scnUpdate.latePenaltyAppliedAt = FieldValue.serverTimestamp();
+    }
+
+    tx.update(scnRef, scnUpdate);
 
     tx.set(
       teamRef,
       {
-        confirmedBalancePence: FieldValue.increment(scn.amountPence || 0),
-        pendingBalancePence: FieldValue.increment(-1 * (scn.amountPence || 0)),
+        confirmedBalancePence: FieldValue.increment(paymentBreakdown.currentAmountPence),
+        pendingBalancePence: FieldValue.increment(-1 * reservedAmount),
       },
       { merge: true }
     );

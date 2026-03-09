@@ -25,6 +25,10 @@ const payload = {
       code: section.code,
       title: section.title,
       description: section.description,
+      amountGBP: section.amountGBP,
+      amountPence: section.amountPence,
+      latePenaltyMultiplier: section.latePenaltyMultiplier,
+      latePenaltyAfterDays: section.latePenaltyAfterDays,
     })),
   })),
 };

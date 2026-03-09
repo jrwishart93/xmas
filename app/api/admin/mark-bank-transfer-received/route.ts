@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminAuth, adminDb } from '../../_lib/firebaseAdmin';
-import { getScnAmountPence } from '../../_lib/scnAmount';
+import { getScnPaymentBreakdown } from '../../_lib/scnAmount';
 
 export async function POST(request: Request) {
   const authHeader = request.headers.get('authorization') || '';
@@ -30,8 +30,8 @@ export async function POST(request: Request) {
       if (!scnSnap.exists) throw new Error('SCN not found.');
 
       const scn = scnSnap.data()!;
-      const amountPence = getScnAmountPence(scn);
-      if (amountPence <= 0) {
+      const paymentBreakdown = getScnPaymentBreakdown(scn, { statusOverride: 'awaiting_payment' });
+      if (paymentBreakdown.originalAmountPence <= 0) {
         throw new Error('SCN amount is invalid.');
       }
 
@@ -39,19 +39,29 @@ export async function POST(request: Request) {
         throw new Error('SCN is not awaiting bank transfer confirmation.');
       }
 
-      const pendingDelta = scn.pendingBalanceReserved === true ? -1 * amountPence : 0;
+      const reservedAmount = scn.pendingBalanceReserved
+        ? Math.round(Number(scn.amountPence || paymentBreakdown.originalAmountPence || 0))
+        : 0;
 
-      tx.update(scnRef, {
+      const scnUpdate: Record<string, unknown> = {
         status: 'paid',
         paidAt: FieldValue.serverTimestamp(),
         pendingBalanceReserved: false,
-      });
+        amountPence: paymentBreakdown.currentAmountPence,
+        amountPaidPence: paymentBreakdown.currentAmountPence,
+      };
+
+      if (paymentBreakdown.shouldPersistLatePenalty) {
+        scnUpdate.latePenaltyAppliedAt = FieldValue.serverTimestamp();
+      }
+
+      tx.update(scnRef, scnUpdate);
 
       const teamUpdate: Record<string, unknown> = {
-        confirmedBalancePence: FieldValue.increment(amountPence),
+        confirmedBalancePence: FieldValue.increment(paymentBreakdown.currentAmountPence),
       };
-      if (pendingDelta !== 0) {
-        teamUpdate.pendingBalancePence = FieldValue.increment(pendingDelta);
+      if (reservedAmount > 0) {
+        teamUpdate.pendingBalancePence = FieldValue.increment(-1 * reservedAmount);
       }
 
       tx.set(teamRef, teamUpdate, { merge: true });

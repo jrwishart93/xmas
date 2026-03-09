@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminAuth, adminDb } from '../_lib/firebaseAdmin';
-import { getScnAmountPence } from '../_lib/scnAmount';
+import { getScnPaymentBreakdown } from '../_lib/scnAmount';
 import { createHostedPayment, getPaymentDisplayConfig, getTrueLayerPaymentConfigError } from '../_lib/truelayer';
 
 function buildBeneficiaryReference(scnId: string, uid: string): string {
@@ -51,14 +51,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'SCN is already paid.' }, { status: 400 });
   }
 
+  const paymentBreakdown = getScnPaymentBreakdown(scn, { statusOverride: 'awaiting_payment' });
   const existingPaymentId = typeof scn.truelayerPaymentId === 'string' ? scn.truelayerPaymentId : null;
   const existingRedirectUrl = typeof scn.truelayerRedirectUrl === 'string' ? scn.truelayerRedirectUrl : null;
-  if (scn.status === 'awaiting_payment' && scn.paymentMethod === 'truelayer' && existingPaymentId && existingRedirectUrl) {
+  if (
+    scn.status === 'awaiting_payment' &&
+    scn.paymentMethod === 'truelayer' &&
+    existingPaymentId &&
+    existingRedirectUrl &&
+    !paymentBreakdown.shouldPersistLatePenalty
+  ) {
     return NextResponse.json({ url: existingRedirectUrl, paymentId: existingPaymentId, reused: true });
   }
 
-  const amountPence = getScnAmountPence(scn);
-  if (amountPence <= 0) {
+  let amountPence = paymentBreakdown.currentAmountPence;
+  if (paymentBreakdown.originalAmountPence <= 0) {
     return NextResponse.json(
       { error: 'SCN amount is invalid. Ensure the case has a monetary amount.' },
       { status: 400 }
@@ -79,6 +86,8 @@ export async function POST(request: Request) {
         throw new Error('SCN is already paid.');
       }
 
+      const latestPaymentBreakdown = getScnPaymentBreakdown(latestScn, { statusOverride: 'awaiting_payment' });
+      amountPence = latestPaymentBreakdown.currentAmountPence;
       const latestPaymentId =
         typeof latestScn.truelayerPaymentId === 'string' ? latestScn.truelayerPaymentId : null;
       const latestRedirectUrl =
@@ -88,7 +97,8 @@ export async function POST(request: Request) {
         latestScn.status === 'awaiting_payment' &&
         latestScn.paymentMethod === 'truelayer' &&
         latestPaymentId &&
-        latestRedirectUrl
+        latestRedirectUrl &&
+        !latestPaymentBreakdown.shouldPersistLatePenalty
       ) {
         throw new Error('An Open Banking payment is already awaiting completion for this SCN.');
       }
@@ -127,22 +137,35 @@ export async function POST(request: Request) {
         throw new Error('SCN is already paid.');
       }
 
+      const latestPaymentBreakdown = getScnPaymentBreakdown(latestScn, { statusOverride: 'awaiting_payment' });
       if (latestScn.truelayerRequestKey !== requestKey) {
         throw new Error('An Open Banking payment is already being prepared for this SCN.');
       }
 
-      const pendingIncrement = latestScn.pendingBalanceReserved === true ? 0 : amountPence;
+      const reservedAmount = latestScn.pendingBalanceReserved
+        ? Math.round(Number(latestScn.amountPence || latestPaymentBreakdown.originalAmountPence || 0))
+        : 0;
+      const pendingIncrement = latestScn.pendingBalanceReserved
+        ? Math.max(0, latestPaymentBreakdown.currentAmountPence - reservedAmount)
+        : latestPaymentBreakdown.currentAmountPence;
 
-      tx.update(scnRef, {
+      const scnUpdate: Record<string, unknown> = {
         paymentMethod: 'truelayer',
         status: 'awaiting_payment',
+        amountPence: latestPaymentBreakdown.currentAmountPence,
         pendingBalanceReserved: true,
         truelayerPaymentId: result.paymentId,
         truelayerPaymentStatus: 'authorization_required',
         truelayerRedirectUrl: result.hostedPageUrl,
         truelayerRequestedAt: FieldValue.serverTimestamp(),
         truelayerRequestKey: FieldValue.delete(),
-      });
+      };
+
+      if (latestPaymentBreakdown.shouldPersistLatePenalty) {
+        scnUpdate.latePenaltyAppliedAt = FieldValue.serverTimestamp();
+      }
+
+      tx.update(scnRef, scnUpdate);
 
       if (pendingIncrement > 0) {
         tx.set(

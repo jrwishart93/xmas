@@ -98,6 +98,8 @@ export function renderAct(container, act) {
             <code>${section.code}</code>
             <strong>${section.title}</strong>
           </div>
+          <p><strong>Contribution:</strong> £${Number(section.amountGBP || 0).toFixed(0)} <span class="muted">(${Number(section.amountPence || 0)}p)</span></p>
+          <p class="muted">Late penalty: x${Number(section.latePenaltyMultiplier || 2)} after ${Number(section.latePenaltyAfterDays || 3)} days.</p>
           <p>${section.description}</p>
         `;
         details.appendChild(article);
