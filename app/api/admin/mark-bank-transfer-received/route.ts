@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminAuth, adminDb } from '../../_lib/firebaseAdmin';
+import { getScnAmountPence } from '../../_lib/scnAmount';
 
 export async function POST(request: Request) {
   const authHeader = request.headers.get('authorization') || '';
@@ -28,6 +29,11 @@ export async function POST(request: Request) {
     if (!scnSnap.exists) throw new Error('SCN not found');
 
     const scn = scnSnap.data()!;
+    const amountPence = getScnAmountPence(scn);
+    if (amountPence <= 0) {
+      throw new Error('SCN amount is invalid.');
+    }
+
     if (scn.paymentMethod !== 'bank_transfer' || scn.status !== 'awaiting_payment') {
       throw new Error('SCN is not awaiting bank transfer confirmation');
     }
@@ -40,8 +46,8 @@ export async function POST(request: Request) {
     tx.set(
       teamRef,
       {
-        confirmedBalancePence: FieldValue.increment(scn.amountPence || 0),
-        pendingBalancePence: FieldValue.increment(-1 * (scn.amountPence || 0)),
+        confirmedBalancePence: FieldValue.increment(amountPence),
+        pendingBalancePence: FieldValue.increment(-1 * amountPence),
       },
       { merge: true }
     );

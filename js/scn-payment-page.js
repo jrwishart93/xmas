@@ -1,12 +1,50 @@
 import { bootProtectedPage, initIcons } from '/js/app-common.js';
 import {
-  createCheckoutSession,
-  getMembers,
+  createOpenBankingPayment,
+  getPaymentConfig,
   markBankTransferAsReceived,
   setScnPaymentMethod,
   subscribeScnById,
 } from '/js/data.js';
 import { money } from '/js/constants.js';
+
+const DEFAULT_PAYMENT_CONFIG = {
+  bankDetails: {
+    accountName: 'Team Social Fund',
+    sortCode: '40-00-05',
+    accountNumber: '74984172',
+  },
+  paymentMethods: {
+    openBanking: true,
+    bankTransfer: true,
+  },
+};
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function normalizePaymentConfig(payload) {
+  const bankDetails = payload?.bankDetails || {};
+  const paymentMethods = payload?.paymentMethods || {};
+
+  return {
+    bankDetails: {
+      accountName: bankDetails.accountName || DEFAULT_PAYMENT_CONFIG.bankDetails.accountName,
+      sortCode: bankDetails.sortCode || DEFAULT_PAYMENT_CONFIG.bankDetails.sortCode,
+      accountNumber: bankDetails.accountNumber || DEFAULT_PAYMENT_CONFIG.bankDetails.accountNumber,
+    },
+    paymentMethods: {
+      openBanking: paymentMethods.openBanking !== false,
+      bankTransfer: paymentMethods.bankTransfer !== false,
+    },
+  };
+}
 
 function getScnIdFromPath() {
   const parts = window.location.pathname.split('/').filter(Boolean);
@@ -14,8 +52,8 @@ function getScnIdFromPath() {
   return idx >= 0 ? parts[idx + 1] : null;
 }
 
-function feeFor(amountPence) {
-  return Math.round(amountPence * 0.029 + 20);
+function contributionAmountPence(scn) {
+  return Number(scn.amountPence || scn.finalAmountPence || scn.baseAmountPence || 0);
 }
 
 function paymentStatusBadge(status) {
@@ -33,15 +71,65 @@ async function copyText(value, label) {
   alert(`${label} copied.`);
 }
 
+function renderPaymentOptions({ scn, isAdmin, ref, amount, paymentConfig }) {
+  const cards = [];
+  const bank = paymentConfig.bankDetails;
+
+  if (paymentConfig.paymentMethods.bankTransfer) {
+    cards.push(`
+      <article class="card payment-option ${scn.paymentMethod === 'bank_transfer' ? 'payment-selected' : ''}" id="bankOption">
+        <p class="section-header">Bank Transfer <span class="badge badge-paid">No Processing Fee</span></p>
+        <p class="muted">Account name: ${escapeHtml(bank.accountName)}</p>
+        <p class="muted">Sort code: ${escapeHtml(bank.sortCode)}</p>
+        <p class="muted">Account number: ${escapeHtml(bank.accountNumber)}</p>
+        <p><strong>Reference:</strong> <code>${escapeHtml(ref)}</code></p>
+        <div class="actions">
+          <button type="button" class="secondary" id="copyBank">Copy account details</button>
+          <button type="button" class="secondary" id="copyRef">Copy reference</button>
+          <button type="button" id="setBank">Use Bank Transfer</button>
+        </div>
+        ${scn.paymentMethod === 'bank_transfer' ? '<p class="muted">Awaiting bank transfer confirmation.</p>' : ''}
+        ${isAdmin && scn.status === 'awaiting_payment' && scn.paymentMethod === 'bank_transfer' ? '<button type="button" id="markPaid">Mark Bank Transfer as Received</button>' : ''}
+      </article>
+    `);
+  }
+
+  if (paymentConfig.paymentMethods.openBanking) {
+    cards.push(`
+      <article class="card payment-option ${scn.paymentMethod === 'truelayer' ? 'payment-selected' : ''}">
+        <p class="section-header">Open Banking (TrueLayer) <span class="badge badge-paid">No Processing Fee</span></p>
+        <p class="muted">Pay securely from your bank app (including Monzo) using TrueLayer.</p>
+        <p><strong>Total: ${money(amount)}</strong></p>
+        <div class="actions">
+          <button type="button" id="payNow">Pay by Bank App</button>
+        </div>
+        ${scn.paymentMethod === 'truelayer' && scn.status === 'awaiting_payment' ? '<p class="muted">Payment initiated. Complete it in your bank app to mark this SCN paid.</p>' : ''}
+      </article>
+    `);
+  }
+
+  if (!cards.length) {
+    cards.push('<article class="card payment-option"><p class="muted">All payment methods are currently disabled. Please contact an admin.</p></article>');
+  }
+
+  return cards.join('\n');
+}
+
 bootProtectedPage(async (ctx) => {
   const scnId = getScnIdFromPath();
   const card = document.getElementById('scnPaymentCard');
-  const members = await getMembers();
   const isAdmin = (ctx.membership?.role || '').toLowerCase() === 'admin';
 
   if (!scnId) {
     card.innerHTML = '<p class="muted">Invalid SCN route.</p>';
     return;
+  }
+
+  let paymentConfig = DEFAULT_PAYMENT_CONFIG;
+  try {
+    paymentConfig = normalizePaymentConfig(await getPaymentConfig());
+  } catch (error) {
+    console.warn('Falling back to default payment config:', error);
   }
 
   subscribeScnById(scnId, (scn) => {
@@ -51,49 +139,27 @@ bootProtectedPage(async (ctx) => {
     }
 
     const ref = scn.bankReference || buildReference(scn.id, scn.accusedUserId || ctx.user.uid);
-    const fee = feeFor(scn.amountPence || 0);
-    const total = (scn.amountPence || 0) + fee;
+    const amount = contributionAmountPence(scn);
     const clauseTitle = scn.clauseTitle || scn.clauseId || 'Unspecified Clause';
 
     card.innerHTML = `
       <section class="payment-section">
         <p class="eyebrow">SCN Details</p>
-        <h2 class="section-header">${clauseTitle}</h2>
-        <p><strong>Amount:</strong> ${money(scn.amountPence || 0)}</p>
+        <h2 class="section-header">${escapeHtml(clauseTitle)}</h2>
+        <p><strong>Amount:</strong> ${money(amount)}</p>
         <p><strong>Status:</strong> ${paymentStatusBadge(scn.status || 'issued')}</p>
         <p class="muted"><strong>Issued:</strong> ${scn.createdAt?.toDate ? scn.createdAt.toDate().toLocaleString() : 'Pending timestamp'}</p>
       </section>
 
       <section class="payment-options-grid">
-        <article class="card payment-option ${scn.paymentMethod === 'bank_transfer' ? 'payment-selected' : ''}" id="bankOption">
-          <p class="section-header">Bank Transfer <span class="badge badge-paid">No Processing Fee</span></p>
-          <p class="muted">Account name: Team Sigma Three Social Fund</p>
-          <p class="muted">Sort code: 11-22-33</p>
-          <p class="muted">Account number: 12345678</p>
-          <p><strong>Reference:</strong> <code>${ref}</code></p>
-          <div class="actions">
-            <button type="button" class="secondary" id="copyBank">Copy account details</button>
-            <button type="button" class="secondary" id="copyRef">Copy reference</button>
-            <button type="button" id="setBank">Use Bank Transfer</button>
-          </div>
-          ${scn.paymentMethod === 'bank_transfer' ? '<p class="muted">Awaiting bank transfer confirmation.</p>' : ''}
-          ${isAdmin && scn.status === 'awaiting_payment' && scn.paymentMethod === 'bank_transfer' ? '<button type="button" id="markPaid">Mark Bank Transfer as Received</button>' : ''}
-        </article>
-
-        <article class="card payment-option ${scn.paymentMethod === 'stripe' ? 'payment-selected' : ''}">
-          <p class="section-header">Apple Pay / Google Pay <span class="badge badge-awaiting">Processing fee applies</span></p>
-          <p class="muted">Outstanding Contribution: ${money(scn.amountPence || 0)}</p>
-          <p class="muted">Fee: ${money(fee)}</p>
-          <p><strong>Total: ${money(total)}</strong></p>
-          <div class="actions">
-            <button type="button" id="payNow">Pay Now</button>
-          </div>
-        </article>
+        ${renderPaymentOptions({ scn, isAdmin, ref, amount, paymentConfig })}
       </section>
     `;
 
+    const bankDetailsText = `${paymentConfig.bankDetails.accountName}\nSort code: ${paymentConfig.bankDetails.sortCode}\nAccount number: ${paymentConfig.bankDetails.accountNumber}`;
+
     document.getElementById('copyBank')?.addEventListener('click', () =>
-      copyText('Team Sigma Three Social Fund\nSort code: 11-22-33\nAccount number: 12345678', 'Bank details')
+      copyText(bankDetailsText, 'Bank details')
     );
     document.getElementById('copyRef')?.addEventListener('click', () => copyText(ref, 'Reference'));
 
@@ -107,9 +173,17 @@ bootProtectedPage(async (ctx) => {
     });
 
     document.getElementById('payNow')?.addEventListener('click', async () => {
-      const idToken = await ctx.user.getIdToken();
-      const result = await createCheckoutSession({ idToken, scnId: scn.id });
-      if (result?.url) window.location.href = result.url;
+      try {
+        const idToken = await ctx.user.getIdToken();
+        const result = await createOpenBankingPayment({ idToken, scnId: scn.id });
+        if (result?.url) {
+          window.location.href = result.url;
+          return;
+        }
+        alert('Unable to start Open Banking payment.');
+      } catch (error) {
+        alert(error?.message || 'Unable to start Open Banking payment.');
+      }
     });
 
     initIcons();

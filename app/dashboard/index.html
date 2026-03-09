@@ -34,6 +34,16 @@
   </section>
 
   <section class="dashboard-grid content-grid">
+    <article class="card stat-card p-responsive" id="teamSocialFundCard">
+      <h2 class="section-header"><i data-lucide="landmark" class="icon"></i>Team Social Fund</h2>
+      <p id="teamSocialFundBalance" class="metric">£0.00</p>
+      <p id="teamSocialFundMeta" class="muted">Checking bank connection…</p>
+      <div class="actions">
+        <button type="button" id="connectBankBtn" class="btn btn-responsive" hidden><i data-lucide="link" class="icon icon-btn"></i>Connect Bank</button>
+        <button type="button" id="refreshBankBalanceBtn" class="btn secondary btn-responsive"><i data-lucide="refresh-cw" class="icon icon-btn"></i>Refresh Balance</button>
+      </div>
+    </article>
+
     <article class="card stat-card p-responsive">
       <h2 class="section-header"><i data-lucide="wallet" class="icon"></i>Confirmed Balance</h2>
       <p id="confirmedTotal" class="metric">£0.00</p>

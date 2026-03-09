@@ -1,5 +1,10 @@
 {
+  "scripts": {
+    "check:client-secrets": "sh -c 'if rg -n \"TRUELAYER_CLIENT_SECRET|TRUELAYER_SIGNING_PRIVATE_KEY|FIREBASE_PRIVATE_KEY\" js app components lib --glob \"!app/api/**\"; then echo \"Potential secret reference found in client paths.\" && exit 1; else echo \"No client secret references found.\"; fi'"
+  },
   "dependencies": {
-    "lucide-react": "^0.575.0"
+    "lucide-react": "^0.575.0",
+    "truelayer-client": "^1.3.2",
+    "truelayer-signing": "^0.2.1"
   }
 }

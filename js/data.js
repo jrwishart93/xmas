@@ -28,6 +28,12 @@ function membersRef() {
   return collection(db, 'teams', TEAM_ID, 'members');
 }
 
+function buildApiError(payload, fallbackMessage) {
+  const error = new Error(payload?.error || fallbackMessage);
+  error.code = payload?.code || null;
+  return error;
+}
+
 export async function getTeamSummary() {
   const snap = await getDoc(teamRef());
   return snap.exists() ? snap.data() : { confirmedBalancePence: 0, pendingBalancePence: 0 };
@@ -143,7 +149,55 @@ export async function markBankTransferAsReceived({ idToken, scnId }) {
   return response.json();
 }
 
-export async function createCheckoutSession({ idToken, scnId }) {
+export async function getPaymentConfig() {
+  const response = await fetch('/api/payment-config', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw buildApiError(payload, 'Unable to load payment configuration');
+  }
+
+  return response.json();
+}
+
+export async function getTrueLayerConnectUrl({ idToken }) {
+  const response = await fetch('/api/truelayer/connect', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${idToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw buildApiError(payload, 'Unable to start bank connection');
+  }
+
+  return response.json();
+}
+
+export async function getTrueLayerBalance({ idToken }) {
+  const response = await fetch('/api/truelayer/balance', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${idToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw buildApiError(payload, 'Unable to retrieve bank balance');
+  }
+
+  return response.json();
+}
+
+export async function createOpenBankingPayment({ idToken, scnId }) {
   const response = await fetch('/api/create-checkout-session', {
     method: 'POST',
     headers: {
@@ -155,11 +209,13 @@ export async function createCheckoutSession({ idToken, scnId }) {
 
   if (!response.ok) {
     const payload = await response.json().catch(() => ({}));
-    throw new Error(payload.error || 'Unable to create checkout session');
+    throw buildApiError(payload, 'Unable to create Open Banking payment');
   }
 
   return response.json();
 }
+
+export const createCheckoutSession = createOpenBankingPayment;
 
 export async function resolvePlea({ scnId, action }) {
   const scnDoc = doc(db, 'teams', TEAM_ID, 'scns', scnId);

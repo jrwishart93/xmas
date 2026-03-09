@@ -1,17 +1,24 @@
 import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminAuth, adminDb } from '../_lib/firebaseAdmin';
+import { getScnAmountPence } from '../_lib/scnAmount';
+import { createHostedPayment, getPaymentDisplayConfig, getTrueLayerPaymentConfigError } from '../_lib/truelayer';
 
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-const STRIPE_PRICE_CURRENCY = 'gbp';
-
-function calculateFeePence(amountPence: number) {
-  return Math.round(amountPence * 0.029 + 20);
+function buildBeneficiaryReference(scnId: string, uid: string): string {
+  const safeScn = scnId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(-8);
+  const safeUid = uid.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 6);
+  return `SCN${safeScn}${safeUid}`.slice(0, 18);
 }
 
 export async function POST(request: Request) {
-  if (!STRIPE_SECRET_KEY) {
-    return NextResponse.json({ error: 'Stripe is not configured.' }, { status: 500 });
+  const configError = getTrueLayerPaymentConfigError();
+  if (configError) {
+    return NextResponse.json({ error: configError }, { status: 500 });
+  }
+
+  const paymentConfig = getPaymentDisplayConfig();
+  if (!paymentConfig.paymentMethods.openBanking) {
+    return NextResponse.json({ error: 'Open Banking payments are currently disabled.' }, { status: 503 });
   }
 
   const authHeader = request.headers.get('authorization') || '';
@@ -25,10 +32,12 @@ export async function POST(request: Request) {
   if (!scnId) return NextResponse.json({ error: 'Missing scnId.' }, { status: 400 });
 
   const teamId = process.env.TEAM_ID || 'rpu-social-fund';
-  const memberSnap = await adminDb.doc(`teams/${teamId}/members/${decoded.uid}`).get();
+  const memberRef = adminDb.doc(`teams/${teamId}/members/${decoded.uid}`);
+  const memberSnap = await memberRef.get();
   if (!memberSnap.exists) return NextResponse.json({ error: 'Unauthorised.' }, { status: 403 });
 
   const scnRef = adminDb.doc(`teams/${teamId}/scns/${scnId}`);
+  const teamRef = adminDb.doc(`teams/${teamId}`);
   const scnSnap = await scnRef.get();
   if (!scnSnap.exists) return NextResponse.json({ error: 'SCN not found.' }, { status: 404 });
 
@@ -37,48 +46,73 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
   }
 
-  const amountPence = Number(scn.amountPence || 0);
-  const feePence = calculateFeePence(amountPence);
-  const totalPence = amountPence + feePence;
-
-  const baseUrl = process.env.APP_BASE_URL || 'http://localhost:3000';
-  const stripeRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      mode: 'payment',
-      success_url: `${baseUrl}/app/scn/${scnId}/?payment=success`,
-      cancel_url: `${baseUrl}/app/scn/${scnId}/?payment=cancelled`,
-      'line_items[0][price_data][currency]': STRIPE_PRICE_CURRENCY,
-      'line_items[0][price_data][unit_amount]': String(totalPence),
-      'line_items[0][price_data][product_data][name]': `Outstanding Contribution ${scnId}`,
-      'line_items[0][quantity]': '1',
-      'metadata[scnId]': scnId,
-      'metadata[teamId]': teamId,
-      'metadata[userId]': decoded.uid,
-    }),
-  });
-
-  const stripePayload = await stripeRes.json();
-  if (!stripeRes.ok) {
-    return NextResponse.json({ error: stripePayload?.error?.message || 'Stripe session failed.' }, { status: 500 });
+  if (scn.status === 'paid') {
+    return NextResponse.json({ error: 'SCN is already paid.' }, { status: 400 });
   }
 
-  await scnRef.update({
-    paymentMethod: 'stripe',
-    status: 'awaiting_payment',
-    stripeSessionId: stripePayload.id,
-  });
+  const amountPence = getScnAmountPence(scn);
+  if (amountPence <= 0) {
+    return NextResponse.json(
+      { error: 'SCN amount is invalid. Ensure the case has a monetary amount.' },
+      { status: 400 }
+    );
+  }
 
-  await adminDb.doc(`teams/${teamId}`).set(
-    {
-      pendingBalancePence: FieldValue.increment(scn.amountPence || 0),
-    },
-    { merge: true }
-  );
+  const member = memberSnap.data() as { displayName?: string; email?: string } | undefined;
+  const baseUrl = process.env.APP_BASE_URL || new URL(request.url).origin;
 
-  return NextResponse.json({ url: stripePayload.url });
+  try {
+    const result = await createHostedPayment({
+      amountInMinor: amountPence,
+      currency: 'GBP',
+      beneficiaryReference: buildBeneficiaryReference(scnId, decoded.uid),
+      userId: decoded.uid,
+      userName: member?.displayName || decoded.name || decoded.email || decoded.uid,
+      userEmail: decoded.email || member?.email || null,
+      metadata: {
+        scnId,
+        teamId,
+        userId: decoded.uid,
+      },
+      returnUri: `${baseUrl}/app/scn/${scnId}/?payment=return`,
+    });
+
+    await adminDb.runTransaction(async (tx) => {
+      const latestSnap = await tx.get(scnRef);
+      if (!latestSnap.exists) throw new Error('SCN not found');
+
+      const latestScn = latestSnap.data()!;
+      if (latestScn.status === 'paid') {
+        throw new Error('SCN is already paid.');
+      }
+
+      const pendingIncrement = latestScn.status === 'awaiting_payment' ? 0 : amountPence;
+
+      tx.update(scnRef, {
+        paymentMethod: 'truelayer',
+        status: 'awaiting_payment',
+        truelayerPaymentId: result.paymentId,
+        truelayerPaymentStatus: 'authorization_required',
+        truelayerRedirectUrl: result.hostedPageUrl,
+        truelayerRequestedAt: FieldValue.serverTimestamp(),
+      });
+
+      if (pendingIncrement > 0) {
+        tx.set(
+          teamRef,
+          {
+            pendingBalancePence: FieldValue.increment(pendingIncrement),
+          },
+          { merge: true }
+        );
+      }
+    });
+
+    return NextResponse.json({ url: result.hostedPageUrl, paymentId: result.paymentId });
+  } catch (error) {
+    console.error('TrueLayer payment creation failed:', error);
+    const message = error instanceof Error ? error.message : 'Unable to create payment.';
+    const status = message.includes('already paid') ? 400 : 500;
+    return NextResponse.json({ error: message }, { status });
+  }
 }
