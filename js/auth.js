@@ -24,10 +24,39 @@ function clearSessionCookie() {
   document.cookie = 'stf_session=; path=/; max-age=0; samesite=lax';
 }
 
+function appError(code, message) {
+  const error = new Error(message);
+  error.code = code;
+  return error;
+}
+
+function isPermissionDeniedError(error) {
+  const code = error?.code || '';
+  const message = error?.message || '';
+  return code.includes('permission-denied') || /insufficient permissions/i.test(message);
+}
+
+function isEmailAlreadyInUseError(error) {
+  return String(error?.code || '').includes('email-already-in-use');
+}
+
+function isInvalidCredentialError(error) {
+  const code = String(error?.code || '');
+  return code.includes('invalid-credential') || code.includes('wrong-password');
+}
+
 async function getMembershipForUser(uid) {
   const membershipRef = doc(db, 'teams', TEAM_ID, 'members', uid);
-  const membershipSnap = await getDoc(membershipRef);
-  return membershipSnap.exists() ? membershipSnap.data() : null;
+  try {
+    const membershipSnap = await getDoc(membershipRef);
+    return membershipSnap.exists() ? membershipSnap.data() : null;
+  } catch (error) {
+    // Treat a blocked read on the current user's own membership lookup as "not joined yet".
+    if (isPermissionDeniedError(error) && auth.currentUser?.uid === uid) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 async function assertTeamMembership(user) {
@@ -35,7 +64,10 @@ async function assertTeamMembership(user) {
   if (!membership) {
     await signOut(auth);
     clearSessionCookie();
-    throw new Error('Your account is not linked to this team fund. Use the team access code when signing up.');
+    throw appError(
+      'app/team-membership-required',
+      'Your account is not linked to this team fund. Use Sign Up with the team access code to join.'
+    );
   }
   return membership;
 }
@@ -64,7 +96,10 @@ async function createMembershipForUser(user, fullName, accessCode) {
 
   const membership = await getMembershipForUser(user.uid);
   if (!membership) {
-    throw new Error('Your account was created, but the team membership record could not be verified.');
+    throw appError(
+      'app/team-membership-unverified',
+      'Your account was created, but the team membership record could not be verified.'
+    );
   }
 
   return membership;
@@ -80,9 +115,29 @@ export async function login(email, password, remember = true) {
 
 export async function register({ fullName, email, password, accessCode, remember = true }) {
   await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
-  const credentials = await createUserWithEmailAndPassword(auth, email, password);
+  let credentials;
+  let createdNewUser = false;
 
-  if (fullName?.trim()) {
+  try {
+    credentials = await createUserWithEmailAndPassword(auth, email, password);
+    createdNewUser = true;
+  } catch (error) {
+    if (!isEmailAlreadyInUseError(error)) throw error;
+
+    try {
+      credentials = await signInWithEmailAndPassword(auth, email, password);
+    } catch (signInError) {
+      if (isInvalidCredentialError(signInError)) {
+        throw appError(
+          'app/existing-account-password-required',
+          'An account already exists with this email. Sign in with the same password or reset it first.'
+        );
+      }
+      throw signInError;
+    }
+  }
+
+  if (fullName?.trim() && (!credentials.user.displayName || createdNewUser)) {
     await updateProfile(credentials.user, { displayName: fullName.trim() });
   }
 
@@ -91,7 +146,11 @@ export async function register({ fullName, email, password, accessCode, remember
     setSessionCookie();
     return { user: credentials.user, membership };
   } catch (error) {
-    await deleteUser(credentials.user).catch(() => signOut(auth).catch(() => null));
+    if (createdNewUser) {
+      await deleteUser(credentials.user).catch(() => signOut(auth).catch(() => null));
+    } else {
+      await signOut(auth).catch(() => null);
+    }
     clearSessionCookie();
     throw error;
   }
@@ -105,6 +164,8 @@ export async function logout() {
   clearSessionCookie();
   await signOut(auth);
 }
+
+export { assertTeamMembership };
 
 export function requireAuth({ onReady }) {
   onAuthStateChanged(auth, async (user) => {

@@ -6,6 +6,10 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isOwnMemberDoc(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
     function isTeamMember(teamId) {
       return signedIn() &&
         exists(/databases/$(database)/documents/teams/$(teamId)/members/$(request.auth.uid));
@@ -22,10 +26,13 @@ service cloud.firestore {
         'issuedByUserId',
         'accusedUserId',
         'clauseId',
+        'clauseTitle',
         'brief',
         'stage',
         'baseAmountPence',
         'finalAmountPence',
+        'latePenaltyMultiplier',
+        'latePenaltyAfterDays',
         'disposalType',
         'resolvedAt',
         'status'
@@ -33,9 +40,14 @@ service cloud.firestore {
       request.resource.data.issuedByUserId == request.auth.uid &&
       request.resource.data.accusedUserId is string &&
       request.resource.data.clauseId is string &&
+      request.resource.data.clauseTitle is string &&
       request.resource.data.stage == 'awaiting_plea' &&
       request.resource.data.baseAmountPence is int &&
       request.resource.data.baseAmountPence > 0 &&
+      request.resource.data.latePenaltyMultiplier is int &&
+      request.resource.data.latePenaltyMultiplier >= 1 &&
+      request.resource.data.latePenaltyAfterDays is int &&
+      request.resource.data.latePenaltyAfterDays >= 0 &&
       request.resource.data.finalAmountPence == 0 &&
       request.resource.data.disposalType == null &&
       request.resource.data.resolvedAt == null &&
@@ -106,7 +118,7 @@ service cloud.firestore {
       allow update: if false;
 
       match /members/{uid} {
-        allow read: if isTeamMember(teamId);
+        allow read: if isTeamMember(teamId) || isOwnMemberDoc(uid);
         allow create: if false;
         allow update, delete: if isAdmin(teamId);
       }

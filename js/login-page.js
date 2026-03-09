@@ -1,6 +1,6 @@
 import { initMobileNav } from '/js/app-common.js';
-import { auth } from '/firebase.js';
-import { login, register, requestPasswordReset } from '/js/auth.js';
+import { auth, onAuthStateChanged } from '/firebase.js';
+import { assertTeamMembership, login, register, requestPasswordReset } from '/js/auth.js';
 
 const authCard = document.querySelector('[data-auth-card]');
 const tabButtons = [...document.querySelectorAll('[data-auth-tab]')];
@@ -11,12 +11,10 @@ const signUpForm = document.querySelector('[data-sign-up-form]');
 const forgotPasswordLink = document.querySelector('[data-forgot-password]');
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DASHBOARD_PATH = '/app/dashboard/';
+let authSubmissionInFlight = false;
 
 initMobileNav();
-
-if (auth.currentUser) {
-  window.location.replace('/dashboard/');
-}
 
 function setStatus(message = '', type = 'info') {
   formStateMessage.textContent = message;
@@ -62,6 +60,9 @@ function toAuthMessage(error) {
   if (code.includes('user-not-found') || code.includes('invalid-credential')) return 'Incorrect email or password.';
   if (code.includes('wrong-password')) return 'Incorrect email or password.';
   if (code.includes('email-already-in-use')) return 'An account already exists with this email. Please sign in instead.';
+  if (code.includes('existing-account-password-required')) return 'An account already exists with this email. Sign in with the same password or reset it first.';
+  if (code.includes('team-membership-required')) return 'This account is not linked to the team fund yet. Use Sign Up with the team access code to join.';
+  if (code.includes('permission-denied')) return 'We could not verify your team membership. Try Sign Up with the team access code.';
   if (code.includes('weak-password')) return 'Use a stronger password (minimum 8 characters).';
   if (code.includes('too-many-requests')) return 'Too many attempts. Please wait a minute and try again.';
   if (code.includes('network-request-failed')) return 'Network error. Check your connection and try again.';
@@ -73,6 +74,17 @@ function shakeForm(form) {
   form.classList.add('form-shake');
   setTimeout(() => form.classList.remove('form-shake'), 350);
 }
+
+onAuthStateChanged(auth, async (user) => {
+  if (authSubmissionInFlight || !user) return;
+
+  try {
+    await assertTeamMembership(user);
+    window.location.replace(DASHBOARD_PATH);
+  } catch (error) {
+    setStatus(error?.message || 'Unable to verify your team membership.', 'error');
+  }
+});
 
 signInForm.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -94,16 +106,18 @@ signInForm.addEventListener('submit', async (event) => {
   }
 
   setStatus('');
+  authSubmissionInFlight = true;
   setLoading(signInForm, true, 'Signing in...');
 
   try {
     await login(email, password, remember);
     setStatus('Signed in successfully. Redirecting...', 'success');
-    window.location.href = '/dashboard/';
+    window.location.href = DASHBOARD_PATH;
   } catch (error) {
     setStatus(toAuthMessage(error), 'error');
     shakeForm(signInForm);
   } finally {
+    authSubmissionInFlight = false;
     setLoading(signInForm, false);
   }
 });
@@ -140,16 +154,18 @@ signUpForm.addEventListener('submit', async (event) => {
   }
 
   setStatus('');
+  authSubmissionInFlight = true;
   setLoading(signUpForm, true, 'Creating account...');
 
   try {
     await register({ fullName, email, password, accessCode, remember });
     setStatus('Account ready. Redirecting...', 'success');
-    window.location.href = '/dashboard/';
+    window.location.href = DASHBOARD_PATH;
   } catch (error) {
     setStatus(toAuthMessage(error), 'error');
     shakeForm(signUpForm);
   } finally {
+    authSubmissionInFlight = false;
     setLoading(signUpForm, false);
   }
 });
