@@ -115,9 +115,10 @@ signUpForm.addEventListener('submit', async (event) => {
   const email = String(formData.get('email') || '').trim().toLowerCase();
   const password = String(formData.get('password') || '');
   const confirmPassword = String(formData.get('confirmPassword') || '');
+  const accessCode = String(formData.get('accessCode') || '').trim();
   const remember = formData.get('remember') === 'on';
 
-  if (!fullName || !email || !password || !confirmPassword) {
+  if (!fullName || !email || !password || !confirmPassword || !accessCode) {
     setStatus('Please complete all sign-up fields.', 'error');
     shakeForm(signUpForm);
     return;
@@ -142,7 +143,7 @@ signUpForm.addEventListener('submit', async (event) => {
   setLoading(signUpForm, true, 'Creating account...');
 
   try {
-    await register({ fullName, email, password, remember });
+    await register({ fullName, email, password, accessCode, remember });
     setStatus('Account ready. Redirecting...', 'success');
     window.location.href = '/dashboard/';
   } catch (error) {

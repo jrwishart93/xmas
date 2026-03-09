@@ -2,11 +2,6 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    match /acts/{docId} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.token.admin == true;
-    }
-
     function signedIn() {
       return request.auth != null;
     }
@@ -21,37 +16,121 @@ service cloud.firestore {
         get(/databases/$(database)/documents/teams/$(teamId)/members/$(request.auth.uid)).data.role == 'admin';
     }
 
+    function isScnCreatePayload() {
+      return request.resource.data.keys().hasOnly([
+        'createdAt',
+        'issuedByUserId',
+        'accusedUserId',
+        'clauseId',
+        'brief',
+        'stage',
+        'baseAmountPence',
+        'finalAmountPence',
+        'disposalType',
+        'resolvedAt',
+        'status'
+      ]) &&
+      request.resource.data.issuedByUserId == request.auth.uid &&
+      request.resource.data.accusedUserId is string &&
+      request.resource.data.clauseId is string &&
+      request.resource.data.stage == 'awaiting_plea' &&
+      request.resource.data.baseAmountPence is int &&
+      request.resource.data.baseAmountPence > 0 &&
+      request.resource.data.finalAmountPence == 0 &&
+      request.resource.data.disposalType == null &&
+      request.resource.data.resolvedAt == null &&
+      (
+        !request.resource.data.keys().hasAny(['status']) ||
+        request.resource.data.status == 'issued'
+      );
+    }
+
+    function isPleaToCourtRequest() {
+      return resource.data.accusedUserId == request.auth.uid &&
+        resource.data.stage == 'awaiting_plea' &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly(['stage']) &&
+        request.resource.data.stage == 'court_requested';
+    }
+
+    function isPleaToGuilty() {
+      return resource.data.accusedUserId == request.auth.uid &&
+        resource.data.stage == 'awaiting_plea' &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          'stage',
+          'finalAmountPence',
+          'disposalType',
+          'resolvedAt'
+        ]) &&
+        request.resource.data.stage == 'pleaded_guilty' &&
+        request.resource.data.finalAmountPence == resource.data.baseAmountPence &&
+        request.resource.data.disposalType == 'money' &&
+        request.resource.data.resolvedAt != null;
+    }
+
+    function isCourtConviction(teamId) {
+      return isAdmin(teamId) &&
+        resource.data.stage == 'court_requested' &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          'stage',
+          'finalAmountPence',
+          'disposalType',
+          'resolvedAt'
+        ]) &&
+        request.resource.data.stage == 'court_convicted' &&
+        request.resource.data.finalAmountPence == resource.data.baseAmountPence * 2 &&
+        request.resource.data.disposalType == 'money' &&
+        request.resource.data.resolvedAt != null;
+    }
+
+    function isCourtAcquittal(teamId) {
+      return isAdmin(teamId) &&
+        resource.data.stage == 'court_requested' &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          'stage',
+          'finalAmountPence',
+          'resolvedAt'
+        ]) &&
+        request.resource.data.stage == 'court_acquitted' &&
+        request.resource.data.finalAmountPence == 0 &&
+        request.resource.data.resolvedAt != null;
+    }
+
+    match /acts/{docId} {
+      allow read: if true;
+      allow write: if isAdmin('rpu-social-fund');
+    }
+
     match /teams/{teamId} {
       allow read: if isTeamMember(teamId);
-      allow create, update: if isAdmin(teamId);
+      allow create, delete: if false;
+      allow update: if false;
 
       match /members/{uid} {
         allow read: if isTeamMember(teamId);
-        allow write: if isAdmin(teamId);
+        allow create: if false;
+        allow update, delete: if isAdmin(teamId);
       }
 
       match /scns/{scnId} {
         allow read: if isTeamMember(teamId);
 
-        allow create: if isTeamMember(teamId)
-          && request.resource.data.issuedByUserId == request.auth.uid
-          && request.resource.data.status == 'issued';
+        allow create: if isTeamMember(teamId) && isScnCreatePayload();
 
-        allow update: if (
-          isTeamMember(teamId)
-          && resource.data.accusedUserId == request.auth.uid
-          && request.resource.data.paymentMethod in ['bank_transfer', 'stripe']
-          && request.resource.data.status == 'awaiting_payment'
-          && resource.data.status in ['issued', 'awaiting_payment']
-          && request.resource.data.diff(resource.data).changedKeys().hasOnly(['paymentMethod', 'status', 'bankReference', 'stripeSessionId'])
-        ) || (
-          isAdmin(teamId)
-          && resource.data.paymentMethod == 'bank_transfer'
-          && resource.data.status == 'awaiting_payment'
-          && request.resource.data.status == 'paid'
-          && request.resource.data.diff(resource.data).changedKeys().hasOnly(['status', 'paidAt'])
-        );
+        allow update: if isPleaToCourtRequest()
+          || isPleaToGuilty()
+          || isCourtConviction(teamId)
+          || isCourtAcquittal(teamId);
+
+        allow delete: if false;
       }
+
+      match /{document=**} {
+        allow read, write: if false;
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

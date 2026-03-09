@@ -7,6 +7,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   createUserWithEmailAndPassword,
+  deleteUser,
   updateProfile,
   setPersistence,
   browserLocalPersistence,
@@ -34,8 +35,38 @@ async function assertTeamMembership(user) {
   if (!membership) {
     await signOut(auth);
     clearSessionCookie();
-    throw new Error('Your account is not linked to this team fund yet. Ask an admin to add you before signing in.');
+    throw new Error('Your account is not linked to this team fund. Use the team access code when signing up.');
   }
+  return membership;
+}
+
+async function createMembershipForUser(user, fullName, accessCode) {
+  const existingMembership = await getMembershipForUser(user.uid);
+  if (existingMembership) return existingMembership;
+
+  const idToken = await user.getIdToken(true);
+  const response = await fetch('/api/team/join', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify({
+      accessCode,
+      fullName,
+    }),
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.error || 'Unable to join the team fund.');
+  }
+
+  const membership = await getMembershipForUser(user.uid);
+  if (!membership) {
+    throw new Error('Your account was created, but the team membership record could not be verified.');
+  }
+
   return membership;
 }
 
@@ -47,7 +78,7 @@ export async function login(email, password, remember = true) {
   return { user: credentials.user, membership };
 }
 
-export async function register({ fullName, email, password, remember = true }) {
+export async function register({ fullName, email, password, accessCode, remember = true }) {
   await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
   const credentials = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -56,11 +87,13 @@ export async function register({ fullName, email, password, remember = true }) {
   }
 
   try {
-    const membership = await assertTeamMembership(credentials.user);
+    const membership = await createMembershipForUser(credentials.user, fullName, accessCode);
     setSessionCookie();
     return { user: credentials.user, membership };
   } catch (error) {
-    throw new Error('Account created, but team access is blocked. Ask an admin to link your account, then sign in.');
+    await deleteUser(credentials.user).catch(() => signOut(auth).catch(() => null));
+    clearSessionCookie();
+    throw error;
   }
 }
 

@@ -6,23 +6,23 @@ const TEAM_ID = 'rpu-social-fund';
 const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
 
 export async function GET() {
-  const teamSnap = await adminDb.doc(`teams/${TEAM_ID}`).get();
-  const socialFundTotalPence = teamSnap.exists ? teamSnap.data()?.moneyBalancePence ?? 0 : 0;
-
-  const scnSnap = await adminDb
-    .collection(`teams/${TEAM_ID}/scns`)
-    .where('createdAt', '>=', ninetyDaysAgo)
-    .where('stage', 'in', ['pleaded_guilty', 'court_convicted'])
-    .get();
+  const scnSnap = await adminDb.collection(`teams/${TEAM_ID}/scns`).where('stage', 'in', ['pleaded_guilty', 'court_convicted']).get();
 
   const memberSnap = await adminDb.collection(`teams/${TEAM_ID}/members`).get();
   const names = new Map<string, string>();
   memberSnap.forEach((doc) => names.set(doc.id, doc.data().displayName || doc.id));
 
   const totals = new Map<string, number>();
+  let socialFundTotalPence = 0;
   scnSnap.forEach((doc) => {
     const data = doc.data();
-    totals.set(data.accusedUserId, (totals.get(data.accusedUserId) || 0) + (data.finalAmountPence || 0));
+    const finalAmountPence = Number(data.finalAmountPence || 0);
+    socialFundTotalPence += finalAmountPence;
+
+    const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
+    if (!createdAt || createdAt < ninetyDaysAgo) return;
+
+    totals.set(data.accusedUserId, (totals.get(data.accusedUserId) || 0) + finalAmountPence);
   });
 
   const leaderboard = [...totals.entries()]

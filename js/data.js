@@ -10,7 +10,6 @@ import {
   where,
   orderBy,
   runTransaction,
-  increment,
   serverTimestamp,
 } from '/firebase.js';
 import { TEAM_ID, RESOLVED_STAGES, ninetyDaysAgo } from '/js/constants.js';
@@ -246,7 +245,6 @@ export async function resolvePlea({ scnId, action }) {
         disposalType: 'money',
         resolvedAt: serverTimestamp(),
       });
-      tx.update(teamRef(), { moneyBalancePence: increment(finalAmountPence) });
       return;
     }
 
@@ -272,7 +270,6 @@ export async function resolveCourt({ scnId, convicted }) {
         disposalType: 'money',
         resolvedAt: serverTimestamp(),
       });
-      tx.update(teamRef(), { moneyBalancePence: increment(finalAmountPence) });
       return;
     }
 

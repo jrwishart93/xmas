@@ -20,11 +20,8 @@ module.exports = async (req, res) => {
     const db = getDb();
     const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
 
-    const teamSnap = await db.doc(`teams/${TEAM_ID}`).get();
-    const socialFundTotalPence = teamSnap.exists ? teamSnap.data().moneyBalancePence || 0 : 0;
-
     const [scns, members] = await Promise.all([
-      db.collection(`teams/${TEAM_ID}/scns`).where('createdAt', '>=', ninetyDaysAgo).where('stage', 'in', ['pleaded_guilty', 'court_convicted']).get(),
+      db.collection(`teams/${TEAM_ID}/scns`).where('stage', 'in', ['pleaded_guilty', 'court_convicted']).get(),
       db.collection(`teams/${TEAM_ID}/members`).get(),
     ]);
 
@@ -32,9 +29,16 @@ module.exports = async (req, res) => {
     members.forEach((doc) => memberNames.set(doc.id, doc.data().displayName || doc.id));
 
     const totals = new Map();
+    let socialFundTotalPence = 0;
     scns.forEach((doc) => {
       const data = doc.data();
-      totals.set(data.accusedUserId, (totals.get(data.accusedUserId) || 0) + (data.finalAmountPence || 0));
+      const finalAmountPence = Number(data.finalAmountPence || 0);
+      socialFundTotalPence += finalAmountPence;
+
+      const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
+      if (!createdAt || createdAt < ninetyDaysAgo) return;
+
+      totals.set(data.accusedUserId, (totals.get(data.accusedUserId) || 0) + finalAmountPence);
     });
 
     const leaderboard = [...totals.entries()]
