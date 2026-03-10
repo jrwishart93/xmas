@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import Link from "next/link";
 import Image from "next/image";
 import BackgroundImage from "@/app/images/Background-court-image.png";
+import MobileNav from "@/app/components/MobileNav";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,7 +41,7 @@ export default function RootLayout({
           <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/80 to-black/90" />
         </div>
 
-        <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-black/45 backdrop-blur-md">
+        <header className="hidden border-b border-white/[0.07] bg-black/45 backdrop-blur-md md:sticky md:top-0 md:z-50 md:block">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
             <Link
               href="/"
@@ -66,7 +67,7 @@ export default function RootLayout({
               <span className="text-sm font-semibold tracking-wide">SJ Act 2025</span>
             </Link>
 
-            <nav className="flex items-center gap-0.5" aria-label="Main">
+            <nav className="hidden items-center gap-0.5 md:flex" aria-label="Main">
               <Link
                 href="/"
                 className="rounded-md px-3 py-1.5 text-sm text-neutral-400 transition-colors hover:bg-white/10 hover:text-neutral-100"
@@ -83,7 +84,8 @@ export default function RootLayout({
           </div>
         </header>
 
-        {children}
+        <div className="pb-[calc(90px+env(safe-area-inset-bottom))] md:pb-0">{children}</div>
+        <MobileNav />
       </body>
     </html>
   );
