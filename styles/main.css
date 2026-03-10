@@ -954,6 +954,14 @@ body {
     display: grid;
     grid-template-columns: 1fr;
   }
+
+  .protected-app .header-row.has-mobile-nav .nav-toggle {
+    display: none;
+  }
+
+  .protected-app .header-row.has-mobile-nav .site-nav {
+    display: none !important;
+  }
 }
 
 @media (min-width: 768px) {

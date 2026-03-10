@@ -197,6 +197,7 @@ export function initIcons() {
 
 export function initMobileNav() {
   const mobileQuery = window.matchMedia('(max-width: 768px)');
+  const isProtectedApp = document.body.classList.contains('protected-app');
 
   const updateHeaderScrollState = () => {
     document.querySelectorAll('.site-header').forEach((header) => {
@@ -208,6 +209,11 @@ export function initMobileNav() {
   document.querySelectorAll('.header-row').forEach((headerRow, index) => {
     const nav = headerRow.querySelector('.site-nav');
     if (!nav || headerRow.querySelector('.nav-toggle')) return;
+
+    if (isProtectedApp) {
+      headerRow.classList.add('has-mobile-nav');
+      return;
+    }
 
     const toggle = document.createElement('button');
     const navId = nav.id || `site-nav-${index + 1}`;
