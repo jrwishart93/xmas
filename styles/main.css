@@ -938,6 +938,24 @@ body {
     box-shadow: 0 16px 36px rgba(2, 7, 16, 0.5);
   }
 
+  body:not(.protected-app) .app-nav-meta .site-nav {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    z-index: 45;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem;
+    margin-top: 0;
+    border-radius: 18px;
+    border: 1px solid rgba(129, 151, 226, 0.2);
+    padding: 0.5rem;
+    background: rgba(8, 13, 25, 0.94);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 16px 36px rgba(2, 7, 16, 0.5);
+  }
+
   .mobile-bottom-nav .nav-link {
     min-height: 56px;
     padding: 0.5rem 0.35rem;
