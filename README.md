@@ -16,6 +16,26 @@ Legacy Brewhemia 2025 pages and assets are archived in `/archive/brewhemia-2025`
 - Seed team document: `node scripts/seed-team.mjs`
 - Seed the Act document: `node scripts/seed-act.mjs`
 
+## Admin system
+
+- Admin routes now live under `/admin/*`.
+- Access is controlled by the member document at `teams/rpu-social-fund/members/{uid}`.
+- Required member fields are:
+  - `displayName`
+  - `email`
+  - `role` (`member` or `admin`)
+  - `disabled`
+  - `createdAt`
+  - `updatedAt`
+- The legacy Firebase login flow syncs a signed server session cookie so `/admin/*` can be protected by middleware.
+- Set `SESSION_COOKIE_SECRET` in server environment before using the admin area.
+
+### Creating an admin account
+
+1. Create the Firebase Auth user you want to use for admin access.
+2. Create or update their member document at `teams/rpu-social-fund/members/{uid}`.
+3. Set `role: "admin"` on that member document.
+
 ## Payments (TrueLayer Open Banking)
 
 This project now uses TrueLayer for SCN Open Banking payments.

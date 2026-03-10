@@ -6,18 +6,31 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isOwnMemberDoc(uid) {
-      return signedIn() && request.auth.uid == uid;
+    function isOwnMemberDoc(teamId, uid) {
+      return signedIn() &&
+        request.auth.uid == uid &&
+        exists(/databases/$(database)/documents/teams/$(teamId)/members/$(uid));
     }
 
     function isTeamMember(teamId) {
       return signedIn() &&
-        exists(/databases/$(database)/documents/teams/$(teamId)/members/$(request.auth.uid));
+        exists(/databases/$(database)/documents/teams/$(teamId)/members/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/teams/$(teamId)/members/$(request.auth.uid)).data.disabled != true;
     }
 
     function isAdmin(teamId) {
       return isTeamMember(teamId) &&
         get(/databases/$(database)/documents/teams/$(teamId)/members/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isOwnSafeMemberUpdate(teamId, uid) {
+      return isOwnMemberDoc(teamId, uid) &&
+        request.resource.data.role == resource.data.role &&
+        request.resource.data.disabled == resource.data.disabled &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          'displayName',
+          'updatedAt'
+        ]);
     }
 
     function isScnCreatePayload() {
@@ -118,9 +131,15 @@ service cloud.firestore {
       allow update: if false;
 
       match /members/{uid} {
-        allow read: if isTeamMember(teamId) || isOwnMemberDoc(uid);
+        allow read: if isTeamMember(teamId) || isOwnMemberDoc(teamId, uid);
         allow create: if false;
-        allow update, delete: if isAdmin(teamId);
+        allow update: if isAdmin(teamId) || isOwnSafeMemberUpdate(teamId, uid);
+        allow delete: if isAdmin(teamId);
+      }
+
+      match /announcements/{announcementId} {
+        allow read: if isTeamMember(teamId);
+        allow create, update, delete: if isAdmin(teamId);
       }
 
       match /scns/{scnId} {
@@ -143,6 +162,11 @@ service cloud.firestore {
 
     match /{document=**} {
       allow read, write: if false;
+    }
+
+    match /fundLedger/{entryId} {
+      allow read: if isTeamMember('rpu-social-fund');
+      allow write: if isAdmin('rpu-social-fund');
     }
   }
 }

@@ -91,6 +91,7 @@ function toAuthMessage(error) {
   if (code.includes('email-already-in-use')) return 'An account already exists with this email. Please sign in instead.';
   if (code.includes('existing-account-password-required')) return 'An account already exists with this email. Sign in with the same password or reset it first.';
   if (code.includes('team-membership-required')) return 'This account is not linked to the team fund yet. Use Sign Up with the team access code to join.';
+  if (code.includes('team-membership-disabled')) return 'This Team Social Fund account has been disabled by an administrator.';
   if (code.includes('permission-denied')) return 'We could not verify your team membership. Try Sign Up with the team access code.';
   if (code.includes('weak-password')) return 'Use a stronger password (minimum 8 characters).';
   if (code.includes('too-many-requests')) return 'Too many attempts. Please wait a minute and try again.';

@@ -5,6 +5,10 @@
     "moduleResolution": "Node",
     "outDir": "build-server",
     "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    },
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
@@ -12,6 +16,7 @@
     "types": ["node"]
   },
   "include": [
-    "app/api/**/*.ts"
+    "app/api/**/*.ts",
+    "lib/**/*.ts"
   ]
 }

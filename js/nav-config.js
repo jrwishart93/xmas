@@ -9,12 +9,19 @@ export const MEMBER_NAV_ITEMS = [
   { section: 'team', href: '/app/team/', label: 'Team', icon: 'users', kind: 'primary' },
   { section: 'cases', href: '/app/issue/', label: 'Cases', icon: 'gavel', kind: 'primary' },
   { section: 'leaderboard', href: '/app/leaderboard/', label: 'Leaderboard', icon: 'trophy', kind: 'primary' },
+  { section: 'admin', href: '/admin/', label: 'Admin', icon: 'shield', kind: 'secondary', adminOnly: true },
   { section: 'disbursements', href: '/app/disbursements/', label: 'Disburse', icon: 'wallet', kind: 'secondary', previewRoute: true },
   { section: 'settings', href: '/under-construction/', label: 'Settings', icon: 'settings', kind: 'secondary' },
   { section: 'act', href: '/app/act/', label: 'Act', icon: 'scroll-text', kind: 'primary' },
 ];
 
-export const MEMBER_TAB_BAR_ITEMS = MEMBER_NAV_ITEMS.filter((item) => item.kind !== 'secondary');
+export function getVisibleMemberNavItems({ isAdmin = false, includeSecondary = true } = {}) {
+  return MEMBER_NAV_ITEMS.filter((item) => {
+    if (!includeSecondary && item.kind === 'secondary') return false;
+    if (item.adminOnly && !isAdmin) return false;
+    return true;
+  });
+}
 
 function normalizePathname(pathname = '') {
   const stripped = String(pathname || '')
@@ -37,6 +44,7 @@ export function getPublicActiveSection(pathname = '/') {
 export function getMemberActiveSection(pathname = '/') {
   const normalized = normalizePathname(pathname);
 
+  if (normalized.startsWith('/admin')) return 'admin';
   if (normalized.startsWith('/app/team')) return 'team';
   if (normalized.startsWith('/app/leaderboard')) return 'leaderboard';
   if (

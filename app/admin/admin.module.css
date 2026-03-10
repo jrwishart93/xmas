@@ -1,0 +1,498 @@
+.shell {
+  min-height: 100vh;
+  padding: 32px 16px 72px;
+}
+
+.frame {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(141, 184, 255, 0.18), transparent 30%),
+    linear-gradient(160deg, rgba(13, 24, 40, 0.92), rgba(7, 13, 23, 0.9));
+  box-shadow: var(--shadow);
+}
+
+.headerTitle,
+.pageTitle {
+  margin: 0;
+  font-size: clamp(1.95rem, 4vw, 2.75rem);
+  line-height: 1.08;
+}
+
+.headerLead,
+.pageLead,
+.panelMeta,
+.metricMeta,
+.rowMeta {
+  color: var(--muted);
+}
+
+.headerLead,
+.pageLead {
+  max-width: 64ch;
+  margin: 12px 0 0;
+}
+
+.sessionCard {
+  display: grid;
+  gap: 4px;
+  min-width: 240px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sessionCard span {
+  color: var(--muted);
+}
+
+.sessionBadge,
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sessionBadge,
+.badgeAdmin {
+  background: rgba(215, 173, 91, 0.16);
+  border: 1px solid rgba(215, 173, 91, 0.26);
+  color: #f5d89f;
+}
+
+.badgeMember {
+  background: rgba(141, 184, 255, 0.12);
+  border: 1px solid rgba(141, 184, 255, 0.22);
+  color: #bfdaff;
+}
+
+.badgeDisabled {
+  background: rgba(219, 88, 88, 0.12);
+  border: 1px solid rgba(219, 88, 88, 0.24);
+  color: #ffb2b2;
+}
+
+.badgeLive {
+  background: rgba(91, 179, 121, 0.12);
+  border: 1px solid rgba(91, 179, 121, 0.24);
+  color: #a9efc0;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.navLink,
+.portalLink,
+.inlineLink {
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.navLink,
+.portalLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+}
+
+.navLink:hover,
+.navLinkActive,
+.portalLink:hover,
+.inlineLink:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.navLinkActive {
+  color: var(--text);
+  background: linear-gradient(180deg, rgba(141, 184, 255, 0.18), rgba(141, 184, 255, 0.08));
+}
+
+.portalLink {
+  margin-left: auto;
+}
+
+.navIcon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
+.content {
+  margin-top: 24px;
+}
+
+.pageStack {
+  display: grid;
+  gap: 20px;
+}
+
+.hero,
+.panel,
+.metricCard,
+.linkCard {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(10, 18, 30, 0.9), rgba(11, 20, 32, 0.84)),
+    rgba(255, 255, 255, 0.02);
+  box-shadow: var(--shadow);
+}
+
+.hero,
+.panel {
+  padding: 24px;
+}
+
+.metricGrid,
+.cardGrid,
+.dualGrid {
+  display: grid;
+  gap: 18px;
+}
+
+.metricGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.cardGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.dualGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.metricCard {
+  padding: 22px;
+}
+
+.metricLabel {
+  display: block;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.metricValue,
+.metricValueSmall {
+  display: block;
+  margin-top: 14px;
+  color: var(--text);
+}
+
+.metricValue {
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  line-height: 1;
+}
+
+.metricValueSmall {
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  line-height: 1.2;
+}
+
+.metricMeta {
+  margin: 12px 0 0;
+}
+
+.linkCard {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+}
+
+.linkCard h3 {
+  margin: 0;
+  font-size: 1.14rem;
+}
+
+.linkCard p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.linkCardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.iconBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: rgba(215, 173, 91, 0.14);
+  color: #f0d09a;
+}
+
+.iconBadge svg,
+.linkArrow {
+  width: 18px;
+  height: 18px;
+}
+
+.panelHead {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.panelHead h3 {
+  margin: 4px 0 0;
+  font-size: 1.25rem;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.inlineLink {
+  color: var(--cool-accent);
+}
+
+.activityCard,
+.noticeCard {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.activityCard strong,
+.noticeCard strong {
+  font-size: 1rem;
+}
+
+.activityCard p,
+.noticeCard p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.activityCard small,
+.noticeCard small {
+  color: rgba(188, 198, 217, 0.72);
+}
+
+.noticeList,
+.stack,
+.buttonRow,
+.actionGroup {
+  display: grid;
+  gap: 12px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.rowMeta,
+.panelMeta,
+.emptyState,
+.message {
+  font-size: 0.95rem;
+}
+
+.emptyState {
+  margin: 0;
+  color: var(--muted);
+}
+
+.formGrid {
+  display: grid;
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field span {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.input,
+.textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  padding: 14px 16px;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: rgba(141, 184, 255, 0.42);
+  box-shadow: 0 0 0 3px rgba(141, 184, 255, 0.14);
+}
+
+.primaryButton,
+.secondaryButton,
+.dangerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, var(--accent), #f0d09a);
+  color: #07111c;
+}
+
+.secondaryButton {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.dangerButton {
+  background: rgba(168, 62, 62, 0.18);
+  color: #ffd0d0;
+  border-color: rgba(168, 62, 62, 0.3);
+}
+
+.inlineForm {
+  margin: 0;
+}
+
+.message {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+}
+
+.messageSuccess {
+  color: #b7f1c8;
+  background: rgba(67, 159, 102, 0.14);
+  border-color: rgba(67, 159, 102, 0.24);
+}
+
+.messageError {
+  color: #ffc0c0;
+  background: rgba(168, 62, 62, 0.14);
+  border-color: rgba(168, 62, 62, 0.24);
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+@media (max-width: 1080px) {
+  .metricGrid,
+  .cardGrid,
+  .dualGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .shell {
+    padding: 20px 12px 64px;
+  }
+
+  .header {
+    grid-template-columns: 1fr;
+    padding: 22px;
+  }
+
+  .sessionCard {
+    min-width: 0;
+  }
+
+  .nav {
+    gap: 10px;
+  }
+
+  .portalLink {
+    margin-left: 0;
+  }
+
+  .metricGrid,
+  .cardGrid,
+  .dualGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .panelHead {
+    flex-direction: column;
+  }
+
+  .table th,
+  .table td {
+    min-width: 130px;
+  }
+}

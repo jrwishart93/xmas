@@ -188,6 +188,22 @@ function renderMemberPreview(members, currentUid) {
   });
 }
 
+function ensureAdminActionCard() {
+  const grid = document.querySelector('.dashboard-action-grid');
+  if (!grid || grid.querySelector('[data-admin-action-card]')) return;
+
+  const card = document.createElement('a');
+  card.href = '/admin/';
+  card.className = 'dashboard-action-card';
+  card.dataset.adminActionCard = 'true';
+  card.innerHTML = `
+    <i data-lucide="shield" class="icon"></i>
+    <strong>Admin Panel</strong>
+    <span>Open member controls, banking, and ledger tools.</span>
+  `;
+  grid.appendChild(card);
+}
+
 bootProtectedPage(async (ctx) => {
   const bankBalanceEl = document.getElementById('teamSocialFundBalance');
   const bankMetaEl = document.getElementById('teamSocialFundMeta');
@@ -201,6 +217,9 @@ bootProtectedPage(async (ctx) => {
   };
 
   updateIdentity(ctx);
+  if (isAdmin) {
+    ensureAdminActionCard();
+  }
 
   if (PREVIEW_MODE) {
     const members = previewMembers();

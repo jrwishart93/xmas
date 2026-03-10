@@ -16,12 +16,40 @@ import {
 } from '/firebase.js';
 import { TEAM_ID } from '/js/constants.js';
 
-function setSessionCookie() {
-  document.cookie = 'stf_session=1; path=/; max-age=2592000; samesite=lax';
+async function syncServerSession(user) {
+  const idToken = await user.getIdToken(true);
+  const response = await fetch('/api/auth/session', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${idToken}`,
+    },
+    credentials: 'same-origin',
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(payload.error || 'Unable to establish server session.');
+  }
 }
 
-function clearSessionCookie() {
+function clearLegacySessionCookie() {
   document.cookie = 'stf_session=; path=/; max-age=0; samesite=lax';
+}
+
+async function clearServerSession() {
+  clearLegacySessionCookie();
+  await fetch('/api/auth/session', {
+    method: 'DELETE',
+    credentials: 'same-origin',
+  }).catch(() => null);
+}
+
+async function syncServerSessionSafely(user) {
+  try {
+    await syncServerSession(user);
+  } catch (error) {
+    console.warn('Unable to sync the server session cookie.', error);
+  }
 }
 
 function appError(code, message) {
@@ -63,12 +91,23 @@ async function assertTeamMembership(user) {
   const membership = await getMembershipForUser(user.uid);
   if (!membership) {
     await signOut(auth);
-    clearSessionCookie();
+    await clearServerSession();
     throw appError(
       'app/team-membership-required',
       'Your account is not linked to this team fund. Use Sign Up with the team access code to join.'
     );
   }
+
+  if (membership.disabled === true) {
+    await signOut(auth);
+    await clearServerSession();
+    throw appError(
+      'app/team-membership-disabled',
+      'Your Team Social Fund access has been disabled by an administrator.'
+    );
+  }
+
+  await syncServerSessionSafely(user);
   return membership;
 }
 
@@ -109,7 +148,6 @@ export async function login(email, password, remember = true) {
   await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
   const credentials = await signInWithEmailAndPassword(auth, email, password);
   const membership = await assertTeamMembership(credentials.user);
-  setSessionCookie();
   return { user: credentials.user, membership };
 }
 
@@ -143,7 +181,7 @@ export async function register({ fullName, email, password, accessCode, remember
 
   try {
     const membership = await createMembershipForUser(credentials.user, fullName, accessCode);
-    setSessionCookie();
+    await syncServerSessionSafely(credentials.user);
     return { user: credentials.user, membership };
   } catch (error) {
     if (createdNewUser) {
@@ -151,7 +189,7 @@ export async function register({ fullName, email, password, accessCode, remember
     } else {
       await signOut(auth).catch(() => null);
     }
-    clearSessionCookie();
+    await clearServerSession();
     throw error;
   }
 }
@@ -164,7 +202,7 @@ export async function logout() {
   try {
     await signOut(auth);
   } finally {
-    clearSessionCookie();
+    await clearServerSession();
   }
 }
 

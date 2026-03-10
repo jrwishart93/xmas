@@ -53,6 +53,7 @@ export async function POST(request: Request) {
     displayName,
     email,
     role: 'member',
+    disabled: false,
     createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),
   });

@@ -1,6 +1,6 @@
 import { logout, requireAuth } from '/js/auth.js';
 import { PREVIEW_MODE, UNDER_CONSTRUCTION_PATH } from '/js/config.js';
-import { MEMBER_NAV_ITEMS, MEMBER_TAB_BAR_ITEMS, getMemberActiveSection } from '/js/nav-config.js';
+import { getMemberActiveSection, getVisibleMemberNavItems } from '/js/nav-config.js';
 
 function escapeHtml(value = '') {
   return String(value).replace(/[&<>"']/g, (character) => {
@@ -61,6 +61,10 @@ function buildNavLink(item, activeSection) {
   `;
 }
 
+function isAdminUser(ctx) {
+  return String(ctx?.membership?.role || '').toLowerCase() === 'admin';
+}
+
 function buildLogoutLink() {
   return `
     <a href="#" id="logoutLink" class="nav-link nav-link--secondary nav-link--logout" data-nav-kind="secondary">
@@ -110,9 +114,10 @@ function ensureAppNavMeta(headerRow) {
   return { nav, meta };
 }
 
-function renderDesktopNav(nav, activeSection) {
+function renderDesktopNav(nav, activeSection, ctx) {
   if (!nav) return;
-  nav.innerHTML = `${MEMBER_NAV_ITEMS.map((item) => buildNavLink(item, activeSection)).join('')}${buildLogoutLink()}`;
+  const items = getVisibleMemberNavItems({ isAdmin: isAdminUser(ctx) });
+  nav.innerHTML = `${items.map((item) => buildNavLink(item, activeSection)).join('')}${buildLogoutLink()}`;
 }
 
 function renderSessionPill(meta, ctx) {
@@ -140,7 +145,7 @@ function renderSessionPill(meta, ctx) {
   `;
 }
 
-function renderTabBar(activeSection) {
+function renderTabBar(activeSection, ctx) {
   let tabBar = document.querySelector('.app-tabbar');
   if (!tabBar) {
     tabBar = document.createElement('nav');
@@ -149,7 +154,8 @@ function renderTabBar(activeSection) {
     document.body.appendChild(tabBar);
   }
 
-  tabBar.innerHTML = MEMBER_TAB_BAR_ITEMS.map((item) => {
+  const items = getVisibleMemberNavItems({ isAdmin: isAdminUser(ctx), includeSecondary: false });
+  tabBar.innerHTML = items.map((item) => {
     const current = item.section === activeSection ? ' aria-current="page"' : '';
     return `
       <a href="${item.href}" class="app-tabbar-link" data-app-section="${item.section}"${current}>
@@ -189,9 +195,9 @@ function enhanceProtectedChrome(ctx) {
   brand?.classList.add('app-page-title');
   decorateProtectedTitle(brand);
 
-  renderDesktopNav(nav, activeSection);
+  renderDesktopNav(nav, activeSection, ctx);
   renderSessionPill(meta, ctx);
-  renderTabBar(activeSection);
+  renderTabBar(activeSection, ctx);
   wireLogoutLink();
 }
 

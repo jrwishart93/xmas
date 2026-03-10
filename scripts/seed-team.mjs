@@ -14,6 +14,8 @@ const db = getFirestore(app);
 await db.doc('teams/rpu-social-fund').set({
   name: 'RPU Social Fund',
   moneyBalancePence: 0,
+  confirmedBalancePence: 0,
+  pendingBalancePence: 0,
   createdAt: FieldValue.serverTimestamp(),
 }, { merge: true });
 
