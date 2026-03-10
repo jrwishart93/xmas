@@ -6,7 +6,7 @@
     "dev": "npm run sync:legacy && next dev",
     "sync:legacy": "node scripts/sync-legacy-static.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "vercel-build": "npm run sync:legacy && npm run typecheck && next build && tsc -p tsconfig.server.json"
+    "vercel-build": "npm run sync:legacy && npm run typecheck && next build"
   },
   "dependencies": {
     "firebase": "^12.10.0",
