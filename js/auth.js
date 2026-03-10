@@ -161,8 +161,11 @@ export async function requestPasswordReset(email) {
 }
 
 export async function logout() {
-  clearSessionCookie();
-  await signOut(auth);
+  try {
+    await signOut(auth);
+  } finally {
+    clearSessionCookie();
+  }
 }
 
 export { assertTeamMembership };
