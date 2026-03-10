@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Team Directory</title>
+  <link rel="stylesheet" href="/styles/main.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="site-shell header-row">
+    <p class="brand">Team Directory</p>
+    <div class="app-nav-meta">
+      <nav aria-label="App navigation" class="site-nav">
+        <a href="/app/dashboard/" class="nav-link"><i data-lucide="bar-chart-3" class="icon"></i>Dashboard</a>
+        <a href="/app/leaderboard/" class="nav-link"><i data-lucide="trophy" class="icon"></i>Leaderboard</a>
+        <a href="/app/issue/" class="nav-link"><i data-lucide="gavel" class="icon"></i>Issue</a>
+        <a href="/app/act/" class="nav-link"><i data-lucide="scroll-text" class="icon"></i>Act</a>
+        <a href="#" id="logoutLink" class="nav-link"><i data-lucide="x-circle" class="icon"></i>Logout</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main class="site-shell with-fixed-header">
+  <section class="card glass-panel fade-in p-responsive team-page-hero">
+    <div class="team-page-hero__copy">
+      <p class="eyebrow">Connected Team</p>
+      <h1>See everyone in the fund</h1>
+      <p class="dashboard-lead">Search team members, confirm roles, and keep the directory readable on mobile.</p>
+    </div>
+    <label class="team-search-field">
+      <span>Search directory</span>
+      <input id="teamSearchInput" type="search" placeholder="Search by name, role, or email" autocomplete="off" />
+    </label>
+  </section>
+
+  <section class="dashboard-kpi-grid team-stats-grid">
+    <article class="card p-responsive dashboard-kpi-card">
+      <p class="eyebrow">Directory Size</p>
+      <p class="metric" id="teamTotalCount">0</p>
+      <p class="muted">Active team members in the fund.</p>
+    </article>
+
+    <article class="card p-responsive dashboard-kpi-card">
+      <p class="eyebrow">Admins</p>
+      <p class="metric" id="teamAdminCount">0</p>
+      <p class="muted">Members who can manage court outcomes.</p>
+    </article>
+
+    <article class="card p-responsive dashboard-kpi-card">
+      <p class="eyebrow">Your Access</p>
+      <p class="metric" id="teamCurrentRole">Member</p>
+      <p class="muted" id="teamCurrentIdentity">Signed-in account</p>
+    </article>
+  </section>
+
+  <section class="card p-responsive">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">Live Directory</p>
+        <h2 class="section-header"><i data-lucide="users" class="icon"></i>Team Members</h2>
+      </div>
+      <p id="teamDirectoryMeta" class="muted">Loading team members...</p>
+    </div>
+    <div id="teamDirectory" class="member-list-grid"></div>
+    <p id="teamDirectoryEmpty" class="member-empty-state" hidden>No team members match that search yet.</p>
+  </section>
+</main>
+
+<script type="module" src="/js/team-page.js"></script>
+</body>
+</html>

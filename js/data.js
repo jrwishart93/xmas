@@ -51,6 +51,18 @@ export async function getMembers() {
   return users;
 }
 
+export function subscribeMembers(onData) {
+  return onSnapshot(membersRef(), (snap) => {
+    const members = snap.docs.map((docSnap) => ({ uid: docSnap.id, ...docSnap.data() }));
+    members.sort((left, right) => {
+      const leftName = String(left.displayName || left.email || left.uid).toLowerCase();
+      const rightName = String(right.displayName || right.email || right.uid).toLowerCase();
+      return leftName.localeCompare(rightName);
+    });
+    onData(members);
+  });
+}
+
 export async function createScn({
   issuedByUserId,
   accusedUserId,

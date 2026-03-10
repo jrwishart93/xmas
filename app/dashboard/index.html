@@ -10,7 +10,7 @@
 <body>
 <header class="site-header">
   <div class="site-shell header-row">
-    <p class="brand">Judicial Dashboard</p>
+    <p class="brand">Team Social Fund</p>
     <div class="app-nav-meta">
       <nav aria-label="App navigation" class="site-nav">
         <a href="/app/dashboard/" class="nav-link" aria-current="page"><i data-lucide="bar-chart-3" class="icon"></i>Dashboard</a>
@@ -27,52 +27,147 @@
 </header>
 
 <main class="site-shell with-fixed-header">
-  <section class="card glass-panel fade-in p-responsive">
-    <p class="eyebrow">Overview</p>
-    <h1>Operational Dashboard</h1>
-    <p class="muted">Track confirmed and pending balances, monitor outstanding contributions, and issue new notices.</p>
+  <section class="card glass-panel fade-in p-responsive dashboard-hero">
+    <div class="dashboard-hero-copy">
+      <p class="eyebrow">Mobile Command Centre</p>
+      <h1 id="dashboardGreeting">Welcome back</h1>
+      <p id="dashboardIdentity" class="dashboard-lead">Your team fund overview is loading.</p>
+      <div class="dashboard-status-strip">
+        <span class="status-chip"><i data-lucide="shield-check" class="icon"></i><span id="dashboardStatusText">Verifying secure session...</span></span>
+        <span class="status-chip"><i data-lucide="users" class="icon"></i><span id="dashboardMemberCount">Loading members...</span></span>
+        <span class="status-chip"><i data-lucide="clock-3" class="icon"></i><span>Late penalty doubles after 3 days</span></span>
+      </div>
+    </div>
+
+    <aside class="dashboard-identity-card">
+      <p class="eyebrow">Signed In</p>
+      <div class="dashboard-user-card">
+        <span class="dashboard-user-avatar" id="dashboardAvatar">TS</span>
+        <div>
+          <h2 id="dashboardUserName">Team Member</h2>
+          <p id="dashboardEmail" class="muted">Loading account...</p>
+        </div>
+      </div>
+      <div class="dashboard-role-row">
+        <span class="badge badge-strong" id="dashboardRoleBadge">Member</span>
+        <span class="muted">Team access active</span>
+      </div>
+    </aside>
   </section>
 
-  <section class="dashboard-grid content-grid">
-    <article class="card stat-card p-responsive" id="teamSocialFundCard">
-      <h2 class="section-header"><i data-lucide="landmark" class="icon"></i>Team Social Fund</h2>
+  <section class="dashboard-kpi-grid">
+    <article class="card stat-card p-responsive dashboard-kpi-card dashboard-kpi-card--feature" id="teamSocialFundCard">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Linked Account</p>
+          <h2 class="section-header"><i data-lucide="landmark" class="icon"></i>Team Social Fund</h2>
+        </div>
+      </div>
       <p id="teamSocialFundBalance" class="metric">£0.00</p>
-      <p id="teamSocialFundMeta" class="muted">Checking bank connection…</p>
+      <p id="teamSocialFundMeta" class="muted">Checking bank connection...</p>
       <div class="actions">
         <button type="button" id="connectBankBtn" class="btn btn-responsive" hidden><i data-lucide="link" class="icon icon-btn"></i>Connect Bank</button>
         <button type="button" id="refreshBankBalanceBtn" class="btn secondary btn-responsive"><i data-lucide="refresh-cw" class="icon icon-btn"></i>Refresh Balance</button>
       </div>
     </article>
 
-    <article class="card stat-card p-responsive">
+    <article class="card stat-card p-responsive dashboard-kpi-card">
+      <p class="eyebrow">Fund Position</p>
       <h2 class="section-header"><i data-lucide="wallet" class="icon"></i>Confirmed Balance</h2>
       <p id="confirmedTotal" class="metric">£0.00</p>
       <p class="muted">Available in team fund.</p>
     </article>
 
-    <article class="card stat-card p-responsive">
+    <article class="card stat-card p-responsive dashboard-kpi-card">
+      <p class="eyebrow">Awaiting Payment</p>
       <h2 class="section-header"><i data-lucide="clock-3" class="icon"></i>Pending Contributions</h2>
       <p id="pendingTotal" class="metric">£0.00</p>
       <p class="muted">Awaiting payment confirmation.</p>
     </article>
 
-    <article class="card p-responsive">
+    <article class="card p-responsive dashboard-kpi-card">
+      <p class="eyebrow">Your Queue</p>
       <h2 class="section-header"><i data-lucide="alert-triangle" class="icon"></i>Outstanding Contributions</h2>
       <p id="outstandingCount" class="metric">0</p>
       <p class="muted">Unpaid SCNs assigned to you.</p>
     </article>
+  </section>
 
+  <section class="dashboard-content-grid">
     <article class="card p-responsive">
-      <h2 class="section-header"><i data-lucide="scroll-text" class="icon"></i>Leaderboard (Live)</h2>
-      <ul id="recentFindings" class="list-clean"></ul>
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Shortcuts</p>
+          <h2 class="section-header"><i data-lucide="rocket" class="icon"></i>Quick Actions</h2>
+        </div>
+      </div>
+      <div class="dashboard-action-grid">
+        <a href="/app/issue/" class="dashboard-action-card" data-preview-gate>
+          <i data-lucide="plus-circle" class="icon"></i>
+          <strong>Issue SCN</strong>
+          <span>Raise a new notice in seconds.</span>
+        </a>
+        <a href="/app/team/" class="dashboard-action-card">
+          <i data-lucide="users" class="icon"></i>
+          <strong>Team Directory</strong>
+          <span>See the full team and role detail.</span>
+        </a>
+        <a href="/app/leaderboard/" class="dashboard-action-card">
+          <i data-lucide="trophy" class="icon"></i>
+          <strong>Leaderboard</strong>
+          <span>Check recent standings and totals.</span>
+        </a>
+        <a href="/app/act/" class="dashboard-action-card" data-preview-gate>
+          <i data-lucide="scroll-text" class="icon"></i>
+          <strong>Read the Act</strong>
+          <span>Open the current clauses and amounts.</span>
+        </a>
+      </div>
     </article>
 
     <article class="card p-responsive">
-      <h2 class="section-header"><i data-lucide="gavel" class="icon"></i>Quick Actions</h2>
-      <div class="actions">
-        <a href="/app/issue/" class="btn btn-responsive" data-preview-gate><i data-lucide="check-circle-2" class="icon icon-btn"></i>Issue SCN</a>
-        <a href="/app/issue/" class="btn secondary btn-responsive" data-preview-gate><i data-lucide="bar-chart-3" class="icon icon-btn"></i>Review Cases</a>
-        <a href="/app/act/" class="btn secondary btn-responsive" data-preview-gate><i data-lucide="file-pen-line" class="icon icon-btn"></i>Amend Act</a>
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Live Ranking</p>
+          <h2 class="section-header"><i data-lucide="trophy" class="icon"></i>Leaderboard Snapshot</h2>
+        </div>
+        <a href="/app/leaderboard/" class="btn secondary">Open</a>
+      </div>
+      <ul id="recentFindings" class="list-clean leaderboard-mini-list"></ul>
+    </article>
+
+    <article class="card p-responsive">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Directory</p>
+          <h2 class="section-header"><i data-lucide="users" class="icon"></i>Team Members</h2>
+        </div>
+        <a href="/app/team/" class="btn secondary">View All</a>
+      </div>
+      <p id="teamMembersMeta" class="muted">Loading team members...</p>
+      <div id="teamMembersList" class="member-list-grid member-list-grid--compact"></div>
+    </article>
+
+    <article class="card p-responsive">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Workflow</p>
+          <h2 class="section-header"><i data-lucide="gavel" class="icon"></i>How This Works</h2>
+        </div>
+      </div>
+      <div class="dashboard-stack">
+        <div class="dashboard-step">
+          <strong>1. Issue or confess</strong>
+          <span>Create an SCN against yourself or another team member.</span>
+        </div>
+        <div class="dashboard-step">
+          <strong>2. Resolve it fast</strong>
+          <span>Pay within 3 days to avoid the automatic late penalty.</span>
+        </div>
+        <div class="dashboard-step">
+          <strong>3. Track the fund</strong>
+          <span>Monitor live balances, rankings, and contributions from one place.</span>
+        </div>
       </div>
     </article>
   </section>
