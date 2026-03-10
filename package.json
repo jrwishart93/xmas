@@ -1,8 +1,10 @@
 {
   "scripts": {
     "build": "npm run vercel-build",
+    "build:app": "next build",
     "check:client-secrets": "sh -c 'if rg -n \"TRUELAYER_CLIENT_SECRET|TRUELAYER_SIGNING_PRIVATE_KEY|FIREBASE_PRIVATE_KEY\" js app components lib --glob \"!app/api/**\"; then echo \"Potential secret reference found in client paths.\" && exit 1; else echo \"No client secret references found.\"; fi'",
-    "vercel-build": "tsc -p tsconfig.server.json && node -e \"console.log('Static site build: no asset compilation required.')\""
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "vercel-build": "npm run typecheck && tsc -p tsconfig.server.json && node -e \"console.log('Server routes compiled and app code typechecked.')\""
   },
   "dependencies": {
     "firebase": "^12.10.0",
@@ -17,6 +19,8 @@
   },
   "devDependencies": {
     "@types/node": "^24.5.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "typescript": "^5.9.3"
   }
 }

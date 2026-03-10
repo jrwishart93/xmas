@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
-import { adminDb } from '../_lib/firebaseAdmin';
+import { getAdminDb } from '../_lib/firebaseAdmin';
 import { getScnPaymentBreakdown } from '../_lib/scnAmount';
 import { verifyTrueLayerWebhookSignature } from '../_lib/truelayer';
 
@@ -20,6 +20,7 @@ function getEventType(payload: TrueLayerWebhookPayload): string {
 }
 
 export async function POST(request: Request) {
+  const adminDb = getAdminDb();
   const rawBody = await request.text();
 
   try {

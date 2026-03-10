@@ -1,16 +1,6 @@
 import { logout, requireAuth } from '/js/auth.js';
 import { PREVIEW_MODE, UNDER_CONSTRUCTION_PATH } from '/js/config.js';
-
-const HEADER_NAV_ITEMS = [
-  { section: 'dashboard', href: '/app/dashboard/', label: 'Dashboard', icon: 'bar-chart-3' },
-  { section: 'team', href: '/app/team/', label: 'Team', icon: 'users' },
-  { section: 'cases', href: '/app/issue/', label: 'Cases', icon: 'gavel' },
-  { section: 'leaderboard', href: '/app/leaderboard/', label: 'Leaderboard', icon: 'trophy' },
-  { section: 'disbursements', href: '/app/disbursements/', label: 'Disburse', icon: 'wallet', previewRoute: true },
-  { section: 'act', href: '/app/act/', label: 'Act', icon: 'scroll-text' },
-];
-
-const TAB_BAR_ITEMS = HEADER_NAV_ITEMS.filter((item) => item.section !== 'disbursements');
+import { MEMBER_NAV_ITEMS, MEMBER_TAB_BAR_ITEMS, getMemberActiveSection } from '/js/nav-config.js';
 
 function escapeHtml(value = '') {
   return String(value).replace(/[&<>"']/g, (character) => {
@@ -23,15 +13,6 @@ function escapeHtml(value = '') {
     };
     return entities[character] || character;
   });
-}
-
-function getActiveSection(pathname = window.location.pathname) {
-  if (pathname.startsWith('/app/team/')) return 'team';
-  if (pathname.startsWith('/app/leaderboard/')) return 'leaderboard';
-  if (pathname.startsWith('/app/issue/') || pathname.startsWith('/app/cases/') || pathname.startsWith('/app/scn/')) return 'cases';
-  if (pathname.startsWith('/app/disbursements/')) return 'disbursements';
-  if (pathname.startsWith('/app/act/')) return 'act';
-  return 'dashboard';
 }
 
 function formatRoleLabel(role = 'member') {
@@ -72,8 +53,9 @@ function getSessionInitials(name, fallback = 'TS') {
 function buildNavLink(item, activeSection) {
   const current = item.section === activeSection ? ' aria-current="page"' : '';
   const previewRoute = item.previewRoute ? ' data-preview-route' : '';
+  const kind = item.kind || 'primary';
   return `
-    <a href="${item.href}" class="nav-link" data-app-section="${item.section}"${current}${previewRoute}>
+    <a href="${item.href}" class="nav-link nav-link--${kind}" data-app-section="${item.section}" data-nav-kind="${kind}"${current}${previewRoute}>
       <i data-lucide="${item.icon}" class="icon"></i>${item.label}
     </a>
   `;
@@ -81,7 +63,7 @@ function buildNavLink(item, activeSection) {
 
 function buildLogoutLink() {
   return `
-    <a href="#" id="logoutLink" class="nav-link nav-link--logout">
+    <a href="#" id="logoutLink" class="nav-link nav-link--secondary nav-link--logout" data-nav-kind="secondary">
       <i data-lucide="log-out" class="icon"></i>Logout
     </a>
   `;
@@ -130,7 +112,7 @@ function ensureAppNavMeta(headerRow) {
 
 function renderDesktopNav(nav, activeSection) {
   if (!nav) return;
-  nav.innerHTML = `${HEADER_NAV_ITEMS.map((item) => buildNavLink(item, activeSection)).join('')}${buildLogoutLink()}`;
+  nav.innerHTML = `${MEMBER_NAV_ITEMS.map((item) => buildNavLink(item, activeSection)).join('')}${buildLogoutLink()}`;
 }
 
 function renderSessionPill(meta, ctx) {
@@ -167,7 +149,7 @@ function renderTabBar(activeSection) {
     document.body.appendChild(tabBar);
   }
 
-  tabBar.innerHTML = TAB_BAR_ITEMS.map((item) => {
+  tabBar.innerHTML = MEMBER_TAB_BAR_ITEMS.map((item) => {
     const current = item.section === activeSection ? ' aria-current="page"' : '';
     return `
       <a href="${item.href}" class="app-tabbar-link" data-app-section="${item.section}"${current}>
@@ -179,7 +161,7 @@ function renderTabBar(activeSection) {
 }
 
 function enhanceProtectedChrome(ctx) {
-  const activeSection = getActiveSection();
+  const activeSection = getMemberActiveSection() || 'dashboard';
   const header = document.querySelector('.site-header');
   const headerRow = header?.querySelector('.header-row') || header?.querySelector('.site-shell');
   const main = document.querySelector('main');

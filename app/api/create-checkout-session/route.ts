@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
-import { adminAuth, adminDb } from '../_lib/firebaseAdmin';
+import { getAdminAuth, getAdminDb } from '../_lib/firebaseAdmin';
 import { getScnPaymentBreakdown } from '../_lib/scnAmount';
 import { createHostedPayment, getPaymentDisplayConfig, getTrueLayerPaymentConfigError } from '../_lib/truelayer';
 
@@ -12,6 +12,8 @@ function buildBeneficiaryReference(scnId: string, uid: string): string {
 }
 
 export async function POST(request: Request) {
+  const adminAuth = getAdminAuth();
+  const adminDb = getAdminDb();
   const configError = getTrueLayerPaymentConfigError();
   if (configError) {
     return NextResponse.json({ error: configError }, { status: 500 });

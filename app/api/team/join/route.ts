@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
-import { adminAuth, adminDb } from '../../_lib/firebaseAdmin';
+import { getAdminAuth, getAdminDb } from '../../_lib/firebaseAdmin';
 
 const DEFAULT_TEAM_SIGNUP_PASSCODE = 'TEAM2FETTES!';
 
@@ -17,6 +17,8 @@ function normalizeDisplayName(value: unknown, fallback: string): string {
 }
 
 export async function POST(request: Request) {
+  const adminAuth = getAdminAuth();
+  const adminDb = getAdminDb();
   const authHeader = request.headers.get('authorization') || '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
   if (!token) {

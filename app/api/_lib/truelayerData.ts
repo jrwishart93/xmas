@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { FieldValue } from 'firebase-admin/firestore';
-import { adminDb } from './firebaseAdmin';
+import { getAdminDb } from './firebaseAdmin';
 
 const AUTH_API = 'https://auth.truelayer.com';
 const EXPECTED_REDIRECT_URI = 'https://team-sigma-three.vercel.app/api/truelayer/callback';
@@ -92,11 +92,11 @@ function parseErrorMessage(payload: unknown, fallback: string): string {
 }
 
 function integrationRef(teamId: string) {
-  return adminDb.doc(`teams/${teamId}/integrations/truelayer`);
+  return getAdminDb().doc(`teams/${teamId}/integrations/truelayer`);
 }
 
 function oauthStateRef(state: string) {
-  return adminDb.doc(`truelayer_oauth_states/${state}`);
+  return getAdminDb().doc(`truelayer_oauth_states/${state}`);
 }
 
 export function getTrueLayerDataConfigError(): string | null {
@@ -288,6 +288,7 @@ export async function consumeOAuthCallback(params: {
 }): Promise<{ teamId: string }> {
   const config = getTrueLayerDataConfigOrThrow();
   const now = Date.now();
+  const adminDb = getAdminDb();
 
   const stateDocRef = oauthStateRef(params.state);
   const stateRecord = await adminDb.runTransaction(async (tx) => {

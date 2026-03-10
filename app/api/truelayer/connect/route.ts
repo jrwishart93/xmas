@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
-import { adminAuth, adminDb } from '../../_lib/firebaseAdmin';
+import { getAdminAuth, getAdminDb } from '../../_lib/firebaseAdmin';
 import { createConsentUrl, getTrueLayerDataConfigError, TrueLayerDataError } from '../../_lib/truelayerData';
 
 export async function GET(request: Request) {
+  const adminAuth = getAdminAuth();
+  const adminDb = getAdminDb();
   const configError = getTrueLayerDataConfigError();
   if (configError) {
     return NextResponse.json({ code: 'missing_config', error: configError }, { status: 500 });

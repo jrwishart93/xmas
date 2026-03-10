@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
-import { adminAuth, adminDb } from '../../_lib/firebaseAdmin';
+import { getAdminAuth, getAdminDb } from '../../_lib/firebaseAdmin';
 import { getScnPaymentBreakdown } from '../../_lib/scnAmount';
 
 type SetPaymentMethodBody = {
@@ -16,6 +16,8 @@ function normalizeBankReference(value: unknown): string | null {
 }
 
 export async function POST(request: Request) {
+  const adminAuth = getAdminAuth();
+  const adminDb = getAdminDb();
   const authHeader = request.headers.get('authorization') || '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
   if (!token) return NextResponse.json({ error: 'Missing ID token.' }, { status: 401 });

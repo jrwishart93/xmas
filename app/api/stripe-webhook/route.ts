@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
-import { adminDb } from '../_lib/firebaseAdmin';
+import { getAdminDb } from '../_lib/firebaseAdmin';
 import { getScnPaymentBreakdown } from '../_lib/scnAmount';
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
@@ -29,6 +29,7 @@ async function fetchCheckoutSession(sessionId: string) {
 }
 
 export async function POST(request: Request) {
+  const adminDb = getAdminDb();
   if (!STRIPE_SECRET_KEY || !STRIPE_WEBHOOK_SECRET) {
     return NextResponse.json({ error: 'Stripe webhook is not configured.' }, { status: 500 });
   }

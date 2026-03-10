@@ -1,40 +1,41 @@
 "use client";
 
 import Link from "next/link";
-import { Home, BookOpen, LayoutDashboard, User } from "lucide-react";
+import { Scale, ScrollText, User } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-const tabs = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/act", label: "The Act", icon: BookOpen },
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/login", label: "Account", icon: User },
-];
+import styles from "@/app/components/MobileNav.module.css";
+import { PUBLIC_NAV_ITEMS, getPublicActiveSection } from "@/js/nav-config.js";
 
-export default function MobileNav() {
+const ICONS = {
+  scale: Scale,
+  "scroll-text": ScrollText,
+  user: User,
+};
+
+type MobileNavProps = {
+  active?: string | null;
+};
+
+export default function MobileNav({ active }: MobileNavProps) {
   const pathname = usePathname();
+  const activeSection = active ?? getPublicActiveSection(pathname);
 
   return (
-    <nav
-      className="fixed inset-x-0 bottom-0 z-[1000] flex h-[70px] items-center justify-around border-t border-white/10 bg-[rgba(10,15,30,0.8)] pb-[env(safe-area-inset-bottom)] backdrop-blur-[14px] md:hidden"
-      aria-label="Mobile"
-    >
-      {tabs.map((tab) => {
-        const Icon = tab.icon;
-        const active =
-          pathname === tab.href ||
-          (tab.href !== "/" && pathname.startsWith(`${tab.href}/`));
+    <nav className={styles.nav} aria-label="Mobile primary navigation">
+      {PUBLIC_NAV_ITEMS.map((item) => {
+        const Icon = ICONS[item.icon];
+        const isActive = item.id === activeSection;
 
         return (
           <Link
-            key={tab.href}
-            href={tab.href}
-            className={`flex flex-col items-center gap-1 text-[11px] transition-colors ${
-              active ? "text-white" : "text-white/60"
-            }`}
+            key={item.id}
+            href={item.href}
+            className={`${styles.link} ${isActive ? styles.linkActive : ""}`}
+            aria-current={isActive ? "page" : undefined}
           >
-            <Icon size={22} className="opacity-90" />
-            <span>{tab.label}</span>
+            <Icon className={styles.linkIcon} strokeWidth={1.8} />
+            <span className={styles.label}>{item.label}</span>
           </Link>
         );
       })}
