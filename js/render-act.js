@@ -40,6 +40,7 @@ export function renderAct(container, act) {
   searchWrap.innerHTML = `
     <label class="act-search-label" for="actSearchInput">Search the Act</label>
     <input id="actSearchInput" class="act-search-input" type="search" placeholder="Try section code, title, or clause text" autocomplete="off" />
+    <p class="muted">Contributions are shown in whole pounds (£). Any unpaid notice after 3 days is automatically doubled.</p>
   `;
   frame.appendChild(searchWrap);
 
@@ -98,8 +99,7 @@ export function renderAct(container, act) {
             <code>${section.code}</code>
             <strong>${section.title}</strong>
           </div>
-          <p><strong>Contribution:</strong> £${Number(section.amountGBP || 0).toFixed(0)} <span class="muted">(${Number(section.amountPence || 0)}p)</span></p>
-          <p class="muted">Late penalty: x${Number(section.latePenaltyMultiplier || 2)} after ${Number(section.latePenaltyAfterDays || 3)} days.</p>
+          <p><strong>Contribution:</strong> £${Number(section.amountGBP || 0).toFixed(0)}</p>
           <p>${section.description}</p>
         `;
         details.appendChild(article);
