@@ -1901,6 +1901,7 @@ h3,
   }
 
   .protected-app .site-nav {
+    display: none;
     border-radius: 18px;
     background: rgba(7, 12, 24, 0.92);
   }
