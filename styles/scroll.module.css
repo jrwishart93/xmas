@@ -115,15 +115,45 @@
 
 @media (max-width: 768px) {
   .actPage {
-    padding: 36px 12px;
+    padding: 28px 10px;
   }
 
   .middle {
-    padding: 40px 25px;
+    padding: 36px 20px;
   }
 
   .top,
   .bottom {
     height: 110px;
+  }
+}
+
+@media (max-width: 480px) {
+  .actPage {
+    padding: 16px 6px;
+  }
+
+  .middle {
+    padding: 28px 14px;
+  }
+
+  .top,
+  .bottom {
+    height: 80px;
+  }
+}
+
+.fadeIn {
+  animation: fadeInChapter 0.22s ease-out both;
+}
+
+@keyframes fadeInChapter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

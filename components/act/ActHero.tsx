@@ -5,7 +5,7 @@ import OpenBook from "@/app/images/Open-book.png";
 
 export default function ActHero() {
   return (
-    <section className="relative min-h-[460px] w-full overflow-hidden border-b border-[#cfbe9d]/70 bg-[#2d2517] md:min-h-[560px]">
+    <section className="relative min-h-[300px] w-full overflow-hidden border-b border-[#cfbe9d]/70 bg-[#2d2517] sm:min-h-[380px] md:min-h-[480px]">
       <div className="absolute inset-0">
         <Image
           src={OpenBook}
@@ -18,12 +18,12 @@ export default function ActHero() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(249,239,214,0.38),transparent_45%),linear-gradient(to_bottom,rgba(23,17,8,0.88),rgba(44,32,18,0.72),#f4efdf)]" />
       </div>
 
-      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-center px-6 py-20 text-[#f6f0e0] md:px-10">
+      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-center px-5 py-10 text-[#f6f0e0] sm:py-14 md:px-10 md:py-20">
         <p className="mb-3 w-fit border border-[#d6bf8b]/70 bg-[#271f13]/70 px-4 py-1 text-xs uppercase tracking-[0.22em] text-[#e8d4ad]">
           Statute Register
         </p>
 
-        <h1 className="max-w-3xl text-4xl leading-tight tracking-[0.02em] md:text-6xl" style={{ fontFamily: "var(--font-playfair)" }}>
+        <h1 className="max-w-3xl text-3xl leading-tight tracking-[0.02em] sm:text-4xl md:text-6xl" style={{ fontFamily: "var(--font-playfair)" }}>
           The Summary Justice (Social Contributions) Act 2025
         </h1>
 

@@ -114,7 +114,7 @@ export default function ActPart() {
         const isOpen = open[part.id] ?? true;
 
         return (
-          <section key={part.id} id={part.id} className="mb-10 scroll-mt-24">
+          <section key={part.id} id={part.id} className="mb-10 scroll-mt-20">
             <button
               onClick={() => setOpen((previous) => ({ ...previous, [part.id]: !isOpen }))}
               className="w-full rounded-sm bg-[#f4ead4] px-3 py-3 text-left"

@@ -6,7 +6,7 @@ import HeroImage from "@/app/images/Hero-book-hammer.png";
 export default function HomePage() {
   return (
     <main className="relative z-0 text-neutral-100">
-      <section className="relative h-[60vh] w-full overflow-hidden md:h-[70vh]">
+      <section className="relative h-[60vh] min-h-[400px] w-full overflow-hidden md:h-[70vh] md:min-h-[500px]">
         <Image
           src={HeroImage}
           alt="Summary Justice Act Book"

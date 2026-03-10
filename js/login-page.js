@@ -16,6 +16,32 @@ let authSubmissionInFlight = false;
 
 initMobileNav();
 
+// ── Access-code field: force uppercase + show/hide toggle ──────────────────
+const accessCodeInput = document.querySelector('#signup-access-code');
+const codeToggle      = document.querySelector('[data-code-toggle]');
+const eyeIcon         = document.querySelector('[data-eye-icon]');
+const eyeOffIcon      = document.querySelector('[data-eye-off-icon]');
+
+if (accessCodeInput) {
+  accessCodeInput.addEventListener('input', () => {
+    const pos = accessCodeInput.selectionStart;
+    accessCodeInput.value = accessCodeInput.value.toUpperCase();
+    accessCodeInput.setSelectionRange(pos, pos);
+  });
+}
+
+if (codeToggle && accessCodeInput) {
+  codeToggle.addEventListener('click', () => {
+    const visible = accessCodeInput.type === 'text';
+    accessCodeInput.type = visible ? 'password' : 'text';
+    codeToggle.setAttribute('aria-label', visible ? 'Show access code' : 'Hide access code');
+    eyeIcon?.toggleAttribute('hidden', !visible);
+    eyeOffIcon?.toggleAttribute('hidden', visible);
+    accessCodeInput.focus();
+  });
+}
+// ───────────────────────────────────────────────────────────────────────────
+
 function setStatus(message = '', type = 'info') {
   formStateMessage.textContent = message;
   formStateMessage.dataset.state = type;
@@ -129,7 +155,7 @@ signUpForm.addEventListener('submit', async (event) => {
   const email = String(formData.get('email') || '').trim().toLowerCase();
   const password = String(formData.get('password') || '');
   const confirmPassword = String(formData.get('confirmPassword') || '');
-  const accessCode = String(formData.get('accessCode') || '').trim();
+  const accessCode = String(formData.get('accessCode') || '').trim().toUpperCase();
   const remember = formData.get('remember') === 'on';
 
   if (!fullName || !email || !password || !confirmPassword || !accessCode) {

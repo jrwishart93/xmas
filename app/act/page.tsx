@@ -1,7 +1,6 @@
+import { Suspense } from "react";
 import ActHero from "@/components/act/ActHero";
-import ActSearch from "@/components/act/ActSearch";
-import ActSidebar from "@/components/act/ActSidebar";
-import ActPart from "@/components/act/ActPart";
+import ActBook from "@/components/act/ActBook";
 import ScrollLayout from "@/components/ScrollLayout";
 import scrollStyles from "@/styles/scroll.module.css";
 
@@ -9,16 +8,14 @@ export default function ActPage() {
   return (
     <div className={scrollStyles.actPage}>
       <ActHero />
-
       <ScrollLayout>
-        <div className={scrollStyles.contentGrid}>
-          <ActSidebar />
-
-          <main className={scrollStyles.contentMain}>
-            <ActSearch />
-            <ActPart />
-          </main>
-        </div>
+        <Suspense
+          fallback={
+            <div className="py-10 text-center text-sm text-[#7a6545]">Loading…</div>
+          }
+        >
+          <ActBook />
+        </Suspense>
       </ScrollLayout>
     </div>
   );

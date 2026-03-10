@@ -67,7 +67,22 @@
       <input id="signup-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" minlength="8" required />
 
       <label for="signup-access-code">Team access code</label>
-      <input id="signup-access-code" name="accessCode" type="password" autocomplete="off" required />
+      <div class="code-field">
+        <input
+          id="signup-access-code"
+          name="accessCode"
+          type="text"
+          autocomplete="off"
+          autocapitalize="characters"
+          autocorrect="off"
+          spellcheck="false"
+          required
+        />
+        <button type="button" class="code-toggle" data-code-toggle aria-label="Hide access code">
+          <i data-lucide="eye-off" class="icon-btn" data-eye-off-icon aria-hidden="true"></i>
+          <i data-lucide="eye"     class="icon-btn" data-eye-icon     aria-hidden="true" hidden></i>
+        </button>
+      </div>
 
       <label class="checkbox-row">
         <input type="checkbox" name="remember" checked />
