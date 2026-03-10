@@ -7,7 +7,12 @@ import HeroImage from "@/app/images/Hero-book-hammer.png";
 import styles from "@/app/page.module.css";
 import PublicSiteShell from "@/components/PublicSiteShell";
 import { ACT_DOCUMENT, formatActDate, formatWholePounds, getActStats } from "@/lib/act";
-import { SITE_DESCRIPTION, SITE_DISCLAIMER, SITE_FULL_TITLE } from "@/lib/site";
+import {
+  SITE_DESCRIPTION,
+  SITE_DISCLAIMER,
+  SITE_FULL_TITLE,
+  SITE_SOCIAL_IMAGE_PATH,
+} from "@/lib/site";
 
 const spotlightCards = [
   {
@@ -32,10 +37,13 @@ export const metadata: Metadata = {
     url: "/",
     title: SITE_FULL_TITLE,
     description: SITE_DESCRIPTION,
+    images: [SITE_SOCIAL_IMAGE_PATH],
   },
   twitter: {
+    card: "summary_large_image",
     title: SITE_FULL_TITLE,
     description: SITE_DESCRIPTION,
+    images: [SITE_SOCIAL_IMAGE_PATH],
   },
 };
 

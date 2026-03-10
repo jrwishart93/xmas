@@ -9,5 +9,4 @@ export const SITE_DISCLAIMER =
 export const SITE_THEME_COLOR = "#0b0f1d";
 export const SITE_LOGO_PATH = "/app/images/logo-image-no-background.png";
 export const SITE_ICON_PATH = "/app/images/icon-image-cake-on-scale.png";
-export const SITE_OG_IMAGE_PATH = "/opengraph-image";
-export const SITE_TWITTER_IMAGE_PATH = "/twitter-image";
+export const SITE_SOCIAL_IMAGE_PATH = "/social-preview.png";

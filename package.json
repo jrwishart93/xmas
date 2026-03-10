@@ -15,7 +15,6 @@
     "next": "^16.1.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "resend": "^6.1.2",
     "truelayer-client": "^1.3.2",
     "truelayer-signing": "^0.2.1"
   },

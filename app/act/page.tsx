@@ -7,7 +7,7 @@ import styles from "@/app/act/page.module.css";
 import PublicSiteShell from "@/components/PublicSiteShell";
 import PublicActExplorer from "@/components/act/PublicActExplorer";
 import { ACT_DOCUMENT, formatActDate, getActStats } from "@/lib/act";
-import { SITE_DISCLAIMER, SITE_NAME } from "@/lib/site";
+import { SITE_DISCLAIMER, SITE_NAME, SITE_SOCIAL_IMAGE_PATH } from "@/lib/site";
 
 const ACT_PAGE_DESCRIPTION =
   "Review every part and clause of The Social Contributions Act 2025, with searchable sections and current contribution amounts.";
@@ -22,10 +22,13 @@ export const metadata: Metadata = {
     url: "/act/",
     title: `The Act | ${SITE_NAME}`,
     description: ACT_PAGE_DESCRIPTION,
+    images: [SITE_SOCIAL_IMAGE_PATH],
   },
   twitter: {
+    card: "summary_large_image",
     title: `The Act | ${SITE_NAME}`,
     description: ACT_PAGE_DESCRIPTION,
+    images: [SITE_SOCIAL_IMAGE_PATH],
   },
 };
 

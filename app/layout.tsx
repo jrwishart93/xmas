@@ -6,9 +6,8 @@ import {
   SITE_FULL_TITLE,
   SITE_ICON_PATH,
   SITE_NAME,
-  SITE_OG_IMAGE_PATH,
+  SITE_SOCIAL_IMAGE_PATH,
   SITE_THEME_COLOR,
-  SITE_TWITTER_IMAGE_PATH,
   SITE_URL,
 } from "@/lib/site";
 import "./globals.css";
@@ -56,7 +55,7 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: [
       {
-        url: SITE_OG_IMAGE_PATH,
+        url: SITE_SOCIAL_IMAGE_PATH,
         width: 1200,
         height: 630,
         alt: "The Social Contributions Act share image",
@@ -69,7 +68,7 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: [
       {
-        url: SITE_TWITTER_IMAGE_PATH,
+        url: SITE_SOCIAL_IMAGE_PATH,
         alt: "The Social Contributions Act social preview",
       },
     ],
