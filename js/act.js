@@ -1,6 +1,17 @@
-import { db, doc, getDoc } from '/firebase.js';
-
 const ACT_DOC_PATH = ['acts', 'social_contributions_act_2025'];
+let firebaseModulesPromise;
+
+async function getFirestoreHelpers() {
+  if (!firebaseModulesPromise) {
+    firebaseModulesPromise = import('/firebase.js').then(({ db, doc, getDoc }) => ({
+      db,
+      doc,
+      getDoc,
+    }));
+  }
+
+  return firebaseModulesPromise;
+}
 
 async function fetchRawLocalAct() {
   const response = await fetch('/data/act.json');
@@ -16,6 +27,7 @@ export async function loadAct() {
   const localActPromise = fetchRawLocalAct().catch(() => null);
 
   try {
+    const { db, doc, getDoc } = await getFirestoreHelpers();
     const actDoc = await getDoc(doc(db, ...ACT_DOC_PATH));
     if (actDoc.exists()) {
       return normalizeActData(actDoc.data(), await localActPromise);
