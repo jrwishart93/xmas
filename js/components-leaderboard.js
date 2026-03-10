@@ -11,7 +11,7 @@ export function renderLeaderboardSummary(container, { entries = [], totalFund = 
 
   const title = document.createElement('h3');
   title.className = 'leaderboard-heading';
-  title.textContent = 'Last 90 Days Leaderboard';
+  title.textContent = '90-Day Contribution Summary';
 
   const list = document.createElement('ol');
   list.className = 'leaderboard-list';
@@ -29,7 +29,7 @@ export function renderLeaderboardSummary(container, { entries = [], totalFund = 
       item.className = 'leaderboard-item';
       const medalClass = index < 3 ? `rank-${index + 1}` : '';
       const percent = Math.max(8, Math.round((amountPence / maxAmount) * 100));
-      const status = index === 0 ? '<span class="status-tag">Most Convicted</span>' : '';
+      const status = index === 0 ? '<span class="status-tag">Highest Total</span>' : '';
 
       item.innerHTML = `
         <span class="rank-badge ${medalClass}">${index + 1}</span>

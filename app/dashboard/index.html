@@ -3,7 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard</title>
+  <title>Dashboard | Team Social Fund</title>
+  <meta name="description" content="Dashboard overview for Team Social Fund members." />
+  <meta name="theme-color" content="#0b0f1d" />
+  <meta name="application-name" content="Team Social Fund" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Team Social Fund" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="icon" type="image/png" href="/app/images/icon-image-cake-on-scale.png" />
+  <link rel="apple-touch-icon" href="/app/images/icon-image-cake-on-scale.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="stylesheet" href="/styles/main.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -29,13 +40,13 @@
 <main class="site-shell with-fixed-header">
   <section class="card glass-panel fade-in p-responsive dashboard-hero">
     <div class="dashboard-hero-copy">
-      <p class="eyebrow">Mobile Command Centre</p>
-      <h1 id="dashboardGreeting">Welcome back</h1>
-      <p id="dashboardIdentity" class="dashboard-lead">Your team fund overview is loading.</p>
+      <p class="eyebrow">Member dashboard</p>
+      <h1 id="dashboardGreeting">Member dashboard</h1>
+      <p id="dashboardIdentity" class="dashboard-lead">Loading account overview.</p>
       <div class="dashboard-status-strip">
         <span class="status-chip"><i data-lucide="shield-check" class="icon"></i><span id="dashboardStatusText">Verifying secure session...</span></span>
-        <span class="status-chip"><i data-lucide="users" class="icon"></i><span id="dashboardMemberCount">Loading members...</span></span>
-        <span class="status-chip"><i data-lucide="clock-3" class="icon"></i><span>Late penalty doubles after 3 days</span></span>
+        <span class="status-chip"><i data-lucide="users" class="icon"></i><span id="dashboardMemberCount">Loading team members...</span></span>
+        <span class="status-chip"><i data-lucide="clock-3" class="icon"></i><span>Amounts may adjust after 3 days under the Act</span></span>
       </div>
     </div>
 
@@ -45,7 +56,7 @@
         <span class="dashboard-user-avatar" id="dashboardAvatar">TS</span>
         <div>
           <h2 id="dashboardUserName">Team Member</h2>
-          <p id="dashboardEmail" class="muted">Loading account...</p>
+          <p id="dashboardEmail" class="muted">Loading account details...</p>
         </div>
       </div>
       <div class="dashboard-role-row">
@@ -87,9 +98,9 @@
 
     <article class="card p-responsive dashboard-kpi-card">
       <p class="eyebrow">Your Queue</p>
-      <h2 class="section-header"><i data-lucide="alert-triangle" class="icon"></i>Outstanding Contributions</h2>
+      <h2 class="section-header"><i data-lucide="alert-triangle" class="icon"></i>Open Notices</h2>
       <p id="outstandingCount" class="metric">0</p>
-      <p class="muted">Unpaid SCNs assigned to you.</p>
+      <p class="muted">SCNs currently assigned to you.</p>
     </article>
   </section>
 
@@ -97,30 +108,30 @@
     <article class="card p-responsive">
       <div class="panel-header">
         <div>
-          <p class="eyebrow">Shortcuts</p>
-          <h2 class="section-header"><i data-lucide="rocket" class="icon"></i>Quick Actions</h2>
+          <p class="eyebrow">Actions</p>
+          <h2 class="section-header"><i data-lucide="layout-grid" class="icon"></i>Common Tasks</h2>
         </div>
       </div>
       <div class="dashboard-action-grid">
         <a href="/app/issue/" class="dashboard-action-card" data-preview-gate>
           <i data-lucide="plus-circle" class="icon"></i>
           <strong>Issue SCN</strong>
-          <span>Raise a new notice in seconds.</span>
+          <span>Create a new notice.</span>
         </a>
         <a href="/app/team/" class="dashboard-action-card">
           <i data-lucide="users" class="icon"></i>
           <strong>Team Directory</strong>
-          <span>See the full team and role detail.</span>
+          <span>View members and access levels.</span>
         </a>
         <a href="/app/leaderboard/" class="dashboard-action-card">
           <i data-lucide="trophy" class="icon"></i>
           <strong>Leaderboard</strong>
-          <span>Check recent standings and totals.</span>
+          <span>Review recent standings and totals.</span>
         </a>
         <a href="/app/act/" class="dashboard-action-card" data-preview-gate>
           <i data-lucide="scroll-text" class="icon"></i>
           <strong>Read the Act</strong>
-          <span>Open the current clauses and amounts.</span>
+          <span>Review the current clauses and standard amounts.</span>
         </a>
       </div>
     </article>
@@ -128,8 +139,8 @@
     <article class="card p-responsive">
       <div class="panel-header">
         <div>
-          <p class="eyebrow">Live Ranking</p>
-          <h2 class="section-header"><i data-lucide="trophy" class="icon"></i>Leaderboard Snapshot</h2>
+          <p class="eyebrow">Contribution summary</p>
+          <h2 class="section-header"><i data-lucide="trophy" class="icon"></i>Recent standings</h2>
         </div>
         <a href="/app/leaderboard/" class="btn secondary">Open</a>
       </div>
@@ -151,22 +162,22 @@
     <article class="card p-responsive">
       <div class="panel-header">
         <div>
-          <p class="eyebrow">Workflow</p>
-          <h2 class="section-header"><i data-lucide="gavel" class="icon"></i>How This Works</h2>
+          <p class="eyebrow">Process</p>
+          <h2 class="section-header"><i data-lucide="gavel" class="icon"></i>How the Application Works</h2>
         </div>
       </div>
       <div class="dashboard-stack">
         <div class="dashboard-step">
-          <strong>1. Issue or confess</strong>
-          <span>Create an SCN against yourself or another team member.</span>
+          <strong>1. Create or record an SCN</strong>
+          <span>Record an SCN for yourself or another team member.</span>
         </div>
         <div class="dashboard-step">
-          <strong>2. Resolve it fast</strong>
-          <span>Pay within 3 days to avoid the automatic late penalty.</span>
+          <strong>2. Review the current amount</strong>
+          <span>The Act sets the standard amount and any timing-based adjustment.</span>
         </div>
         <div class="dashboard-step">
           <strong>3. Track the fund</strong>
-          <span>Monitor live balances, rankings, and contributions from one place.</span>
+          <span>Monitor balances, standings, and contribution activity from one place.</span>
         </div>
       </div>
     </article>

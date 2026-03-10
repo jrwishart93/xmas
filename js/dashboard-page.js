@@ -127,7 +127,7 @@ function renderLeaderboard(rows, membersById) {
   findings.innerHTML = '';
 
   if (!rows.length) {
-    findings.innerHTML = '<li class="leaderboard-mini-empty">No paid contributions recorded yet.</li>';
+    findings.innerHTML = '<li class="leaderboard-mini-empty">No contribution payments have been recorded yet.</li>';
     return;
   }
 
@@ -154,8 +154,8 @@ function renderMemberPreview(members, currentUid) {
 
   document.getElementById('dashboardMemberCount').textContent = `${members.length} team member${members.length === 1 ? '' : 's'} connected`;
   meta.textContent = members.length
-    ? `Showing ${visibleMembers.length} of ${members.length} active team members.`
-    : 'No team members found yet.';
+    ? `Showing ${visibleMembers.length} of ${members.length} team members.`
+    : 'No team members found.';
 
   container.innerHTML = '';
 
@@ -214,7 +214,7 @@ bootProtectedPage(async (ctx) => {
     document.getElementById('pendingTotal').textContent = '£6.00';
     document.getElementById('outstandingCount').textContent = '3';
     bankBalanceEl.textContent = '£187.40';
-    bankMetaEl.textContent = 'Preview balance from Team Social Fund Monzo account.';
+    bankMetaEl.textContent = 'Illustrative balance from the Team Social Fund Monzo account.';
     connectBankBtn.hidden = true;
     refreshBankBtn.hidden = true;
 
@@ -234,7 +234,7 @@ bootProtectedPage(async (ctx) => {
     bankMetaEl.textContent = 'Bank connected successfully. Loading latest balance...';
     clearBankStatusFromUrl();
   } else if (bankStatus.bank === 'error') {
-    bankMetaEl.textContent = 'Bank connection failed. Please try connecting again.';
+    bankMetaEl.textContent = 'Bank connection was unsuccessful. Please try again.';
     clearBankStatusFromUrl();
   }
 

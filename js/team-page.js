@@ -62,7 +62,7 @@ bootProtectedPage(async (ctx) => {
   let members = [];
 
   currentRole.textContent = formatRole(ctx.membership?.role);
-  currentIdentity.textContent = `${getUserDisplayName(ctx)} - ${ctx.user?.email || 'Signed-in account'}`;
+  currentIdentity.textContent = `${getUserDisplayName(ctx)} · ${ctx.user?.email || 'Signed-in account'}`;
 
   const render = () => {
     const term = String(searchInput.value || '').trim().toLowerCase();

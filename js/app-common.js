@@ -160,6 +160,19 @@ function renderTabBar(activeSection) {
   }).join('');
 }
 
+function decorateProtectedTitle(brand) {
+  if (!brand || brand.dataset.branded === 'true') return;
+
+  const titleText = brand.textContent?.trim() || 'Team Social Fund';
+  brand.dataset.branded = 'true';
+  brand.innerHTML = `
+    <span class="app-brand-badge" aria-hidden="true">
+      <img src="/app/images/icon-image-cake-on-scale.png" alt="" loading="eager" decoding="async" />
+    </span>
+    <span class="app-page-title-text">${escapeHtml(titleText)}</span>
+  `;
+}
+
 function enhanceProtectedChrome(ctx) {
   const activeSection = getMemberActiveSection() || 'dashboard';
   const header = document.querySelector('.site-header');
@@ -174,6 +187,7 @@ function enhanceProtectedChrome(ctx) {
   headerRow?.classList.add('app-header-row');
   main?.classList.add('app-main-shell');
   brand?.classList.add('app-page-title');
+  decorateProtectedTitle(brand);
 
   renderDesktopNav(nav, activeSection);
   renderSessionPill(meta, ctx);

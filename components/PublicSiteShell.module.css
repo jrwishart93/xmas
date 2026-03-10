@@ -31,41 +31,19 @@
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
   min-width: 0;
 }
 
 .brandMark {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  display: grid;
-  place-items: center;
-  background:
-    linear-gradient(135deg, rgba(215, 173, 91, 0.94), rgba(125, 166, 255, 0.96));
-  color: #09121d;
-  font-size: 0.95rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  box-shadow: 0 14px 34px rgba(12, 18, 28, 0.34);
+  width: clamp(136px, 18vw, 168px);
+  display: inline-flex;
 }
 
-.brand strong,
-.brand small {
+.brandLogo {
+  width: 100%;
+  height: auto;
   display: block;
-}
-
-.brand strong {
-  font-size: 0.98rem;
-  line-height: 1.05;
-}
-
-.brand small {
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  filter: drop-shadow(0 14px 30px rgba(7, 11, 18, 0.28));
 }
 
 .contextPill {
@@ -129,10 +107,28 @@
   font-size: 0.94rem;
 }
 
-.footer p {
-  margin: 0;
+.footerInner {
+  display: grid;
+  gap: 14px;
   padding-top: 22px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footerBrand {
+  width: min(180px, 100%);
+}
+
+.footerLogo {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 12px 26px rgba(7, 11, 18, 0.24));
+}
+
+.footer p {
+  margin: 0;
+  max-width: 72ch;
+  line-height: 1.6;
 }
 
 @media (max-width: 767px) {
@@ -153,23 +149,11 @@
   }
 
   .brand {
-    gap: 10px;
+    max-width: 132px;
   }
 
   .brandMark {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    font-size: 0.82rem;
-  }
-
-  .brand strong {
-    font-size: 0.9rem;
-  }
-
-  .brand small {
-    font-size: 0.7rem;
-    letter-spacing: 0.1em;
+    width: 100%;
   }
 
   .contextPill {
@@ -202,7 +186,11 @@
     padding-bottom: calc(18px + var(--mobile-nav-space));
   }
 
-  .footer p {
+  .footerInner {
     padding-top: 18px;
+  }
+
+  .footerBrand {
+    width: 140px;
   }
 }

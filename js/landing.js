@@ -21,7 +21,7 @@ function animateCurrencyValue(node, valuePence = 0) {
 
 async function loadPublicSummary() {
   const response = await fetch('/api/public-summary');
-  if (!response.ok) throw new Error('Unable to load public summary');
+  if (!response.ok) throw new Error('Unable to load the fund summary');
 
   const data = await response.json();
 
@@ -46,7 +46,7 @@ loadPublicSummary().catch((error) => {
 
   const warning = document.createElement('p');
   warning.className = 'muted';
-  warning.textContent = `Unable to load summary: ${error.message}`;
+  warning.textContent = `Unable to load the summary: ${error.message}`;
   publicSummary.appendChild(warning);
 });
 

@@ -1159,6 +1159,14 @@ body {
   margin-bottom: 1.2rem;
 }
 
+.auth-logo-image {
+  width: min(220px, 72%);
+  height: auto;
+  display: block;
+  margin: 0 auto 0.55rem;
+  filter: drop-shadow(0 16px 28px rgba(5, 9, 18, 0.28));
+}
+
 .auth-header h1 {
   margin: .35rem 0 .2rem;
   font-size: 1.7rem;
@@ -1346,6 +1354,9 @@ body {
   text-align: center;
   color: #c5d1fa;
   font-size: .85rem;
+  line-height: 1.55;
+  max-width: 34ch;
+  margin-inline: auto;
 }
 
 .form-shake {
@@ -1465,8 +1476,35 @@ h3,
 
 .app-page-title {
   margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
   font-size: clamp(1rem, 0.7rem + 0.8vw, 1.15rem);
   letter-spacing: 0.04em;
+}
+
+.app-page-title-text {
+  min-width: 0;
+}
+
+.app-brand-badge {
+  width: 2.7rem;
+  height: 2.7rem;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 14px 28px rgba(5, 8, 17, 0.28);
+}
+
+.app-brand-badge img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 .app-nav-meta {
@@ -1928,6 +1966,12 @@ h3,
   .app-page-title {
     max-width: 100%;
     font-size: 0.98rem;
+    gap: 0.65rem;
+  }
+
+  .app-brand-badge {
+    width: 2.35rem;
+    height: 2.35rem;
   }
 
   .protected-app .app-nav-meta {

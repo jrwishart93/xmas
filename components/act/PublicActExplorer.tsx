@@ -48,7 +48,7 @@ export default function PublicActExplorer({ document }: PublicActExplorerProps) 
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Try 4.6, birthday, vehicle, or operational error"
+              placeholder="Try a section code, title, or keyword"
               className={styles.searchInput}
             />
           </span>
@@ -136,7 +136,7 @@ function PartCard({
         {part.operationallySensitive ? (
           <span className={styles.partTag}>Operationally sensitive</span>
         ) : (
-          <span className={styles.partTagMuted}>General publication</span>
+          <span className={styles.partTagMuted}>Standard section</span>
         )}
       </div>
 
@@ -156,10 +156,10 @@ function PartCard({
             <p className={styles.sectionDescription}>{section.description}</p>
 
             <div className={styles.sectionMeta}>
-              <span>{formatWholePounds(section.amountGBP)} standard contribution</span>
-              <span>Late penalty x{section.latePenaltyMultiplier}</span>
+              <span>{formatWholePounds(section.amountGBP)} standard amount</span>
+              <span>Adjustment x{section.latePenaltyMultiplier}</span>
               <span>After {section.latePenaltyAfterDays} days</span>
-              {searchActive ? <span>Search match</span> : null}
+              {searchActive ? <span>Matched result</span> : null}
             </div>
           </section>
         ))}

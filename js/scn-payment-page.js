@@ -118,13 +118,13 @@ function renderPaymentOptions({ scn, isAdmin, ref, breakdown, paymentConfig }) {
         <div class="actions">
           <button type="button" id="payNow">Pay by Bank App</button>
         </div>
-        ${scn.paymentMethod === 'truelayer' && scn.status === 'awaiting_payment' ? '<p class="muted">Payment initiated. Complete it in your bank app to mark this SCN paid.</p>' : ''}
+        ${scn.paymentMethod === 'truelayer' && scn.status === 'awaiting_payment' ? '<p class="muted">Payment started. Complete it in your bank app to update this SCN.</p>' : ''}
       </article>
     `);
   }
 
   if (!cards.length) {
-    cards.push('<article class="card payment-option"><p class="muted">All payment methods are currently disabled. Please contact an admin.</p></article>');
+    cards.push('<article class="card payment-option"><p class="muted">All payment methods are currently unavailable. Please contact an admin.</p></article>');
   }
 
   return cards.join('\n');
@@ -136,7 +136,7 @@ bootProtectedPage(async (ctx) => {
   const isAdmin = (ctx.membership?.role || '').toLowerCase() === 'admin';
 
   if (!scnId) {
-    card.innerHTML = '<p class="muted">Invalid SCN route.</p>';
+    card.innerHTML = '<p class="muted">Invalid SCN reference.</p>';
     return;
   }
 
@@ -158,12 +158,12 @@ bootProtectedPage(async (ctx) => {
     const clauseTitle = scn.clauseTitle || scn.clauseId || 'Unspecified Clause';
     const penaltySummary =
       breakdown.latePenaltyAmountPence > breakdown.originalAmountPence
-        ? `doubles to ${money(breakdown.latePenaltyAmountPence)}`
-        : 'no increase';
+        ? `increases to ${money(breakdown.latePenaltyAmountPence)}`
+        : 'no change';
     const latePenaltyNotice = breakdown.isLatePenaltyApplied
       ? `
         <article class="card payment-option">
-          <p class="section-header">Late Penalty Applied</p>
+          <p class="section-header">Amount Adjustment Applied</p>
           <p><strong>Original:</strong> ${money(breakdown.originalAmountPence)}</p>
           <p><strong>Current:</strong> ${money(breakdown.currentAmountPence)}</p>
         </article>
@@ -172,11 +172,11 @@ bootProtectedPage(async (ctx) => {
 
     card.innerHTML = `
       <section class="payment-section">
-        <p class="eyebrow">SCN Details</p>
+        <p class="eyebrow">SCN summary</p>
         <h2 class="section-header">${escapeHtml(clauseTitle)}</h2>
         <p><strong>Contribution:</strong> ${money(breakdown.currentAmountPence)}</p>
-        <p><strong>Due within:</strong> ${escapeHtml(formatDueWindow(breakdown))}</p>
-        <p><strong>Late penalty:</strong> ${escapeHtml(penaltySummary)}</p>
+        <p><strong>Due by:</strong> ${escapeHtml(formatDueWindow(breakdown))}</p>
+        <p><strong>Adjustment after due date:</strong> ${escapeHtml(penaltySummary)}</p>
         <p><strong>Status:</strong> ${paymentStatusBadge(scn.status || 'issued')}</p>
         <p class="muted"><strong>Issued:</strong> ${scn.createdAt?.toDate ? scn.createdAt.toDate().toLocaleString() : 'Pending timestamp'}</p>
       </section>

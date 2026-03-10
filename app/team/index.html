@@ -3,7 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Team Directory</title>
+  <title>Team Directory | Team Social Fund</title>
+  <meta name="description" content="Member directory for Team Social Fund." />
+  <meta name="theme-color" content="#0b0f1d" />
+  <meta name="application-name" content="Team Social Fund" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Team Social Fund" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="icon" type="image/png" href="/app/images/icon-image-cake-on-scale.png" />
+  <link rel="apple-touch-icon" href="/app/images/icon-image-cake-on-scale.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="stylesheet" href="/styles/main.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -26,9 +37,9 @@
 <main class="site-shell with-fixed-header">
   <section class="card glass-panel fade-in p-responsive team-page-hero">
     <div class="team-page-hero__copy">
-      <p class="eyebrow">Connected Team</p>
-      <h1>See everyone in the fund</h1>
-      <p class="dashboard-lead">Search team members, confirm roles, and keep the directory readable on mobile.</p>
+      <p class="eyebrow">Team directory</p>
+      <h1>View current members</h1>
+      <p class="dashboard-lead">Search team members, review roles, and keep directory details current.</p>
     </div>
     <label class="team-search-field">
       <span>Search directory</span>
@@ -46,7 +57,7 @@
     <article class="card p-responsive dashboard-kpi-card">
       <p class="eyebrow">Admins</p>
       <p class="metric" id="teamAdminCount">0</p>
-      <p class="muted">Members who can manage court outcomes.</p>
+      <p class="muted">Members with admin access.</p>
     </article>
 
     <article class="card p-responsive dashboard-kpi-card">
@@ -59,7 +70,7 @@
   <section class="card p-responsive">
     <div class="panel-header">
       <div>
-        <p class="eyebrow">Live Directory</p>
+        <p class="eyebrow">Directory</p>
         <h2 class="section-header"><i data-lucide="users" class="icon"></i>Team Members</h2>
       </div>
       <p id="teamDirectoryMeta" class="muted">Loading team members...</p>

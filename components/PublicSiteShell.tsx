@@ -1,36 +1,42 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 import MobileNav from "@/app/components/MobileNav";
+import BrandLogo from "@/app/images/logo-image-no-background.png";
 import styles from "@/components/PublicSiteShell.module.css";
 import { PUBLIC_NAV_ITEMS } from "@/js/nav-config.js";
 
 type PublicSiteShellProps = {
   active?: "home" | "act" | null;
   contextLabel?: string;
+  footerNote?: string;
   children: ReactNode;
 };
 
 export default function PublicSiteShell({
   active = "home",
   contextLabel,
+  footerNote,
   children,
 }: PublicSiteShellProps) {
   const activeItem = PUBLIC_NAV_ITEMS.find((item) => item.id === active) || null;
-  const mobileContext = contextLabel || activeItem?.label || "Public pages";
+  const mobileContext = contextLabel || activeItem?.label || "Website";
 
   return (
     <div className={styles.shell}>
       <header className={styles.headerWrap}>
         <div className={styles.header}>
           <div className={styles.headerIdentity}>
-            <Link href="/" className={styles.brand}>
-              <span className={styles.brandMark} aria-hidden="true">
-                SJ
-              </span>
-              <span>
-                <strong>Summary Justice Act</strong>
-                <small>Social Contributions 2025</small>
+            <Link href="/" className={styles.brand} aria-label="The Social Contributions Act home">
+              <span className={styles.brandMark}>
+                <Image
+                  src={BrandLogo}
+                  alt="The Social Contributions Act Team Social Fund"
+                  className={styles.brandLogo}
+                  sizes="(max-width: 767px) 132px, 164px"
+                  priority
+                />
               </span>
             </Link>
             <p className={styles.contextPill}>{mobileContext}</p>
@@ -55,12 +61,21 @@ export default function PublicSiteShell({
 
       <main className={styles.main}>{children}</main>
 
-      <footer className={styles.footer}>
-        <p>
-          Private team contribution system. Voluntary participation only. This is an informal
-          team social framework, not a real disciplinary process.
-        </p>
-      </footer>
+      {footerNote ? (
+        <footer className={styles.footer}>
+          <div className={styles.footerInner}>
+            <div className={styles.footerBrand}>
+              <Image
+                src={BrandLogo}
+                alt="The Social Contributions Act Team Social Fund"
+                className={styles.footerLogo}
+                sizes="160px"
+              />
+            </div>
+            <p>{footerNote}</p>
+          </div>
+        </footer>
+      ) : null}
 
       <MobileNav active={active} />
     </div>

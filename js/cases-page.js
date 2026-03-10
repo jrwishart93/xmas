@@ -20,13 +20,13 @@ function fillClauses(select) {
 function caseCard(item, canPlea, canCourt) {
   const div = document.createElement('div');
   div.className = 'card';
-  div.innerHTML = `<p><span class="badge">${STAGE_LABELS[item.stage] || item.stage}</span></p><p>Clause: ${item.clauseId}</p><p>Brief: ${item.brief || '—'}</p><p>Base: ${money(item.baseAmountPence)} | Final: ${money(item.finalAmountPence || 0)}</p>`;
+  div.innerHTML = `<p><span class="badge">${STAGE_LABELS[item.stage] || item.stage}</span></p><p>Clause: ${item.clauseId}</p><p>Summary: ${item.brief || '—'}</p><p>Standard amount: ${money(item.baseAmountPence)} | Current amount: ${money(item.finalAmountPence || 0)}</p>`;
 
   if (canPlea && item.stage === 'awaiting_plea') {
     const actions = document.createElement('div');
     actions.className = 'actions';
     const guilty = document.createElement('button');
-    guilty.textContent = 'Plead Guilty';
+    guilty.textContent = 'Record Guilty Plea';
     guilty.onclick = async () => { await resolvePlea({ scnId: item.id, action: 'guilty' }); await refreshCases(); };
     const court = document.createElement('button');
     court.className = 'secondary';
@@ -41,7 +41,7 @@ function caseCard(item, canPlea, canCourt) {
     actions.className = 'actions';
     const convicted = document.createElement('button');
     convicted.className = 'danger';
-    convicted.textContent = 'Convicted (Double Fine)';
+    convicted.textContent = 'Convicted (Higher Amount)';
     convicted.onclick = async () => { await resolveCourt({ scnId: item.id, convicted: true }); await refreshCases(); };
     const acquitted = document.createElement('button');
     acquitted.className = 'secondary';

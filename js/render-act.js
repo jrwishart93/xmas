@@ -23,9 +23,9 @@ export function renderAct(container, act) {
   const parts = act.parts || [];
   const totalSections = parts.reduce((count, part) => count + (part.sections?.length || 0), 0);
   hero.innerHTML = `
-    <p class="act-eyebrow">⚖️ Public rulebook</p>
+    <p class="act-eyebrow">⚖️ Act reference</p>
     <h2>${act.title}</h2>
-    <p class="act-subtitle">Browse all sections and clauses in an elevated, easy-to-scan format.</p>
+    <p class="act-subtitle">Review all sections and clauses in a clear, searchable format.</p>
     <div class="act-meta-row" role="list" aria-label="Act summary">
       <p class="act-meta" role="listitem"><span class="meta-label">Version</span><strong>${act.version}</strong></p>
       <p class="act-meta" role="listitem"><span class="meta-label">Last updated</span><strong>${formatLastUpdated(act.lastUpdated)}</strong></p>
@@ -39,8 +39,8 @@ export function renderAct(container, act) {
   searchWrap.className = 'act-search-wrap';
   searchWrap.innerHTML = `
     <label class="act-search-label" for="actSearchInput">Search the Act</label>
-    <input id="actSearchInput" class="act-search-input" type="search" placeholder="Try section code, title, or clause text" autocomplete="off" />
-    <p class="muted">Contributions are shown in whole pounds (£). Any unpaid notice after 3 days is automatically doubled.</p>
+    <input id="actSearchInput" class="act-search-input" type="search" placeholder="Try a section code, title, or keyword" autocomplete="off" />
+    <p class="muted">Amounts are shown in whole pounds (£). Where an amount remains open after 3 days, the Act applies the stated adjustment automatically.</p>
   `;
   frame.appendChild(searchWrap);
 

@@ -3,7 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sign In | Team Social Fund</title>
+  <title>Member Portal | Team Social Fund</title>
+  <meta name="description" content="Secure access for Team Social Fund members." />
+  <meta name="theme-color" content="#0b0f1d" />
+  <meta name="application-name" content="Team Social Fund" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Team Social Fund" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="icon" type="image/png" href="/app/images/icon-image-cake-on-scale.png" />
+  <link rel="apple-touch-icon" href="/app/images/icon-image-cake-on-scale.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="stylesheet" href="/styles/main.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -21,9 +32,15 @@
 <main class="auth-layout with-fixed-header">
   <section class="auth-card" data-auth-card data-mode="sign-in">
     <header class="auth-header">
-      <i data-lucide="shield-check" class="auth-logo" aria-hidden="true"></i>
-      <h1>Team Portal</h1>
-      <p class="muted">Secure access for members.</p>
+      <img
+        src="/app/images/logo-image-no-background.png"
+        alt="The Social Contributions Act Team Social Fund"
+        class="auth-logo-image"
+        loading="eager"
+        decoding="async"
+      />
+      <h1>Member Portal</h1>
+      <p class="muted">Secure access to notices, balances, and member activity.</p>
     </header>
 
     <div class="auth-toggle" role="tablist" aria-label="Authentication mode">
@@ -109,7 +126,7 @@
       </button>
     </form>
 
-    <p class="auth-security-note">🔐 Your data is securely encrypted</p>
+    <p class="auth-security-note">Participation in Team Social Fund is entirely optional. No member is required to make a contribution or payment. This application is not part of any disciplinary or employment process.</p>
   </section>
 </main>
 <script type="module" src="/js/login-page.js"></script>
