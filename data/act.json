@@ -208,6 +208,24 @@
           "amountPence": 200,
           "latePenaltyMultiplier": 2,
           "latePenaltyAfterDays": 3
+        },
+        {
+          "code": "4.6",
+          "title": "Vehicle Recovery or Puncture Incident",
+          "description": "Applies where an officer, whilst on duty, causes or contributes to a vehicle requiring roadside recovery, tyre replacement, or mechanical assistance following contact with a pothole, kerb, debris, or similar road hazard. This includes circumstances where assistance from the AA, recovery services, or equivalent roadside support is required.",
+          "amountGBP": 2,
+          "amountPence": 200,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
+        },
+        {
+          "code": "4.6(b)",
+          "title": "Multiple Tyre Destruction",
+          "description": "Applies where more than one tyre is destroyed during a single incident.",
+          "amountGBP": 3,
+          "amountPence": 300,
+          "latePenaltyMultiplier": 2,
+          "latePenaltyAfterDays": 3
         }
       ]
     },
