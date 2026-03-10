@@ -70,7 +70,7 @@ export function renderAct(container, act) {
     frame.querySelectorAll('.act-part').forEach((node) => node.remove());
 
     let hasResults = false;
-    normalizedParts.forEach((part, index) => {
+    normalizedParts.forEach((part) => {
       const matchingSections = searchTerm
         ? part.sections.filter((section) => section.searchBlob.includes(searchTerm))
         : part.sections;
@@ -80,7 +80,7 @@ export function renderAct(container, act) {
 
       const details = document.createElement('details');
       details.className = 'act-part';
-      details.open = searchTerm ? true : index === 0;
+      details.open = Boolean(searchTerm);
 
       const summary = document.createElement('summary');
       summary.className = 'act-part-summary';
