@@ -14,6 +14,7 @@ import {
   getPreviewBalanceFromArchive,
   getPreviewLeaderboardFromArchive,
 } from '/js/preview-data.js';
+import { initQuickPayMonzo } from '/js/quick-pay-monzo.js';
 
 const BANK_REFRESH_INTERVAL_MS = 60_000;
 const MEMBER_PREVIEW_LIMIT = 6;
@@ -220,6 +221,7 @@ bootProtectedPage(async (ctx) => {
   if (isAdmin) {
     ensureAdminActionCard();
   }
+  initQuickPayMonzo(document.getElementById('quickPayMonzoSection'));
 
   if (PREVIEW_MODE) {
     const members = previewMembers();
@@ -243,6 +245,7 @@ bootProtectedPage(async (ctx) => {
       new Map(members.map((member) => [member.uid, member]))
     );
 
+    initQuickPayMonzo(document.getElementById('quickPayMonzoSection'));
     initPreviewGates();
     initIcons();
     return;

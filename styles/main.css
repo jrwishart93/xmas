@@ -210,6 +210,7 @@ input, select, textarea {
   border-radius: 10px;
   padding: .6rem;
   margin: .35rem 0 .75rem;
+  font-size: 1rem; /* ≥16px prevents iOS auto-zoom on focus */
 }
 
 .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); }
@@ -1226,6 +1227,7 @@ body {
   margin-bottom: .85rem;
   background: rgba(10, 16, 28, 0.76);
   border-color: rgba(210, 220, 255, 0.24);
+  font-size: 1rem; /* explicit: prevents iOS auto-zoom */
 }
 
 .auth-card input:focus {
@@ -2094,5 +2096,119 @@ h3,
 @media (min-width: 768px) {
   .app-tabbar {
     display: none !important;
+  }
+}
+
+/* ── Quick Pay: Monzo widget ──────────────────────────────────────────────── */
+
+.monzo-pay-body {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.monzo-pay-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+}
+
+.monzo-pay-select {
+  margin: 0; /* override global select margin */
+}
+
+.monzo-pay-preview {
+  border: 1px solid rgba(136, 158, 228, 0.22);
+  border-radius: 14px;
+  background: rgba(79, 109, 255, 0.07);
+  padding: 1rem 1.1rem;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.monzo-pay-preview-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.monzo-pay-preview-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.monzo-pay-preview-title {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.monzo-pay-preview-amount {
+  margin: 0;
+  font-size: 1.65rem;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--highlight);
+  line-height: 1.1;
+}
+
+.monzo-pay-btn {
+  background: var(--highlight);
+  color: #fff;
+  min-width: 180px;
+  justify-content: center;
+}
+
+.monzo-pay-btn:hover {
+  background: #6a85ff;
+  box-shadow: 0 10px 22px rgba(79, 109, 255, 0.35);
+}
+
+.monzo-pay-quick-grid {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding-top: 0.75rem;
+}
+
+.monzo-pay-quick-btn {
+  flex: 1 1 auto;
+  min-width: 52px;
+  justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+}
+
+.monzo-pay-disclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 767px) {
+  .monzo-pay-preview-amount {
+    font-size: 1.4rem;
+  }
+
+  .monzo-pay-btn {
+    width: 100%;
+  }
+
+  .monzo-pay-quick-grid {
+    gap: 0.5rem;
+  }
+
+  .monzo-pay-quick-btn {
+    flex: 1 1 calc(33.333% - 0.35rem);
   }
 }

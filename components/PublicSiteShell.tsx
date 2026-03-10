@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 import MobileNav from "@/app/components/MobileNav";
+import Image from "next/image";
 import BrandLogo from "@/app/images/logo-image-no-background.png";
 import styles from "@/components/PublicSiteShell.module.css";
 import { PUBLIC_NAV_ITEMS } from "@/js/nav-config.js";
@@ -64,14 +64,6 @@ export default function PublicSiteShell({
       {footerNote ? (
         <footer className={styles.footer}>
           <div className={styles.footerInner}>
-            <div className={styles.footerBrand}>
-              <Image
-                src={BrandLogo}
-                alt="The Social Contributions Act Team Social Fund"
-                className={styles.footerLogo}
-                sizes="160px"
-              />
-            </div>
             <p>{footerNote}</p>
           </div>
         </footer>
