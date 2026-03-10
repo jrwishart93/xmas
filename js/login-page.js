@@ -9,6 +9,9 @@ const formStateMessage = document.querySelector('[data-auth-status]');
 const signInForm = document.querySelector('[data-sign-in-form]');
 const signUpForm = document.querySelector('[data-sign-up-form]');
 const forgotPasswordLink = document.querySelector('[data-forgot-password]');
+const resetPasswordForm = document.querySelector('[data-reset-password-form]');
+const resetEmailInput = resetPasswordForm?.querySelector('input[name="email"]');
+const backToSignInButton = document.querySelector('[data-back-to-sign-in]');
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DASHBOARD_PATH = '/app/dashboard/';
@@ -99,6 +102,28 @@ function toAuthMessage(error) {
 function shakeForm(form) {
   form.classList.add('form-shake');
   setTimeout(() => form.classList.remove('form-shake'), 350);
+}
+
+
+function openResetPasswordPane(seedEmail = '') {
+  panes.forEach((pane) => {
+    const active = pane.dataset.authPane === 'reset-password';
+    pane.hidden = !active;
+  });
+
+  tabButtons.forEach((button) => {
+    button.classList.remove('active');
+    button.setAttribute('aria-selected', 'false');
+  });
+
+  authCard.dataset.mode = 'reset-password';
+  if (resetEmailInput) resetEmailInput.value = seedEmail;
+  setStatus('');
+}
+
+function returnToSignInPane() {
+  setActiveTab('sign-in');
+  signInForm.querySelector('input[name="email"]')?.focus();
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -196,21 +221,40 @@ signUpForm.addEventListener('submit', async (event) => {
   }
 });
 
-forgotPasswordLink?.addEventListener('click', async (event) => {
+forgotPasswordLink?.addEventListener('click', (event) => {
   event.preventDefault();
-  const email = String(signInForm.querySelector('input[name="email"]').value || '').trim().toLowerCase();
+  const signInEmail = String(signInForm.querySelector('input[name="email"]').value || '').trim().toLowerCase();
+  openResetPasswordPane(signInEmail);
+  resetEmailInput?.focus();
+});
+
+resetPasswordForm?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const formData = new FormData(resetPasswordForm);
+  const email = String(formData.get('email') || '').trim().toLowerCase();
 
   if (!validateEmail(email)) {
-    setStatus('Enter your email in the sign-in form first, then click Forgot password.', 'error');
+    setStatus('Please enter a valid email address to reset your password.', 'error');
+    shakeForm(resetPasswordForm);
     return;
   }
+
+  setStatus('');
+  setLoading(resetPasswordForm, true, 'Sending link...');
 
   try {
     await requestPasswordReset(email);
     setStatus('Password reset email sent. Check your inbox.', 'success');
   } catch (error) {
     setStatus(toAuthMessage(error), 'error');
+    shakeForm(resetPasswordForm);
+  } finally {
+    setLoading(resetPasswordForm, false);
   }
+});
+
+backToSignInButton?.addEventListener('click', () => {
+  returnToSignInPane();
 });
 
 tabButtons.forEach((button) => {

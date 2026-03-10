@@ -53,6 +53,20 @@
       <a href="#" class="auth-link" data-forgot-password>Forgot password?</a>
     </form>
 
+    <form data-auth-pane="reset-password" data-reset-password-form hidden>
+      <p class="auth-form-helper">Enter your account email and we will send you a secure reset link.</p>
+
+      <label for="reset-email">Email</label>
+      <input id="reset-email" name="email" type="email" autocomplete="email" required />
+
+      <button type="submit" class="btn auth-btn" data-default-label="Send reset link">
+        <span class="spinner" aria-hidden="true"></span>
+        <span data-btn-label>Send reset link</span>
+      </button>
+
+      <button type="button" class="auth-link auth-link-button" data-back-to-sign-in>Back to sign in</button>
+    </form>
+
     <form data-auth-pane="sign-up" data-sign-up-form hidden>
       <label for="signup-name">Full name</label>
       <input id="signup-name" name="fullName" type="text" autocomplete="name" required />
