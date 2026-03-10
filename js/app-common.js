@@ -198,6 +198,7 @@ export function initIcons() {
 export function initMobileNav() {
   const mobileQuery = window.matchMedia('(max-width: 768px)');
   const isProtectedApp = document.body.classList.contains('protected-app');
+  const isPublicApp = !isProtectedApp;
 
   const updateHeaderScrollState = () => {
     document.querySelectorAll('.site-header').forEach((header) => {
@@ -206,12 +207,20 @@ export function initMobileNav() {
     });
   };
 
-  document.querySelectorAll('.header-row').forEach((headerRow, index) => {
+  const navContainers = document.querySelectorAll('.header-row, .site-header > .site-shell');
+
+  navContainers.forEach((headerRow, index) => {
     const nav = headerRow.querySelector('.site-nav');
     if (!nav || headerRow.querySelector('.nav-toggle')) return;
 
     if (isProtectedApp) {
       headerRow.classList.add('has-mobile-nav');
+      return;
+    }
+
+    if (isPublicApp) {
+      headerRow.classList.add('mobile-bottom-nav');
+      nav.dataset.open = 'true';
       return;
     }
 
