@@ -94,8 +94,18 @@ function wireLogoutLink() {
   logoutLink.dataset.bound = 'true';
   logoutLink.addEventListener('click', async (event) => {
     event.preventDefault();
-    await logout();
-    window.location.href = '/';
+
+    if (logoutLink.dataset.loading === 'true') return;
+    logoutLink.dataset.loading = 'true';
+    logoutLink.setAttribute('aria-disabled', 'true');
+
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed, forcing return to home page.', error);
+    } finally {
+      window.location.href = '/';
+    }
   });
 }
 
