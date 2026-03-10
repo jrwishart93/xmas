@@ -1158,6 +1158,13 @@ body {
   animation: fadeIn .28s ease both;
 }
 
+
+.auth-form-helper {
+  margin: 0 0 .9rem;
+  color: #d2daf4;
+  font-size: .92rem;
+}
+
 .auth-card label {
   display: block;
   margin-top: .2rem;
@@ -1226,6 +1233,15 @@ body {
 
 .auth-link:hover {
   text-decoration: underline;
+}
+
+
+.auth-link-button {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
 }
 
 .auth-status {
