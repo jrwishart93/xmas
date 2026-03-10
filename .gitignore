@@ -11,3 +11,10 @@ npm-debug.log*
 .vercel
 build-server/
 firebase-debug.log
+public/archive/
+public/app/images/
+public/data/
+public/firebase.js
+public/js/
+public/legacy/
+public/styles/
