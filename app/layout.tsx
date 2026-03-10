@@ -41,7 +41,7 @@ export default function RootLayout({
           <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/80 to-black/90" />
         </div>
 
-        <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-black/45 backdrop-blur-md">
+        <header className="hidden border-b border-white/[0.07] bg-black/45 backdrop-blur-md md:sticky md:top-0 md:z-50 md:block">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
             <Link
               href="/"
