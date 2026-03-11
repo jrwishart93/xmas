@@ -1641,11 +1641,14 @@ h3,
 .dashboard-quick-payment {
   display: grid;
   gap: 1rem;
-  border-radius: 24px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 22px;
   background:
-    radial-gradient(circle at 0% 0%, rgba(105, 133, 255, 0.24), transparent 34%),
-    radial-gradient(circle at 100% 0%, rgba(37, 202, 181, 0.18), transparent 32%),
-    linear-gradient(150deg, rgba(22, 33, 58, 0.97), rgba(10, 17, 31, 0.99));
+    radial-gradient(circle at 0% 0%, rgba(96, 126, 255, 0.22), transparent 42%),
+    radial-gradient(circle at 100% 0%, rgba(46, 191, 236, 0.14), transparent 42%),
+    linear-gradient(180deg, rgba(40, 60, 110, 0.4), rgba(10, 20, 40, 0.6));
+  backdrop-filter: blur(20px);
 }
 
 .dashboard-quick-payment-copy {
@@ -1655,35 +1658,79 @@ h3,
 
 .dashboard-quick-payment-grid {
   display: grid;
-  gap: 0.75rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(100px, 1fr));
+  gap: 14px;
 }
 
 .dashboard-quick-payment-btn {
-  display: inline-flex;
-  align-items: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: center;
-  gap: 0.45rem;
-  min-height: 58px;
-  padding: 0.85rem 0.9rem;
-  border-radius: 16px;
-  border: 1px solid rgba(160, 185, 255, 0.3);
-  background: rgba(255, 255, 255, 0.08);
+  min-height: 78px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(35, 45, 70, 0.55);
   color: #f4f8ff;
   text-decoration: none;
-  font-weight: 700;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  backdrop-filter: blur(14px);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.dashboard-quick-payment-btn::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  z-index: -1;
+  background: radial-gradient(circle at center, rgba(70, 130, 255, 0.35), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .dashboard-quick-payment-btn:hover {
-  background: rgba(76, 112, 255, 0.24);
-  border-color: rgba(171, 195, 255, 0.46);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  border-color: rgba(175, 198, 255, 0.36);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(80, 130, 255, 0.2);
 }
 
-.dashboard-quick-payment-btn .icon {
-  width: 1rem;
-  height: 1rem;
+.dashboard-quick-payment-btn:hover::before,
+.dashboard-quick-payment-btn:focus-visible::before {
+  opacity: 1;
+}
+
+.dashboard-quick-payment-btn:active {
+  transform: scale(0.96);
+}
+
+.dashboard-quick-payment-btn .amount {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.dashboard-quick-payment-btn .label {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: rgba(233, 241, 255, 0.7);
+}
+
+.dashboard-quick-payment-footer {
+  margin: 0;
+  margin-top: -2px;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.6;
+  color: #d7e1fb;
 }
 
 .dashboard-payment-update {
@@ -2237,7 +2284,7 @@ h3,
   }
 
   .dashboard-quick-payment-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(100px, 1fr));
   }
 }
 
@@ -2353,12 +2400,12 @@ h3,
 
 
   .dashboard-quick-payment-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(100px, 1fr));
+    gap: 12px;
   }
 
   .dashboard-quick-payment-btn {
-    min-height: 60px;
-    font-size: 0.95rem;
+    min-height: 78px;
   }
 
   .dashboard-hero h1,
