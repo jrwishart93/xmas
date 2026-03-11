@@ -114,6 +114,42 @@ export function subscribeOutstandingScnCount(uid, onData) {
   });
 }
 
+function sortByCreatedAtDesc(left, right) {
+  const leftValue = left?.createdAt;
+  const rightValue = right?.createdAt;
+
+  const leftMs =
+    typeof leftValue?.toDate === 'function'
+      ? leftValue.toDate().getTime()
+      : typeof leftValue?._seconds === 'number'
+        ? leftValue._seconds * 1000
+        : typeof leftValue === 'number'
+          ? leftValue
+          : 0;
+
+  const rightMs =
+    typeof rightValue?.toDate === 'function'
+      ? rightValue.toDate().getTime()
+      : typeof rightValue?._seconds === 'number'
+        ? rightValue._seconds * 1000
+        : typeof rightValue === 'number'
+          ? rightValue
+          : 0;
+
+  return rightMs - leftMs;
+}
+
+export function subscribeOutstandingScns(uid, onData) {
+  return onSnapshot(query(scnsRef(), where('accusedUserId', '==', uid)), (snap) => {
+    const items = snap.docs
+      .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
+      .filter((item) => (item.status || 'issued') !== 'paid')
+      .sort(sortByCreatedAtDesc);
+
+    onData(items);
+  });
+}
+
 export function subscribeLeaderboard(onData) {
   const cutoff = ninetyDaysAgo();
   return onSnapshot(

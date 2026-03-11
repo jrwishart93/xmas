@@ -1,13 +1,14 @@
 import { TEAM } from '/archive/brewhemia-2025/team.js';
+import { loadAct, flattenClauses } from '/js/act.js';
 import { bootProtectedPage, initIcons, initPreviewGates } from '/js/app-common.js';
-import { money } from '/js/constants.js';
+import { money, STAGE_LABELS } from '/js/constants.js';
 import { PREVIEW_MODE } from '/js/config.js';
 import {
   getTrueLayerBalance,
   getTrueLayerConnectUrl,
   subscribeLeaderboard,
   subscribeMembers,
-  subscribeOutstandingScnCount,
+  subscribeOutstandingScns,
   subscribeTeamSummary,
 } from '/js/data.js';
 import {
@@ -15,9 +16,12 @@ import {
   getPreviewLeaderboardFromArchive,
 } from '/js/preview-data.js';
 import { initQuickPayMonzo } from '/js/quick-pay-monzo.js';
+import { getScnPaymentBreakdown } from '/js/scn-amount.js';
 
 const BANK_REFRESH_INTERVAL_MS = 60_000;
 const MEMBER_PREVIEW_LIMIT = 6;
+const OFFENCE_RESULT_LIMIT = 6;
+const PREVIEW_FINE_CODES = ['4.6', '2.5', '3.4'];
 
 function escapeHtml(value = '') {
   return String(value).replace(/[&<>"']/g, (character) => {
@@ -106,6 +110,174 @@ function previewMembers() {
       role: index === 0 ? 'admin' : 'member',
     }))
     .sort((left, right) => left.displayName.localeCompare(right.displayName));
+}
+
+function normalizeText(value = '') {
+  return String(value || '').trim().toLowerCase();
+}
+
+function parseTimestampMs(value) {
+  if (!value) return null;
+
+  if (typeof value === 'object' && typeof value.toDate === 'function') {
+    const date = value.toDate();
+    return date instanceof Date && !Number.isNaN(date.getTime()) ? date.getTime() : null;
+  }
+
+  if (typeof value === 'object' && typeof value._seconds === 'number') {
+    return value._seconds * 1000;
+  }
+
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value > 10_000_000_000 ? value : value * 1000;
+  }
+
+  const parsed = new Date(String(value));
+  return Number.isNaN(parsed.getTime()) ? null : parsed.getTime();
+}
+
+function formatShortDate(value) {
+  const timestamp = parseTimestampMs(value);
+  if (!timestamp) return 'recently';
+  return new Date(timestamp).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+  });
+}
+
+function formatFineStatus(scn) {
+  if (scn?.status === 'awaiting_payment') return 'Awaiting payment';
+  if (scn?.status === 'paid') return 'Paid';
+  if (scn?.stage && STAGE_LABELS[scn.stage]) return STAGE_LABELS[scn.stage];
+  if (scn?.stage) return formatRole(scn.stage);
+  return 'Issued';
+}
+
+function formatDueMessage(breakdown) {
+  if (!breakdown?.dueAtMs) return 'Timing set by the Act';
+
+  const dueDate = new Date(breakdown.dueAtMs);
+  const dueText = dueDate.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+  });
+
+  if (breakdown.isLatePenaltyApplied) {
+    return `Late adjustment applied on ${dueText}`;
+  }
+
+  return `Due by ${dueText}`;
+}
+
+function getFinePillClass(breakdown) {
+  if (breakdown?.isLatePenaltyApplied) return ' dashboard-fine-pill--danger';
+  if (breakdown?.dueAtMs && breakdown.dueAtMs - Date.now() < 24 * 60 * 60 * 1000) {
+    return ' dashboard-fine-pill--warning';
+  }
+  return '';
+}
+
+function buildFineLink(scnId) {
+  return `/app/scn/${encodeURIComponent(scnId)}/`;
+}
+
+function isPayableFine(scn) {
+  const status = normalizeText(scn?.status || '');
+  const stage = normalizeText(scn?.stage || '');
+
+  if (status === 'paid') return false;
+  if (status === 'awaiting_payment') return true;
+  if (!stage) return true;
+
+  return stage === 'pleaded_guilty' || stage === 'court_convicted';
+}
+
+function buildClauseLookup(clauses) {
+  const lookup = new Map();
+
+  clauses.forEach((clause) => {
+    const keys = [clause.id, clause.code].filter(Boolean);
+    keys.forEach((key) => {
+      lookup.set(normalizeText(key), clause);
+    });
+  });
+
+  return lookup;
+}
+
+function resolveClause(scn, clauseLookup) {
+  const key = normalizeText(scn?.clauseId || scn?.clauseCode || '');
+  return clauseLookup.get(key) || null;
+}
+
+function buildSearchBlob(clause) {
+  return normalizeText(
+    [
+      clause.id,
+      clause.code,
+      clause.title,
+      clause.description,
+      clause.partTitle,
+      `part ${clause.partNumber}`,
+    ].join(' ')
+  );
+}
+
+function searchClauses(clauses, searchTerm) {
+  const term = normalizeText(searchTerm);
+  if (!term) return [];
+
+  return clauses
+    .map((clause) => {
+      const code = normalizeText(clause.code || clause.id);
+      const title = normalizeText(clause.title);
+      const description = normalizeText(clause.description);
+      const haystack = buildSearchBlob(clause);
+
+      if (!haystack.includes(term)) return null;
+
+      let score = 0;
+      if (code === term) score += 120;
+      if (code.startsWith(term)) score += 70;
+      if (title.startsWith(term)) score += 55;
+      if (title.includes(term)) score += 30;
+      if (description.includes(term)) score += 12;
+
+      return { clause, score };
+    })
+    .filter(Boolean)
+    .sort((left, right) => right.score - left.score || left.clause.partNumber - right.clause.partNumber)
+    .slice(0, OFFENCE_RESULT_LIMIT)
+    .map((item) => item.clause);
+}
+
+function findMatchingOutstandingScns(clause, outstandingScns) {
+  const keys = new Set([normalizeText(clause.id), normalizeText(clause.code)].filter(Boolean));
+  return outstandingScns.filter((scn) => keys.has(normalizeText(scn?.clauseId || scn?.clauseCode || '')));
+}
+
+function buildPreviewOutstandingScns(clauses) {
+  const now = Date.now();
+
+  return PREVIEW_FINE_CODES.map((code, index) => {
+    const clause = clauses.find((item) => String(item.code) === code) || clauses[index] || null;
+    if (!clause) return null;
+
+    const createdAt = new Date(now - (index + 1) * 24 * 60 * 60 * 1000).toISOString();
+
+    return {
+      id: `preview-${clause.code || index + 1}`,
+      clauseId: clause.id || clause.code,
+      clauseTitle: clause.title,
+      accusedUserId: 'preview-user',
+      baseAmountPence: clause.amountPence,
+      latePenaltyMultiplier: clause.latePenaltyMultiplier,
+      latePenaltyAfterDays: clause.latePenaltyAfterDays,
+      createdAt,
+      status: index === 0 ? 'awaiting_payment' : 'issued',
+      stage: index === 2 ? 'court_requested' : 'pleaded_guilty',
+    };
+  }).filter(Boolean);
 }
 
 function updateIdentity(ctx) {
@@ -205,6 +377,162 @@ function ensureAdminActionCard() {
   grid.appendChild(card);
 }
 
+function renderSearchResults(state) {
+  const meta = document.getElementById('dashboardSearchMeta');
+  const container = document.getElementById('dashboardSearchResults');
+  const searchInput = document.getElementById('dashboardOffenceSearchInput');
+  const term = searchInput?.value || '';
+
+  if (!state.clauses.length) {
+    meta.textContent = 'Offence search is unavailable right now.';
+    container.innerHTML = `
+      <div class="dashboard-empty-state">
+        <strong>Unable to load offence data.</strong>
+        <span>Please refresh the page and try again.</span>
+      </div>
+    `;
+    return;
+  }
+
+  if (!normalizeText(term)) {
+    meta.textContent = 'Search by offence code, title, or keyword. Suggested searches are above.';
+    container.innerHTML = `
+      <div class="dashboard-search-placeholder">
+        <strong>Start with what you know.</strong>
+        <span>Search by code like 4.6, or by words such as birthday, speeding, or promotion.</span>
+      </div>
+    `;
+    return;
+  }
+
+  const results = searchClauses(state.clauses, term);
+
+  if (!results.length) {
+    meta.textContent = `No offences matched "${term}".`;
+    container.innerHTML = `
+      <div class="dashboard-empty-state">
+        <strong>No results found.</strong>
+        <span>Try a shorter phrase or search by section code.</span>
+      </div>
+    `;
+    return;
+  }
+
+  meta.textContent = `Showing ${results.length} matching offence${results.length === 1 ? '' : 's'}.`;
+  container.innerHTML = results.map((clause) => {
+    const matches = findMatchingOutstandingScns(clause, state.outstandingScns);
+    const matchButtons = matches.slice(0, 2).map((scn) => {
+      const breakdown = getScnPaymentBreakdown(scn);
+      return `
+        <a href="${buildFineLink(scn.id)}" class="btn">
+          Pay ${escapeHtml(money(breakdown.currentAmountPence))} fine
+        </a>
+      `;
+    }).join('');
+    const extraMatches = matches.length > 2 ? `<span class="dashboard-search-note">+${matches.length - 2} more open fine${matches.length - 2 === 1 ? '' : 's'}</span>` : '';
+
+    return `
+      <article class="dashboard-search-result">
+        <div class="dashboard-search-result__head">
+          <div class="dashboard-search-result__badges">
+            <span class="badge">${escapeHtml(clause.code || clause.id)}</span>
+            <span class="dashboard-search-part">Part ${escapeHtml(clause.partNumber)} · ${escapeHtml(clause.partTitle || 'Act reference')}</span>
+          </div>
+          <strong class="dashboard-search-amount">${escapeHtml(money(clause.amountPence || 0))}</strong>
+        </div>
+        <h3>${escapeHtml(clause.title || clause.code || 'Offence')}</h3>
+        <p>${escapeHtml(clause.description || 'No description provided.')}</p>
+        <div class="dashboard-search-actions">
+          <a href="/act/#section-${encodeURIComponent(clause.code || clause.id)}" class="btn secondary">Read clause</a>
+          ${matchButtons}
+          ${extraMatches}
+        </div>
+        <p class="dashboard-search-note">
+          ${matches.length
+            ? `${matches.length} open fine${matches.length === 1 ? '' : 's'} currently match this offence.`
+            : 'No open fine currently matches this offence.'}
+        </p>
+      </article>
+    `;
+  }).join('');
+}
+
+function renderOpenFines(state) {
+  const meta = document.getElementById('dashboardOpenFinesMeta');
+  const container = document.getElementById('dashboardOpenFinesList');
+  const count = state.outstandingScns.length;
+
+  document.getElementById('outstandingCount').textContent = String(count);
+
+  if (!count) {
+    meta.textContent = 'No unpaid fines are assigned to you right now.';
+    container.innerHTML = `
+      <div class="dashboard-empty-state">
+        <strong>Nothing waiting for payment.</strong>
+        <span>When a notice is issued to you, it will appear here with a direct link to its payment page.</span>
+      </div>
+    `;
+    return;
+  }
+
+  meta.textContent = `${count} open fine${count === 1 ? '' : 's'} ready to review and pay.`;
+  container.innerHTML = state.outstandingScns.slice(0, 5).map((scn) => {
+    const clause = resolveClause(scn, state.clauseLookup);
+    const breakdown = getScnPaymentBreakdown(scn);
+    const title = clause?.title || scn.clauseTitle || scn.clauseId || 'Open fine';
+    const code = clause?.code || scn.clauseId || 'SCN';
+
+    return `
+      <article class="dashboard-fine-card">
+        <div class="dashboard-fine-card__head">
+          <div class="dashboard-fine-card__title-wrap">
+            <div class="dashboard-fine-card__labels">
+              <span class="badge">${escapeHtml(code)}</span>
+              <span class="dashboard-fine-pill${getFinePillClass(breakdown)}">${escapeHtml(formatFineStatus(scn))}</span>
+            </div>
+            <h3>${escapeHtml(title)}</h3>
+          </div>
+          <strong class="dashboard-fine-card__amount">${escapeHtml(money(breakdown.currentAmountPence))}</strong>
+        </div>
+        <p class="dashboard-fine-card__meta">
+          Issued ${escapeHtml(formatShortDate(scn.createdAt))} · ${escapeHtml(formatDueMessage(breakdown))}
+        </p>
+        <div class="actions">
+          <a href="${buildFineLink(scn.id)}" class="btn">Pay now</a>
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
+function refreshFineHub(state) {
+  renderSearchResults(state);
+  renderOpenFines(state);
+}
+
+function bindSearchControls(state) {
+  const searchInput = document.getElementById('dashboardOffenceSearchInput');
+  if (searchInput?.dataset.bound === 'true') return;
+
+  if (searchInput) {
+    searchInput.dataset.bound = 'true';
+    searchInput.addEventListener('input', () => {
+      renderSearchResults(state);
+    });
+  }
+
+  document.querySelectorAll('[data-dashboard-search-value]').forEach((button) => {
+    if (button.dataset.bound === 'true') return;
+    button.dataset.bound = 'true';
+    button.addEventListener('click', () => {
+      if (!searchInput) return;
+      searchInput.value = button.dataset.dashboardSearchValue || '';
+      searchInput.focus();
+      renderSearchResults(state);
+    });
+  });
+}
+
 bootProtectedPage(async (ctx) => {
   const bankBalanceEl = document.getElementById('teamSocialFundBalance');
   const bankMetaEl = document.getElementById('teamSocialFundMeta');
@@ -215,12 +543,25 @@ bootProtectedPage(async (ctx) => {
   const state = {
     leaderboardRows: [],
     membersById: new Map(),
+    clauses: [],
+    clauseLookup: new Map(),
+    outstandingScns: [],
   };
 
   updateIdentity(ctx);
   if (isAdmin) {
     ensureAdminActionCard();
   }
+
+  try {
+    state.clauses = await loadAct().then(flattenClauses);
+    state.clauseLookup = buildClauseLookup(state.clauses);
+  } catch (error) {
+    console.warn('Unable to load Act clauses for dashboard search:', error);
+  }
+
+  bindSearchControls(state);
+  refreshFineHub(state);
   initQuickPayMonzo(document.getElementById('quickPayMonzoSection'));
 
   if (PREVIEW_MODE) {
@@ -233,17 +574,18 @@ bootProtectedPage(async (ctx) => {
 
     document.getElementById('confirmedTotal').textContent = previewBalance.formatted;
     document.getElementById('pendingTotal').textContent = '£6.00';
-    document.getElementById('outstandingCount').textContent = '3';
     bankBalanceEl.textContent = '£187.40';
     bankMetaEl.textContent = 'Illustrative balance from the Team Social Fund Monzo account.';
     connectBankBtn.hidden = true;
     refreshBankBtn.hidden = true;
+    state.outstandingScns = buildPreviewOutstandingScns(state.clauses).filter(isPayableFine);
 
     renderMemberPreview(members, ctx.user.uid);
     renderLeaderboard(
       previewRows,
       new Map(members.map((member) => [member.uid, member]))
     );
+    refreshFineHub(state);
 
     initQuickPayMonzo(document.getElementById('quickPayMonzoSection'));
     initPreviewGates();
@@ -268,8 +610,9 @@ bootProtectedPage(async (ctx) => {
   );
 
   unsubscribers.push(
-    subscribeOutstandingScnCount(ctx.user.uid, (count) => {
-      document.getElementById('outstandingCount').textContent = String(count);
+    subscribeOutstandingScns(ctx.user.uid, (items) => {
+      state.outstandingScns = items.filter(isPayableFine);
+      refreshFineHub(state);
     })
   );
 

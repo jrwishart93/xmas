@@ -43,6 +43,10 @@
       <p class="eyebrow">Member dashboard</p>
       <h1 id="dashboardGreeting">Member dashboard</h1>
       <p id="dashboardIdentity" class="dashboard-lead">Loading account overview.</p>
+      <div class="actions dashboard-hero-actions">
+        <a href="#dashboardFineSearch" class="btn">Search an offence</a>
+        <a href="#dashboardOpenFines" class="btn secondary">Pay a fine</a>
+      </div>
       <div class="dashboard-status-strip">
         <span class="status-chip"><i data-lucide="shield-check" class="icon"></i><span id="dashboardStatusText">Verifying secure session...</span></span>
         <span class="status-chip"><i data-lucide="users" class="icon"></i><span id="dashboardMemberCount">Loading team members...</span></span>
@@ -98,9 +102,52 @@
 
     <article class="card p-responsive dashboard-kpi-card">
       <p class="eyebrow">Your Queue</p>
-      <h2 class="section-header"><i data-lucide="alert-triangle" class="icon"></i>Open Notices</h2>
+      <h2 class="section-header"><i data-lucide="alert-triangle" class="icon"></i>Payable Fines</h2>
       <p id="outstandingCount" class="metric">0</p>
-      <p class="muted">SCNs currently assigned to you.</p>
+      <p class="muted">Notices ready to review and settle.</p>
+    </article>
+  </section>
+
+  <section class="dashboard-pay-grid">
+    <article class="card p-responsive dashboard-spotlight-card" id="dashboardFineSearch">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Find an offence</p>
+          <h2 class="section-header"><i data-lucide="search" class="icon"></i>Search by code, title, or keyword</h2>
+        </div>
+      </div>
+      <p class="muted dashboard-spotlight-copy">
+        Search the Act directly from your dashboard, check the standard amount, and jump to payment if you already have an open fine for that offence.
+      </p>
+      <label class="dashboard-search-field" for="dashboardOffenceSearchInput">
+        <span class="dashboard-search-label">Offence search</span>
+        <input
+          id="dashboardOffenceSearchInput"
+          type="search"
+          placeholder="Try 4.6, birthday, speeding, promotion..."
+          autocomplete="off"
+        />
+      </label>
+      <div class="dashboard-search-chip-row" aria-label="Suggested searches">
+        <button type="button" class="dashboard-search-chip" data-dashboard-search-value="4.6">4.6</button>
+        <button type="button" class="dashboard-search-chip" data-dashboard-search-value="birthday">Birthday</button>
+        <button type="button" class="dashboard-search-chip" data-dashboard-search-value="speeding">Speeding</button>
+        <button type="button" class="dashboard-search-chip" data-dashboard-search-value="promotion">Promotion</button>
+      </div>
+      <p id="dashboardSearchMeta" class="muted dashboard-search-meta">Loading offence list...</p>
+      <div id="dashboardSearchResults" class="dashboard-search-results"></div>
+    </article>
+
+    <article class="card p-responsive dashboard-spotlight-card" id="dashboardOpenFines">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Pay a fine</p>
+          <h2 class="section-header"><i data-lucide="credit-card" class="icon"></i>Your open fines</h2>
+        </div>
+        <a href="/app/issue/" class="btn secondary">View all cases</a>
+      </div>
+      <p id="dashboardOpenFinesMeta" class="muted dashboard-spotlight-copy">Checking your current notices...</p>
+      <div id="dashboardOpenFinesList" class="dashboard-open-fines"></div>
     </article>
   </section>
 
@@ -113,6 +160,16 @@
         </div>
       </div>
       <div class="dashboard-action-grid">
+        <a href="#dashboardFineSearch" class="dashboard-action-card dashboard-action-card--highlight">
+          <i data-lucide="search" class="icon"></i>
+          <strong>Search Offences</strong>
+          <span>Look up a clause and confirm the standard amount.</span>
+        </a>
+        <a href="#dashboardOpenFines" class="dashboard-action-card dashboard-action-card--highlight">
+          <i data-lucide="credit-card" class="icon"></i>
+          <strong>Pay a Fine</strong>
+          <span>Open the notices waiting for payment.</span>
+        </a>
         <a href="/app/issue/" class="dashboard-action-card" data-preview-gate>
           <i data-lucide="plus-circle" class="icon"></i>
           <strong>Issue SCN</strong>
@@ -162,22 +219,22 @@
     <article class="card p-responsive">
       <div class="panel-header">
         <div>
-          <p class="eyebrow">Process</p>
-          <h2 class="section-header"><i data-lucide="gavel" class="icon"></i>How the Application Works</h2>
+          <p class="eyebrow">Payment path</p>
+          <h2 class="section-header"><i data-lucide="gavel" class="icon"></i>How to settle a fine quickly</h2>
         </div>
       </div>
       <div class="dashboard-stack">
         <div class="dashboard-step">
-          <strong>1. Create or record an SCN</strong>
-          <span>Record an SCN for yourself or another team member.</span>
+          <strong>1. Search the offence</strong>
+          <span>Use the dashboard search to confirm the clause, amount, and whether a matching notice is open for you.</span>
         </div>
         <div class="dashboard-step">
-          <strong>2. Review the current amount</strong>
-          <span>The Act sets the standard amount and any timing-based adjustment.</span>
+          <strong>2. Open the fine details</strong>
+          <span>Select Pay now from Your open fines to review the current amount, due date, and payment options.</span>
         </div>
         <div class="dashboard-step">
-          <strong>3. Track the fund</strong>
-          <span>Monitor balances, standings, and contribution activity from one place.</span>
+          <strong>3. Complete payment in your bank app</strong>
+          <span>Use Open Banking or bank transfer from the SCN page so the record stays tied to the correct notice.</span>
         </div>
       </div>
     </article>
