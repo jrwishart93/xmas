@@ -38,19 +38,13 @@
 </header>
 
 <main class="site-shell with-fixed-header">
-  <section class="card glass-panel fade-in p-responsive dashboard-hero">
+  <section class="card glass-panel fade-in p-responsive dashboard-hero dashboard-hero--compact">
     <div class="dashboard-hero-copy">
-      <p class="eyebrow">Member dashboard</p>
-      <h1 id="dashboardGreeting">Member dashboard</h1>
-      <p id="dashboardIdentity" class="dashboard-lead">Loading account overview.</p>
-      <div class="actions dashboard-hero-actions">
-        <a href="#dashboardFineSearch" class="btn">Search an offence</a>
-        <a href="#dashboardOpenFines" class="btn secondary">Pay a fine</a>
-      </div>
+      <h1 id="dashboardGreeting">Welcome back, Team Member</h1>
+      <p id="dashboardIdentity" class="dashboard-lead">Manage contributions to the Team Social Fund.</p>
       <div class="dashboard-status-strip">
         <span class="status-chip"><i data-lucide="shield-check" class="icon"></i><span id="dashboardStatusText">Verifying secure session...</span></span>
         <span class="status-chip"><i data-lucide="users" class="icon"></i><span id="dashboardMemberCount">Loading team members...</span></span>
-        <span class="status-chip"><i data-lucide="clock-3" class="icon"></i><span>Amounts may adjust after 3 days under the Act</span></span>
       </div>
     </div>
 
@@ -68,6 +62,45 @@
         <span class="muted">Team access active</span>
       </div>
     </aside>
+  </section>
+
+  <section class="card p-responsive dashboard-quick-payment" aria-label="Quick payment">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">Quick Payment</p>
+        <h2 class="section-header"><i data-lucide="banknote" class="icon"></i>Quick Payment</h2>
+      </div>
+    </div>
+    <p class="dashboard-quick-payment-copy">
+      Pay a contribution to the Team Social Fund in seconds.
+      Select an amount below to transfer directly into the shared team account.
+    </p>
+    <div class="dashboard-quick-payment-grid" role="list" aria-label="Quick payment amounts">
+      <a href="https://monzo.com/pay/r/team-funds_aRlKSNC7qhSOwp?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem"><i data-lucide="pound-sterling" class="icon"></i><span>£1 Contribution</span></a>
+      <a href="https://monzo.com/pay/r/team-funds_CPB94nTOohBqbA?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem"><i data-lucide="pound-sterling" class="icon"></i><span>£2 Contribution</span></a>
+      <a href="https://monzo.com/pay/r/team-funds_y4u0pUaquscHIr?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem"><i data-lucide="pound-sterling" class="icon"></i><span>£3 Contribution</span></a>
+      <a href="https://monzo.com/pay/r/team-funds_gULPWd7vCdIgI0?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem"><i data-lucide="pound-sterling" class="icon"></i><span>£4 Contribution</span></a>
+      <a href="https://monzo.com/pay/r/team-funds_ic1AXddsyKMpjz?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem"><i data-lucide="pound-sterling" class="icon"></i><span>£5 Contribution</span></a>
+    </div>
+  </section>
+
+  <section class="card p-responsive dashboard-payment-update" aria-label="Payment system update">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">Notice</p>
+        <h2 class="section-header"><i data-lucide="info" class="icon"></i>Payment System Update</h2>
+      </div>
+    </div>
+    <p>The fully integrated online payment system is currently being developed.</p>
+    <p>In the meantime, quick payment options above allow contributions to be sent directly into the Team Social Fund using secure Monzo payment links.</p>
+    <p>All contributions go into the shared team account which is used for team events and social activities.</p>
+    <p>Once the integrated system is complete, payments will automatically record and track contributions within the app.</p>
+  </section>
+
+  <section class="dashboard-more-features-header">
+    <p class="eyebrow">More Features</p>
+    <h2 class="section-header"><i data-lucide="layout-grid" class="icon"></i>More Features</h2>
+    <p class="muted">Additional tools and tracking features will appear here as they are introduced.</p>
   </section>
 
   <section class="dashboard-kpi-grid">
@@ -240,9 +273,6 @@
     </article>
   </section>
 
-  <!-- Quick Pay: Monzo widget — populated by js/quick-pay-monzo.js -->
-  <article id="quickPayMonzoSection" class="card p-responsive">
-  </article>
 </main>
 
 <script type="module" src="/js/dashboard-page.js"></script>

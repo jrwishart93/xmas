@@ -15,7 +15,6 @@ import {
   getPreviewBalanceFromArchive,
   getPreviewLeaderboardFromArchive,
 } from '/js/preview-data.js';
-import { initQuickPayMonzo } from '/js/quick-pay-monzo.js';
 import { getScnPaymentBreakdown } from '/js/scn-amount.js';
 
 const BANK_REFRESH_INTERVAL_MS = 60_000;
@@ -286,7 +285,7 @@ function updateIdentity(ctx) {
   const email = ctx.user?.email || 'Signed-in account';
 
   document.getElementById('dashboardGreeting').textContent = `Welcome back, ${displayName}`;
-  document.getElementById('dashboardIdentity').textContent = `${roleLabel} access is active for ${email}.`;
+  document.getElementById('dashboardIdentity').textContent = 'Manage contributions to the Team Social Fund.';
   document.getElementById('dashboardStatusText').textContent = 'Secure session active';
   document.getElementById('dashboardMemberCount').textContent = 'Loading team members...';
   document.getElementById('dashboardUserName').textContent = displayName;
@@ -562,7 +561,6 @@ bootProtectedPage(async (ctx) => {
 
   bindSearchControls(state);
   refreshFineHub(state);
-  initQuickPayMonzo(document.getElementById('quickPayMonzoSection'));
 
   if (PREVIEW_MODE) {
     const members = previewMembers();
@@ -587,7 +585,6 @@ bootProtectedPage(async (ctx) => {
     );
     refreshFineHub(state);
 
-    initQuickPayMonzo(document.getElementById('quickPayMonzoSection'));
     initPreviewGates();
     initIcons();
     return;
