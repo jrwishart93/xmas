@@ -19,6 +19,8 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+<div class="app-background" aria-hidden="true"></div>
+
 <header class="site-header">
   <div class="site-shell header-row">
     <p class="brand">Team Directory</p>
@@ -34,7 +36,7 @@
   </div>
 </header>
 
-<main class="site-shell with-fixed-header">
+<main class="site-shell with-fixed-header app-content">
   <section class="card glass-panel fade-in p-responsive team-page-hero">
     <div class="team-page-hero__copy">
       <p class="eyebrow">Team directory</p>
@@ -43,7 +45,7 @@
     </div>
     <label class="team-search-field">
       <span>Search directory</span>
-      <input id="teamSearchInput" type="search" placeholder="Search by name, role, or email" autocomplete="off" />
+      <input id="teamSearchInput" type="search" placeholder="Search by name or role" autocomplete="off" />
     </label>
   </section>
 

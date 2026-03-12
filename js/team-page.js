@@ -36,7 +36,7 @@ function formatRole(role = 'member') {
 }
 
 function getUserDisplayName(ctx) {
-  return ctx.membership?.displayName || ctx.user?.displayName || ctx.user?.email?.split('@')[0] || 'Team Member';
+  return ctx.membership?.displayName || ctx.user?.displayName || 'Team Member';
 }
 
 function previewMembers() {
@@ -44,7 +44,6 @@ function previewMembers() {
     .map((member, index) => ({
       uid: member.id,
       displayName: member.name,
-      email: `${member.id}@preview.local`,
       role: index === 0 ? 'admin' : 'member',
     }))
     .sort((left, right) => left.displayName.localeCompare(right.displayName));
@@ -62,15 +61,13 @@ bootProtectedPage(async (ctx) => {
   let members = [];
 
   currentRole.textContent = formatRole(ctx.membership?.role);
-  currentIdentity.textContent = `${getUserDisplayName(ctx)} · ${ctx.user?.email || 'Signed-in account'}`;
+  currentIdentity.textContent = getUserDisplayName(ctx);
 
   const render = () => {
     const term = String(searchInput.value || '').trim().toLowerCase();
     const filteredMembers = members.filter((member) => {
       const haystack = [
         member.displayName,
-        member.email,
-        member.uid,
         formatRole(member.role),
       ]
         .filter(Boolean)
@@ -89,21 +86,16 @@ bootProtectedPage(async (ctx) => {
     emptyState.hidden = filteredMembers.length !== 0;
 
     filteredMembers.forEach((member) => {
-      const displayName = member.displayName || member.email || member.uid;
-      const isCurrentUser = member.uid === ctx.user.uid;
+      const displayName = member.displayName || 'Team Member';
       const card = document.createElement('article');
-      card.className = `member-card member-card--directory${isCurrentUser ? ' member-card--current' : ''}`;
+      card.className = 'member-card member-card--directory';
       card.innerHTML = `
         <div class="member-card__head">
           <span class="member-card__avatar" aria-hidden="true">${escapeHtml(initialsFromName(displayName))}</span>
           <div class="member-card__meta">
             <strong>${escapeHtml(displayName)}</strong>
-            <span>${escapeHtml(member.email || 'Team account')}</span>
+            <span>${escapeHtml(formatRole(member.role))}</span>
           </div>
-        </div>
-        <div class="member-card__footer">
-          <span class="badge">${escapeHtml(formatRole(member.role))}</span>
-          ${isCurrentUser ? '<span class="member-card__you">You</span>' : `<span class="muted">${escapeHtml(member.uid)}</span>`}
         </div>
       `;
       directory.appendChild(card);
