@@ -12,7 +12,7 @@ export const MEMBER_NAV_ITEMS = [
   { section: 'admin', href: '/admin/', label: 'Admin', icon: 'shield', kind: 'secondary', adminOnly: true },
   { section: 'disbursements', href: '/app/disbursements/', label: 'Disburse', icon: 'wallet', kind: 'secondary', previewRoute: true },
   { section: 'settings', href: '/under-construction/', label: 'Settings', icon: 'settings', kind: 'secondary' },
-  { section: 'act', href: '/app/act/', label: 'Act', icon: 'scroll-text', kind: 'primary' },
+  { section: 'act', href: '/act/', label: 'Act', icon: 'scroll-text', kind: 'primary' },
 ];
 
 export function getVisibleMemberNavItems({ isAdmin = false, includeSecondary = true } = {}) {
