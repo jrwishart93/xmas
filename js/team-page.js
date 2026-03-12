@@ -41,10 +41,10 @@ function getUserDisplayName(ctx) {
 
 function previewMembers() {
   return Object.values(TEAM)
-    .map((member, index) => ({
+    .map((member) => ({
       uid: member.id,
       displayName: member.name,
-      role: index === 0 ? 'admin' : 'member',
+      role: 'member',
     }))
     .sort((left, right) => left.displayName.localeCompare(right.displayName));
 }
@@ -55,7 +55,7 @@ bootProtectedPage(async (ctx) => {
   const emptyState = document.getElementById('teamDirectoryEmpty');
   const directoryMeta = document.getElementById('teamDirectoryMeta');
   const totalCount = document.getElementById('teamTotalCount');
-  const adminCount = document.getElementById('teamAdminCount');
+  const visibleCount = document.getElementById('teamVisibleCount');
   const currentRole = document.getElementById('teamCurrentRole');
   const currentIdentity = document.getElementById('teamCurrentIdentity');
   let members = [];
@@ -64,23 +64,21 @@ bootProtectedPage(async (ctx) => {
   currentIdentity.textContent = getUserDisplayName(ctx);
 
   const render = () => {
+    const membersForDirectory = members.filter((member) => String(member.role || '').toLowerCase() !== 'admin');
     const term = String(searchInput.value || '').trim().toLowerCase();
-    const filteredMembers = members.filter((member) => {
-      const haystack = [
-        member.displayName,
-        formatRole(member.role),
-      ]
+    const filteredMembers = membersForDirectory.filter((member) => {
+      const haystack = [member.displayName]
         .filter(Boolean)
         .join(' ')
         .toLowerCase();
       return !term || haystack.includes(term);
     });
 
-    totalCount.textContent = String(members.length);
-    adminCount.textContent = String(members.filter((member) => String(member.role || '').toLowerCase() === 'admin').length);
-    directoryMeta.textContent = filteredMembers.length === members.length
-      ? `${members.length} team member${members.length === 1 ? '' : 's'} in the directory.`
-      : `Showing ${filteredMembers.length} of ${members.length} team members.`;
+    totalCount.textContent = String(membersForDirectory.length);
+    visibleCount.textContent = String(filteredMembers.length);
+    directoryMeta.textContent = filteredMembers.length === membersForDirectory.length
+      ? `${membersForDirectory.length} team member${membersForDirectory.length === 1 ? '' : 's'} in the directory.`
+      : `Showing ${filteredMembers.length} of ${membersForDirectory.length} team members.`;
 
     directory.innerHTML = '';
     emptyState.hidden = filteredMembers.length !== 0;
@@ -94,7 +92,7 @@ bootProtectedPage(async (ctx) => {
           <span class="member-card__avatar" aria-hidden="true">${escapeHtml(initialsFromName(displayName))}</span>
           <div class="member-card__meta">
             <strong>${escapeHtml(displayName)}</strong>
-            <span>${escapeHtml(formatRole(member.role))}</span>
+            <span>Active member</span>
           </div>
         </div>
       `;

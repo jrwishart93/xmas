@@ -40,12 +40,17 @@
   <section class="card glass-panel fade-in p-responsive team-page-hero">
     <div class="team-page-hero__copy">
       <p class="eyebrow">Team directory</p>
-      <h1>View current members</h1>
-      <p class="dashboard-lead">Search team members, review roles, and keep directory details current.</p>
+      <h1>Meet the team</h1>
+      <p class="dashboard-lead">A polished snapshot of active contributors in the social fund.</p>
+      <div class="team-hero-badges" aria-hidden="true">
+        <span>Live roster</span>
+        <span>Instant search</span>
+        <span>Member-first view</span>
+      </div>
     </div>
     <label class="team-search-field">
       <span>Search directory</span>
-      <input id="teamSearchInput" type="search" placeholder="Search by name or role" autocomplete="off" />
+      <input id="teamSearchInput" type="search" placeholder="Search by name" autocomplete="off" />
     </label>
   </section>
 
@@ -57,9 +62,9 @@
     </article>
 
     <article class="card p-responsive dashboard-kpi-card">
-      <p class="eyebrow">Admins</p>
-      <p class="metric" id="teamAdminCount">0</p>
-      <p class="muted">Members with admin access.</p>
+      <p class="eyebrow">Search Matches</p>
+      <p class="metric" id="teamVisibleCount">0</p>
+      <p class="muted">Members currently shown in the directory.</p>
     </article>
 
     <article class="card p-responsive dashboard-kpi-card">
