@@ -1733,6 +1733,136 @@ h3,
   color: #d7e1fb;
 }
 
+
+.dashboard-whats-coming {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 0.25rem;
+  padding-top: 1.15rem;
+  border-top: 1px solid rgba(164, 187, 255, 0.24);
+}
+
+.dashboard-whats-coming-header {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.dashboard-whats-coming-header h3 {
+  margin: 0;
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+}
+
+.dashboard-whats-coming-copy {
+  margin: 0;
+  color: #dbe5ff;
+  max-width: 56ch;
+}
+
+.dashboard-whats-coming-trigger {
+  width: fit-content;
+  min-height: 42px;
+  border-radius: 999px;
+  border-color: rgba(184, 205, 255, 0.42);
+  background: rgba(48, 68, 121, 0.52);
+  color: #f2f6ff;
+}
+
+.dashboard-whats-coming-trigger:hover {
+  border-color: rgba(214, 227, 255, 0.56);
+  background: rgba(60, 84, 147, 0.62);
+}
+
+.dashboard-info-modal {
+  width: min(720px, calc(100vw - 2rem));
+  max-height: min(84vh, 780px);
+  border: 0;
+  padding: 0;
+  border-radius: 24px;
+  background: transparent;
+  color: #eef3ff;
+}
+
+.dashboard-info-modal::backdrop {
+  background: rgba(3, 7, 16, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.dashboard-info-modal__backdrop-close {
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.dashboard-info-modal__backdrop {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dashboard-info-modal__content {
+  position: relative;
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  max-height: min(84vh, 780px);
+  overflow: auto;
+  border-radius: 24px;
+  border: 1px solid rgba(174, 196, 255, 0.24);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(88, 121, 255, 0.26), transparent 36%),
+    radial-gradient(circle at 100% 0%, rgba(44, 194, 216, 0.16), transparent 32%),
+    linear-gradient(180deg, rgba(17, 28, 53, 0.98), rgba(11, 18, 34, 0.98));
+  box-shadow: 0 24px 80px rgba(4, 8, 18, 0.72);
+  padding: clamp(1.05rem, 3vw, 1.4rem);
+}
+
+.dashboard-info-modal__content p,
+.dashboard-info-modal__content ul {
+  margin: 0;
+  color: #dce7ff;
+}
+
+.dashboard-info-modal__content ul {
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.dashboard-info-modal__content h3 {
+  margin: 0.25rem 0 0;
+  font-size: 1rem;
+  color: #f4f8ff;
+}
+
+.dashboard-info-modal__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(198, 214, 255, 0.34);
+  background: rgba(255, 255, 255, 0.07);
+  color: #eef3ff;
+  cursor: pointer;
+}
+
+.dashboard-info-modal__close:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.dashboard-info-modal__note {
+  margin-top: 0.4rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(176, 197, 255, 0.2);
+}
+
 .dashboard-payment-update {
   border-radius: 24px;
   background: linear-gradient(180deg, rgba(20, 28, 47, 0.72), rgba(12, 19, 34, 0.75));
@@ -2406,6 +2536,19 @@ h3,
 
   .dashboard-quick-payment-btn {
     min-height: 78px;
+  }
+
+  .dashboard-whats-coming-trigger {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dashboard-info-modal {
+    width: calc(100vw - 1rem);
+  }
+
+  .dashboard-info-modal__content {
+    max-height: 86vh;
   }
 
   .dashboard-hero h1,

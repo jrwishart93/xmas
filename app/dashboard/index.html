@@ -82,7 +82,58 @@
       <a href="https://monzo.com/pay/r/team-funds_ic1AXddsyKMpjz?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem"><span class="amount">£5</span><span class="label">Contribution</span></a>
     </div>
     <p class="dashboard-quick-payment-footer">Payments open securely in Monzo.</p>
+
+    <section class="dashboard-whats-coming" aria-label="What's coming">
+      <div class="dashboard-whats-coming-header">
+        <p class="eyebrow">What’s Coming</p>
+        <h3>Alleged Breach Reporting</h3>
+      </div>
+      <p class="dashboard-whats-coming-copy">
+        A new feature will soon allow team members to formally report an alleged breach of the Social Contributions Act.
+      </p>
+      <button type="button" class="btn btn-secondary dashboard-whats-coming-trigger" id="openBreachModal">
+        Read How It Works
+      </button>
+    </section>
   </section>
+
+  <dialog class="dashboard-info-modal" id="breachInfoModal" aria-labelledby="breachModalTitle">
+    <form method="dialog" class="dashboard-info-modal__backdrop-close">
+      <button class="dashboard-info-modal__backdrop" aria-label="Close"></button>
+    </form>
+    <article class="dashboard-info-modal__content">
+      <button type="button" class="dashboard-info-modal__close" id="closeBreachModal" aria-label="Close details">
+        <i data-lucide="x" class="icon"></i>
+      </button>
+      <p class="eyebrow">What’s Coming</p>
+      <h2 id="breachModalTitle" class="section-header"><i data-lucide="shield-alert" class="icon"></i>Alleged Breach Reporting</h2>
+      <p>
+        A new feature is currently in development which will allow team members to formally report an alleged breach of the Social Contributions Act.
+      </p>
+      <p>When released, users will be able to:</p>
+      <ul>
+        <li>Select the team member involved</li>
+        <li>Choose the relevant section of the Act</li>
+        <li>Add optional notes or circumstances</li>
+        <li>Submit the allegation for review</li>
+      </ul>
+      <p>
+        Once submitted, the accused team member will receive a notification and the matter will appear on the Outstanding Offences Board.
+      </p>
+      <p>The accused will then have two options:</p>
+      <h3>Admit the offence</h3>
+      <p>The contribution can be paid immediately using the Quick Payment options above.</p>
+      <h3>Contest the allegation</h3>
+      <p>The matter will be placed before the team for a vote.</p>
+      <p>If the vote finds the accused guilty, the contribution amount will be doubled.</p>
+      <p>
+        If the vote finds the accused not guilty, the allegation will be dismissed and the reporting member will be required to pay £1 court costs to the team fund.
+      </p>
+      <p class="dashboard-info-modal__note">
+        This system is designed to provide a transparent and fair way of managing social contributions within the team.
+      </p>
+    </article>
+  </dialog>
 
   <section class="dashboard-content-grid">
     <article class="card p-responsive">

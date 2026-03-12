@@ -28,6 +28,46 @@ function setText(id, value) {
   if (node) node.textContent = value;
 }
 
+
+function initBreachInfoModal() {
+  const trigger = document.getElementById('openBreachModal');
+  const modal = document.getElementById('breachInfoModal');
+  const closeBtn = document.getElementById('closeBreachModal');
+
+  if (!(trigger && modal)) return;
+
+  const openModal = () => {
+    if (typeof modal.showModal === 'function') {
+      modal.showModal();
+      return;
+    }
+
+    modal.setAttribute('open', 'open');
+  };
+
+  const closeModal = () => {
+    if (typeof modal.close === 'function') {
+      modal.close();
+      return;
+    }
+
+    modal.removeAttribute('open');
+  };
+
+  trigger.addEventListener('click', openModal);
+  closeBtn?.addEventListener('click', closeModal);
+
+  modal.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (target.classList.contains('dashboard-info-modal__backdrop')) closeModal();
+  });
+
+  modal.addEventListener('cancel', () => {
+    modal.removeAttribute('open');
+  });
+}
+
 bootProtectedPage(async (ctx) => {
   const displayName = getUserDisplayName(ctx);
   const roleLabel = formatRole(ctx.membership?.role);
@@ -42,5 +82,6 @@ bootProtectedPage(async (ctx) => {
   setText('dashboardAvatar', initialsFromName(displayName));
 
   initPreviewGates();
+  initBreachInfoModal();
   initIcons();
 });
