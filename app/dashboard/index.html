@@ -41,10 +41,10 @@
   <section class="card glass-panel fade-in p-responsive dashboard-hero dashboard-hero--compact">
     <div class="dashboard-hero-copy">
       <h1 id="dashboardGreeting">Welcome back, Team Member</h1>
-      <p id="dashboardIdentity" class="dashboard-lead">Manage contributions to the Team Social Fund.</p>
+      <p id="dashboardIdentity" class="dashboard-lead">Only Quick Monzo Payment is live right now.</p>
       <div class="dashboard-status-strip">
-        <span class="status-chip"><i data-lucide="shield-check" class="icon"></i><span id="dashboardStatusText">Verifying secure session...</span></span>
-        <span class="status-chip"><i data-lucide="users" class="icon"></i><span id="dashboardMemberCount">Loading team members...</span></span>
+        <span class="status-chip"><i data-lucide="shield-check" class="icon"></i><span id="dashboardStatusText">Secure session active</span></span>
+        <span class="status-chip"><i data-lucide="rocket" class="icon"></i><span>More features coming soon</span></span>
       </div>
     </div>
 
@@ -59,7 +59,7 @@
       </div>
       <div class="dashboard-role-row">
         <span class="badge badge-strong" id="dashboardRoleBadge">Member</span>
-        <span class="muted">Team access active</span>
+        <span class="muted">Quick payment available</span>
       </div>
     </aside>
   </section>
@@ -68,11 +68,11 @@
     <div class="panel-header">
       <div>
         <p class="eyebrow">Quick Payment</p>
-        <h2 class="section-header"><i data-lucide="banknote" class="icon"></i>Quick Payment</h2>
+        <h2 class="section-header"><i data-lucide="banknote" class="icon"></i>Quick Monzo Payment</h2>
       </div>
     </div>
     <p class="dashboard-quick-payment-copy">
-      Send a contribution instantly.
+      This is the only active dashboard payment flow at the moment.
     </p>
     <div class="dashboard-quick-payment-grid" role="list" aria-label="Quick payment amounts">
       <a href="https://monzo.com/pay/r/team-funds_aRlKSNC7qhSOwp?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem"><span class="amount">£1</span><span class="label">Contribution</span></a>
@@ -84,195 +84,31 @@
     <p class="dashboard-quick-payment-footer">Payments open securely in Monzo.</p>
   </section>
 
-  <section class="card p-responsive dashboard-payment-update" aria-label="Payment system update">
-    <div class="panel-header">
-      <div>
-        <p class="eyebrow">Notice</p>
-        <h2 class="section-header"><i data-lucide="info" class="icon"></i>Payment System Update</h2>
-      </div>
-    </div>
-    <p>The fully integrated online payment system is currently being developed.</p>
-    <p>In the meantime, quick payment options above allow contributions to be sent directly into the Team Social Fund using secure Monzo payment links.</p>
-    <p>All contributions go into the shared team account which is used for team events and social activities.</p>
-    <p>Once the integrated system is complete, payments will automatically record and track contributions within the app.</p>
-  </section>
-
-  <section class="dashboard-more-features-header">
-    <p class="eyebrow">More Features</p>
-    <h2 class="section-header"><i data-lucide="layout-grid" class="icon"></i>More Features</h2>
-    <p class="muted">Additional tools and tracking features will appear here as they are introduced.</p>
-  </section>
-
-  <section class="dashboard-kpi-grid">
-    <article class="card stat-card p-responsive dashboard-kpi-card dashboard-kpi-card--feature" id="teamSocialFundCard">
-      <div class="panel-header">
-        <div>
-          <p class="eyebrow">Linked Account</p>
-          <h2 class="section-header"><i data-lucide="landmark" class="icon"></i>Team Social Fund</h2>
-        </div>
-      </div>
-      <p id="teamSocialFundBalance" class="metric">£0.00</p>
-      <p id="teamSocialFundMeta" class="muted">Checking bank connection...</p>
-      <div class="actions">
-        <button type="button" id="connectBankBtn" class="btn btn-responsive" hidden><i data-lucide="link" class="icon icon-btn"></i>Connect Bank</button>
-        <button type="button" id="refreshBankBalanceBtn" class="btn secondary btn-responsive"><i data-lucide="refresh-cw" class="icon icon-btn"></i>Refresh Balance</button>
-      </div>
-    </article>
-
-    <article class="card stat-card p-responsive dashboard-kpi-card">
-      <p class="eyebrow">Fund Position</p>
-      <h2 class="section-header"><i data-lucide="wallet" class="icon"></i>Confirmed Balance</h2>
-      <p id="confirmedTotal" class="metric">£0.00</p>
-      <p class="muted">Available in team fund.</p>
-    </article>
-
-    <article class="card stat-card p-responsive dashboard-kpi-card">
-      <p class="eyebrow">Awaiting Payment</p>
-      <h2 class="section-header"><i data-lucide="clock-3" class="icon"></i>Pending Contributions</h2>
-      <p id="pendingTotal" class="metric">£0.00</p>
-      <p class="muted">Awaiting payment confirmation.</p>
-    </article>
-
-    <article class="card p-responsive dashboard-kpi-card">
-      <p class="eyebrow">Your Queue</p>
-      <h2 class="section-header"><i data-lucide="alert-triangle" class="icon"></i>Payable Fines</h2>
-      <p id="outstandingCount" class="metric">0</p>
-      <p class="muted">Notices ready to review and settle.</p>
-    </article>
-  </section>
-
-  <section class="dashboard-pay-grid">
-    <article class="card p-responsive dashboard-spotlight-card" id="dashboardFineSearch">
-      <div class="panel-header">
-        <div>
-          <p class="eyebrow">Find an offence</p>
-          <h2 class="section-header"><i data-lucide="search" class="icon"></i>Search by code, title, or keyword</h2>
-        </div>
-      </div>
-      <p class="muted dashboard-spotlight-copy">
-        Search the Act directly from your dashboard, check the standard amount, and jump to payment if you already have an open fine for that offence.
-      </p>
-      <label class="dashboard-search-field" for="dashboardOffenceSearchInput">
-        <span class="dashboard-search-label">Offence search</span>
-        <input
-          id="dashboardOffenceSearchInput"
-          type="search"
-          placeholder="Try 4.6, birthday, speeding, promotion..."
-          autocomplete="off"
-        />
-      </label>
-      <div class="dashboard-search-chip-row" aria-label="Suggested searches">
-        <button type="button" class="dashboard-search-chip" data-dashboard-search-value="4.6">4.6</button>
-        <button type="button" class="dashboard-search-chip" data-dashboard-search-value="birthday">Birthday</button>
-        <button type="button" class="dashboard-search-chip" data-dashboard-search-value="speeding">Speeding</button>
-        <button type="button" class="dashboard-search-chip" data-dashboard-search-value="promotion">Promotion</button>
-      </div>
-      <p id="dashboardSearchMeta" class="muted dashboard-search-meta">Loading offence list...</p>
-      <div id="dashboardSearchResults" class="dashboard-search-results"></div>
-    </article>
-
-    <article class="card p-responsive dashboard-spotlight-card" id="dashboardOpenFines">
-      <div class="panel-header">
-        <div>
-          <p class="eyebrow">Pay a fine</p>
-          <h2 class="section-header"><i data-lucide="credit-card" class="icon"></i>Your open fines</h2>
-        </div>
-        <a href="/app/issue/" class="btn secondary">View all cases</a>
-      </div>
-      <p id="dashboardOpenFinesMeta" class="muted dashboard-spotlight-copy">Checking your current notices...</p>
-      <div id="dashboardOpenFinesList" class="dashboard-open-fines"></div>
-    </article>
-  </section>
-
   <section class="dashboard-content-grid">
     <article class="card p-responsive">
-      <div class="panel-header">
-        <div>
-          <p class="eyebrow">Actions</p>
-          <h2 class="section-header"><i data-lucide="layout-grid" class="icon"></i>Common Tasks</h2>
-        </div>
-      </div>
-      <div class="dashboard-action-grid">
-        <a href="#dashboardFineSearch" class="dashboard-action-card dashboard-action-card--highlight">
-          <i data-lucide="search" class="icon"></i>
-          <strong>Search Offences</strong>
-          <span>Look up a clause and confirm the standard amount.</span>
-        </a>
-        <a href="#dashboardOpenFines" class="dashboard-action-card dashboard-action-card--highlight">
-          <i data-lucide="credit-card" class="icon"></i>
-          <strong>Pay a Fine</strong>
-          <span>Open the notices waiting for payment.</span>
-        </a>
-        <a href="/app/issue/" class="dashboard-action-card" data-preview-gate>
-          <i data-lucide="plus-circle" class="icon"></i>
-          <strong>Issue SCN</strong>
-          <span>Create a new notice.</span>
-        </a>
-        <a href="/app/team/" class="dashboard-action-card">
-          <i data-lucide="users" class="icon"></i>
-          <strong>Team Directory</strong>
-          <span>View members and access levels.</span>
-        </a>
-        <a href="/app/leaderboard/" class="dashboard-action-card">
-          <i data-lucide="trophy" class="icon"></i>
-          <strong>Leaderboard</strong>
-          <span>Review recent standings and totals.</span>
-        </a>
-        <a href="/act/" class="dashboard-action-card" data-preview-gate>
-          <i data-lucide="scroll-text" class="icon"></i>
-          <strong>Read the Act</strong>
-          <span>Review the current clauses and standard amounts.</span>
-        </a>
-      </div>
+      <p class="eyebrow">Bank Sync</p>
+      <h2 class="section-header"><i data-lucide="landmark" class="icon"></i>Feature coming soon</h2>
+      <p class="muted">Live account balance and syncing will be available soon.</p>
     </article>
 
     <article class="card p-responsive">
-      <div class="panel-header">
-        <div>
-          <p class="eyebrow">Contribution summary</p>
-          <h2 class="section-header"><i data-lucide="trophy" class="icon"></i>Recent standings</h2>
-        </div>
-        <a href="/app/leaderboard/" class="btn secondary">Open</a>
-      </div>
-      <ul id="recentFindings" class="list-clean leaderboard-mini-list"></ul>
+      <p class="eyebrow">Fines</p>
+      <h2 class="section-header"><i data-lucide="credit-card" class="icon"></i>Feature coming soon</h2>
+      <p class="muted">Fine tracking and in-app settlement will return soon.</p>
     </article>
 
     <article class="card p-responsive">
-      <div class="panel-header">
-        <div>
-          <p class="eyebrow">Directory</p>
-          <h2 class="section-header"><i data-lucide="users" class="icon"></i>Team Members</h2>
-        </div>
-        <a href="/app/team/" class="btn secondary">View All</a>
-      </div>
-      <p id="teamMembersMeta" class="muted">Loading team members...</p>
-      <div id="teamMembersList" class="member-list-grid member-list-grid--compact"></div>
+      <p class="eyebrow">Team</p>
+      <h2 class="section-header"><i data-lucide="users" class="icon"></i>Feature coming soon</h2>
+      <p class="muted">Team member insights and standings are being rebuilt.</p>
     </article>
 
     <article class="card p-responsive">
-      <div class="panel-header">
-        <div>
-          <p class="eyebrow">Payment path</p>
-          <h2 class="section-header"><i data-lucide="gavel" class="icon"></i>How to settle a fine quickly</h2>
-        </div>
-      </div>
-      <div class="dashboard-stack">
-        <div class="dashboard-step">
-          <strong>1. Search the offence</strong>
-          <span>Use the dashboard search to confirm the clause, amount, and whether a matching notice is open for you.</span>
-        </div>
-        <div class="dashboard-step">
-          <strong>2. Open the fine details</strong>
-          <span>Select Pay now from Your open fines to review the current amount, due date, and payment options.</span>
-        </div>
-        <div class="dashboard-step">
-          <strong>3. Complete payment in your bank app</strong>
-          <span>Use Open Banking or bank transfer from the SCN page so the record stays tied to the correct notice.</span>
-        </div>
-      </div>
+      <p class="eyebrow">Actions</p>
+      <h2 class="section-header"><i data-lucide="layout-grid" class="icon"></i>Feature coming soon</h2>
+      <p class="muted">Additional dashboard tools will appear here soon.</p>
     </article>
   </section>
-
 </main>
 
 <script type="module" src="/js/dashboard-page.js"></script>
