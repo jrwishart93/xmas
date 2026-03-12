@@ -1589,6 +1589,87 @@ h3,
   text-transform: uppercase;
 }
 
+
+
+.protected-app .app-header--minimal {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 18, 35, 0.65);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  box-shadow: none;
+}
+
+.protected-app .app-header--minimal::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(120, 150, 255, 0.25),
+    transparent
+  );
+}
+
+.app-header--minimal .site-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  min-height: 52px;
+  max-height: 60px;
+  padding: 14px 18px;
+}
+
+.app-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  opacity: 0.9;
+}
+
+.app-title .title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Space Grotesk', 'Manrope', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.app-title .logo {
+  font-size: 18px;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(80, 120, 255, 0.35));
+}
+
+.profile-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #f5f8ff;
+  background: linear-gradient(135deg, #5c7cff, #7aa6ff);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.dashboard-container {
+  padding-top: 10px;
+}
 .app-main-shell {
   display: grid;
   gap: 1.2rem;
@@ -2435,6 +2516,20 @@ h3,
     min-height: 50px;
     padding-top: 0.3rem;
     padding-bottom: 0.3rem;
+  }
+
+  .protected-app .app-header--minimal {
+    min-height: 52px;
+  }
+
+  .protected-app .app-header--minimal .site-shell {
+    min-height: 52px;
+    max-height: 60px;
+    padding: 14px 18px;
+  }
+
+  .protected-app .dashboard-container.with-fixed-header {
+    padding-top: 10px;
   }
 
   .app-header-row {

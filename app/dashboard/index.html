@@ -19,25 +19,18 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-<header class="site-header">
-  <div class="site-shell header-row">
-    <p class="brand">Team Social Fund</p>
-    <div class="app-nav-meta">
-      <nav aria-label="App navigation" class="site-nav">
-        <a href="/app/dashboard/" class="nav-link" aria-current="page"><i data-lucide="bar-chart-3" class="icon"></i>Dashboard</a>
-        <a href="/app/leaderboard/" class="nav-link"><i data-lucide="trophy" class="icon"></i>Leaderboard</a>
-        <a href="/app/issue/" class="nav-link"><i data-lucide="gavel" class="icon"></i>Issue</a>
-        <a href="/app/disbursements/" class="nav-link" data-preview-route><i data-lucide="wallet" class="icon"></i>Disbursements</a>
-        <a href="/act/" class="nav-link"><i data-lucide="scroll-text" class="icon"></i>Act</a>
-        <a href="#" id="settingsLink" class="nav-link" data-preview-gate><i data-lucide="settings" class="icon"></i>Settings</a>
-        <a href="#" id="logoutLink" class="nav-link"><i data-lucide="x-circle" class="icon"></i>Logout</a>
-      </nav>
-      <span class="avatar-dot" aria-hidden="true"></span>
+<header class="site-header app-header app-header--minimal" data-minimal-header="true">
+  <div class="site-shell">
+    <div class="app-title" aria-label="App name">
+      <span class="logo" aria-hidden="true">⚖️</span>
+      <span class="title">Team Social Fund</span>
     </div>
+
+    <div class="profile-avatar" id="headerProfileAvatar" aria-label="Signed in user initials">JW</div>
   </div>
 </header>
 
-<main class="site-shell with-fixed-header">
+<main class="site-shell with-fixed-header dashboard-container">
   <section class="card glass-panel fade-in p-responsive dashboard-hero dashboard-hero--compact">
     <div class="dashboard-hero-copy">
       <h1 id="dashboardGreeting">Welcome back, Team Member</h1>

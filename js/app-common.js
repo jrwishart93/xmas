@@ -185,13 +185,20 @@ function enhanceProtectedChrome(ctx) {
   const headerRow = header?.querySelector('.header-row') || header?.querySelector('.site-shell');
   const main = document.querySelector('main');
   const brand = headerRow?.querySelector('.brand, .section-header');
-  const { nav, meta } = ensureAppNavMeta(headerRow);
+  const isMinimalHeader = header?.dataset.minimalHeader === 'true';
 
   document.body.classList.add('protected-app');
   document.body.dataset.appSection = activeSection;
   header?.classList.add('app-site-header');
-  headerRow?.classList.add('app-header-row');
   main?.classList.add('app-main-shell');
+
+  if (isMinimalHeader) {
+    renderTabBar(activeSection, ctx);
+    return;
+  }
+
+  const { nav, meta } = ensureAppNavMeta(headerRow);
+  headerRow?.classList.add('app-header-row');
   brand?.classList.add('app-page-title');
   decorateProtectedTitle(brand);
 

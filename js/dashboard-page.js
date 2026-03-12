@@ -78,8 +78,11 @@ bootProtectedPage(async (ctx) => {
   setText('dashboardStatusText', 'Secure session active');
   setText('dashboardUserName', displayName);
   setText('dashboardEmail', email);
+  const initials = initialsFromName(displayName);
+
   setText('dashboardRoleBadge', roleLabel);
-  setText('dashboardAvatar', initialsFromName(displayName));
+  setText('dashboardAvatar', initials);
+  setText('headerProfileAvatar', initials);
 
   initPreviewGates();
   initBreachInfoModal();
