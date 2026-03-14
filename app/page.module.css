@@ -141,6 +141,17 @@
   padding: 22px;
 }
 
+.statIcon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+
 .statLabel {
   display: block;
   color: var(--muted);

@@ -25,6 +25,9 @@ export default function PublicSiteShell({
 
   return (
     <div className={styles.shell}>
+      <a href="#main-content" className={styles.skipLink}>
+        Skip to content
+      </a>
       <header className={styles.headerWrap}>
         <div className={styles.header}>
           <div className={styles.headerIdentity}>
@@ -59,7 +62,7 @@ export default function PublicSiteShell({
         </div>
       </header>
 
-      <main className={styles.main}>{children}</main>
+      <main id="main-content" className={styles.main}>{children}</main>
 
       {footerNote ? (
         <footer className={styles.footer}>

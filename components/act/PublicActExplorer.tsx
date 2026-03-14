@@ -75,6 +75,7 @@ export default function PublicActExplorer({ document }: PublicActExplorerProps) 
                 className={`${styles.filterButton} ${partFilter === part.partNumber ? styles.filterButtonActive : ""}`}
               >
                 Part {part.partNumber}
+                <span className={styles.filterBadge}>{part.sections.length}</span>
               </button>
             ))}
           </div>
@@ -105,8 +106,15 @@ export default function PublicActExplorer({ document }: PublicActExplorerProps) 
         <div className={styles.parts}>
           {filteredParts.length === 0 ? (
             <div className={styles.emptyState}>
-              <h2>No sections matched that search</h2>
-              <p>Try a part number, section code, or a less specific phrase.</p>
+              <h2>No results found</h2>
+              <p>Try a different search term, or clear your filters to browse the full Act.</p>
+              <button
+                type="button"
+                className={styles.emptyStateReset}
+                onClick={() => { setQuery(""); setPartFilter(null); }}
+              >
+                Clear search
+              </button>
             </div>
           ) : (
             filteredParts.map((part) => (
