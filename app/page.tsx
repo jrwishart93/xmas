@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BookOpenText, Clock3, Landmark, Scale } from "lucide-react";
+import { ArrowRight, BarChart2, BookOpen, BookOpenText, Clock3, Hash, Landmark, Scale, TrendingUp } from "lucide-react";
 
 import HeroImage from "@/app/images/Hero-book-hammer.png";
 import styles from "@/app/page.module.css";
@@ -94,18 +94,22 @@ export default function HomePage() {
 
         <section className={styles.statsGrid} aria-label="Act summary">
           <article className={styles.statCard}>
+            <div className={styles.statIcon} aria-hidden="true"><BookOpen size={18} /></div>
             <span className={styles.statLabel}>Published parts</span>
             <strong className={styles.statValue}>{stats.totalParts}</strong>
           </article>
           <article className={styles.statCard}>
+            <div className={styles.statIcon} aria-hidden="true"><Hash size={18} /></div>
             <span className={styles.statLabel}>Listed sections</span>
             <strong className={styles.statValue}>{stats.totalSections}</strong>
           </article>
           <article className={styles.statCard}>
+            <div className={styles.statIcon} aria-hidden="true"><TrendingUp size={18} /></div>
             <span className={styles.statLabel}>Highest standard contribution</span>
             <strong className={styles.statValue}>{formatWholePounds(stats.highestContribution)}</strong>
           </article>
           <article className={styles.statCard}>
+            <div className={styles.statIcon} aria-hidden="true"><BarChart2 size={18} /></div>
             <span className={styles.statLabel}>Average listed contribution</span>
             <strong className={styles.statValue}>
               {formatWholePounds(Number(stats.averageContribution.toFixed(2)))}

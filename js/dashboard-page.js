@@ -68,6 +68,70 @@ function initBreachInfoModal() {
   });
 }
 
+function initQuickPayConfirmation(ctx) {
+  const paymentButtons = document.querySelectorAll('.dashboard-quick-payment-btn[data-amount]');
+  const confirmArea = document.getElementById('quickPayConfirm');
+  const confirmBtn = document.getElementById('quickPayConfirmBtn');
+  const statusEl = document.getElementById('quickPayConfirmStatus');
+
+  if (!confirmArea || !confirmBtn || !statusEl) return;
+
+  let pendingAmountPence = null;
+
+  function showStatus(message, isError) {
+    statusEl.textContent = message;
+    statusEl.className = `dashboard-quick-payment-confirm-status${isError ? ' dashboard-quick-payment-confirm-status--error' : ' dashboard-quick-payment-confirm-status--success'}`;
+    statusEl.hidden = false;
+  }
+
+  paymentButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const pounds = parseInt(btn.dataset.amount, 10);
+      if (!pounds) return;
+
+      pendingAmountPence = pounds * 100;
+      confirmBtn.textContent = `Confirm £${pounds} payment sent`;
+      confirmBtn.disabled = false;
+      statusEl.hidden = true;
+      confirmArea.hidden = false;
+    });
+  });
+
+  confirmBtn.addEventListener('click', async () => {
+    if (!pendingAmountPence) return;
+
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Recording...';
+
+    try {
+      const idToken = await ctx.user.getIdToken();
+      const response = await fetch('/api/quick-pay/declaration', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({ amountPence: pendingAmountPence }),
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Unable to record payment.');
+      }
+
+      const poundAmount = pendingAmountPence / 100;
+      showStatus(`£${poundAmount} payment recorded. Thank you!`, false);
+      pendingAmountPence = null;
+      confirmBtn.textContent = 'Confirm payment sent';
+    } catch (error) {
+      showStatus(error instanceof Error ? error.message : 'Something went wrong. Please try again.', true);
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm payment sent';
+    }
+  });
+}
+
 bootProtectedPage(async (ctx) => {
   const displayName = getUserDisplayName(ctx);
   const roleLabel = formatRole(ctx.membership?.role);
@@ -86,5 +150,6 @@ bootProtectedPage(async (ctx) => {
 
   initPreviewGates();
   initBreachInfoModal();
+  initQuickPayConfirmation(ctx);
   initIcons();
 });

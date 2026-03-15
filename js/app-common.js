@@ -180,7 +180,7 @@ function decorateProtectedTitle(brand) {
 }
 
 function enhanceProtectedChrome(ctx) {
-  const activeSection = getMemberActiveSection() || 'dashboard';
+  const activeSection = getMemberActiveSection(window.location.pathname) || 'dashboard';
   const header = document.querySelector('.site-header');
   const headerRow = header?.querySelector('.header-row') || header?.querySelector('.site-shell');
   const main = document.querySelector('main');
