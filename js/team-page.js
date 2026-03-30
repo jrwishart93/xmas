@@ -69,12 +69,22 @@ bootProtectedPage(async (ctx) => {
   const teamFundBreakdown = document.getElementById('teamFundBreakdown');
   const teamFundMeta = document.getElementById('teamFundMeta');
   const teamFundDonut = document.getElementById('teamFundDonut');
-  const teamFundLegend = document.getElementById('teamFundLegend');
   const teamFundTopContributor = document.getElementById('teamFundTopContributor');
+  const teamFundTopline = document.getElementById('teamFundTopline');
+  let activeContributor = '';
   let members = [];
 
   currentRole.textContent = formatRole(ctx.membership?.role);
   currentIdentity.textContent = getUserDisplayName(ctx);
+  const updateActiveContributor = (name, options = {}) => {
+    activeContributor = name;
+    updateActiveState(activeContributor);
+    if (options.scrollIntoView) {
+      document
+        .querySelector(`.team-fund-person[data-member-name="${CSS.escape(name)}"]`)
+        ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  };
 
   const renderTeamFund = () => {
     const total = TEAM_FUND_ENTRIES.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
@@ -92,59 +102,64 @@ bootProtectedPage(async (ctx) => {
     const totalSafe = total || 1;
 
     teamFundBreakdown.innerHTML = '';
-    if (teamFundLegend) teamFundLegend.innerHTML = '';
+    if (memberRows.length && !activeContributor) activeContributor = memberRows[0].name;
+    if (!memberRows.length) activeContributor = '';
 
-    const chartStops = [];
-    let runningStart = 0;
-    memberRows.forEach((member) => {
+    const colorMap = memberRows.reduce((map, member, index) => {
+      map.set(member.name, memberColor(index));
+      return map;
+    }, new Map());
+
+    memberRows.forEach((member, index) => {
       const row = document.createElement('article');
       row.className = 'team-fund-person';
+      row.dataset.memberName = member.name;
+      row.style.setProperty('--team-fund-person-color', colorMap.get(member.name));
+      row.tabIndex = 0;
+      if (member.name === activeContributor) row.classList.add('is-active');
 
-      const reasons = member.entries.map((entry) => `${entry.reason} (£${entry.amount})`).join(' • ');
-      const percentage = Math.max(14, Math.round((member.total / highestTotal) * 100));
+      const percentage = Math.round((member.total / totalSafe) * 100);
+      const barWidth = Math.max(9, Math.round((member.total / highestTotal) * 100));
       row.innerHTML = `
         <div class="team-fund-person__head">
-          <p>${escapeHtml(member.name)}</p>
-          <strong>£${member.total}</strong>
+          <p>
+            <span class="team-fund-person__dot" aria-hidden="true"></span>
+            ${escapeHtml(member.name)}
+          </p>
+          <strong>£${member.total} (${percentage}%)</strong>
         </div>
         <div class="team-fund-person__bar" role="presentation">
-          <span style="width: ${percentage}%"></span>
+          <span style="width: ${barWidth}%"></span>
         </div>
-        <p class="team-fund-person__meta">${escapeHtml(reasons)}</p>
+        <p class="team-fund-person__meta">#${index + 1} contributor • ${member.entries.length} entr${member.entries.length === 1 ? 'y' : 'ies'}</p>
       `;
+      row.addEventListener('mouseenter', () => updateActiveContributor(member.name));
+      row.addEventListener('focus', () => updateActiveContributor(member.name));
+      row.addEventListener('click', () => updateActiveContributor(member.name));
       teamFundBreakdown.appendChild(row);
-
-      const ratio = member.total / totalSafe;
-      const arc = Math.max(0.005, ratio);
-      const stopStart = Math.round(runningStart * 10000) / 100;
-      runningStart += arc;
-      const stopEnd = Math.round(Math.min(runningStart, 1) * 10000) / 100;
-      const color = memberColor(member.name);
-      chartStops.push(`${color} ${stopStart}% ${stopEnd}%`);
-
-      const legend = document.createElement('p');
-      legend.className = 'team-fund-legend__item';
-      legend.innerHTML = `
-        <span class="team-fund-legend__dot" style="background:${color}"></span>
-        <span>${escapeHtml(member.name)}</span>
-        <strong>${Math.round(ratio * 100)}%</strong>
-      `;
-      teamFundLegend?.appendChild(legend);
     });
 
-    const gradient = chartStops.length
-      ? `conic-gradient(from -90deg, ${chartStops.join(', ')})`
-      : 'conic-gradient(from -90deg, #4f5b85 0 100%)';
     if (teamFundDonut) {
-      teamFundDonut.style.setProperty('--team-fund-donut-gradient', gradient);
+      buildDonutChart(
+        teamFundDonut,
+        memberRows,
+        colorMap,
+        totalSafe,
+        activeContributor,
+        (name) => updateActiveContributor(name, { scrollIntoView: true })
+      );
       teamFundDonut.classList.remove('is-animated');
       requestAnimationFrame(() => teamFundDonut.classList.add('is-animated'));
     }
 
+    const topContributor = memberRows[0];
     if (teamFundTopContributor) {
-      teamFundTopContributor.textContent = memberRows[0]
-        ? `${memberRows[0].name} (£${memberRows[0].total})`
-        : '—';
+      teamFundTopContributor.textContent = `£${total} total`;
+    }
+    if (teamFundTopline) {
+      teamFundTopline.textContent = topContributor
+        ? `Top contributor: ${topContributor.name} (£${topContributor.total})`
+        : 'Top contributor: —';
     }
 
     teamFundMeta.textContent = `${TEAM_FUND_ENTRIES.length} manual entries recorded.`;
@@ -214,6 +229,78 @@ bootProtectedPage(async (ctx) => {
   );
 });
 
+function updateActiveState(activeName) {
+  document.querySelectorAll('.team-fund-person').forEach((element) => {
+    element.classList.toggle('is-active', element.dataset.memberName === activeName);
+  });
+  document.querySelectorAll('.team-fund-donut-segment').forEach((element) => {
+    element.classList.toggle('is-active', element.dataset.memberName === activeName);
+    element.classList.toggle('is-dimmed', Boolean(activeName) && element.dataset.memberName !== activeName);
+  });
+}
+
+function buildDonutChart(container, memberRows, colorMap, totalSafe, activeContributor, onSelect) {
+  container.innerHTML = '';
+  if (!memberRows.length) return;
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('class', 'team-fund-donut__svg');
+  svg.setAttribute('viewBox', '-64 -64 128 128');
+  svg.setAttribute('aria-hidden', 'true');
+
+  let startAngle = -Math.PI / 2;
+  memberRows.forEach((member) => {
+    const ratio = member.total / totalSafe;
+    const endAngle = startAngle + ratio * Math.PI * 2;
+    const segment = donutSegmentPath(startAngle, endAngle, 62, 35);
+    startAngle = endAngle;
+
+    const path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('d', segment);
+    path.setAttribute('fill', colorMap.get(member.name));
+    path.setAttribute('class', 'team-fund-donut-segment');
+    path.dataset.memberName = member.name;
+    path.tabIndex = 0;
+    path.addEventListener('mouseenter', () => onSelect(member.name));
+    path.addEventListener('focus', () => onSelect(member.name));
+    path.addEventListener('click', () => onSelect(member.name));
+    svg.appendChild(path);
+  });
+
+  container.appendChild(svg);
+  updateActiveState(activeContributor);
+}
+
+function donutSegmentPath(startAngle, endAngle, outerRadius, innerRadius) {
+  const gapRadians = 0.02;
+  const adjustedStart = startAngle + gapRadians;
+  const adjustedEnd = endAngle - gapRadians;
+  const safeStart = adjustedStart < adjustedEnd ? adjustedStart : startAngle;
+  const safeEnd = adjustedStart < adjustedEnd ? adjustedEnd : endAngle;
+
+  const startOuter = polarToCartesian(outerRadius, safeStart);
+  const endOuter = polarToCartesian(outerRadius, safeEnd);
+  const startInner = polarToCartesian(innerRadius, safeStart);
+  const endInner = polarToCartesian(innerRadius, safeEnd);
+  const largeArc = safeEnd - safeStart > Math.PI ? 1 : 0;
+
+  return [
+    `M ${startOuter.x} ${startOuter.y}`,
+    `A ${outerRadius} ${outerRadius} 0 ${largeArc} 1 ${endOuter.x} ${endOuter.y}`,
+    `L ${endInner.x} ${endInner.y}`,
+    `A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${startInner.x} ${startInner.y}`,
+    'Z',
+  ].join(' ');
+}
+
+function polarToCartesian(radius, angle) {
+  return {
+    x: Number((Math.cos(angle) * radius).toFixed(3)),
+    y: Number((Math.sin(angle) * radius).toFixed(3)),
+  };
+}
+
 function animateNumber(element, endValue, options = {}) {
   if (!element) return;
   const duration = Number(options.duration || 1000);
@@ -236,8 +323,20 @@ function animateNumber(element, endValue, options = {}) {
   requestAnimationFrame(tick);
 }
 
-function memberColor(name = '') {
-  const palette = ['#ff2bd1', '#4af2ff', '#ffb52b', '#8b5bff', '#42ff87', '#ff5a69'];
-  const seed = String(name).split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  return palette[seed % palette.length];
+function memberColor(index = 0) {
+  const palette = [
+    '#ff4ecb',
+    '#30e7ff',
+    '#9d6bff',
+    '#ffbf3c',
+    '#4f8cff',
+    '#42f5b0',
+    '#ff6b7a',
+    '#7cf254',
+    '#fd8dff',
+    '#52c7ff',
+    '#ff8e42',
+    '#7f8cff',
+  ];
+  return palette[index % palette.length];
 }
