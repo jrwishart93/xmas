@@ -173,6 +173,17 @@ export function subscribeLeaderboard(onData) {
   );
 }
 
+
+export function subscribePaidContributions(onData) {
+  return onSnapshot(
+    query(scnsRef(), where('status', '==', 'paid'), orderBy('createdAt', 'desc')),
+    (snap) => {
+      const payments = snap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+      onData(payments);
+    }
+  );
+}
+
 export async function getScnById(scnId) {
   const snap = await getDoc(doc(db, 'teams', TEAM_ID, 'scns', scnId));
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;

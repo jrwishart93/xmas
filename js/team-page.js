@@ -1,14 +1,7 @@
 import { TEAM } from '/archive/brewhemia-2025/team.js';
 import { bootProtectedPage, initIcons } from '/js/app-common.js';
 import { PREVIEW_MODE } from '/js/config.js';
-import { subscribeMembers } from '/js/data.js';
-
-const TEAM_FUND_ENTRIES = [
-  { name: 'Jamie', amount: 1, reason: 'Amend rules' },
-  { name: 'Jamie', amount: 1, reason: 'Punctured tyre' },
-  { name: 'Paul', amount: 3, reason: 'Annual leave' },
-  { name: 'Chris', amount: 3, reason: 'Annual leave' },
-];
+import { subscribeMembers, subscribePaidContributions } from '/js/data.js';
 
 function escapeHtml(value = '') {
   return String(value).replace(/[&<>"']/g, (character) => {
@@ -73,6 +66,7 @@ bootProtectedPage(async (ctx) => {
   const teamFundTopline = document.getElementById('teamFundTopline');
   let activeContributor = '';
   let members = [];
+  let paidScns = [];
 
   currentRole.textContent = formatRole(ctx.membership?.role);
   currentIdentity.textContent = getUserDisplayName(ctx);
@@ -86,20 +80,31 @@ bootProtectedPage(async (ctx) => {
     }
   };
 
-  const renderTeamFund = () => {
-    const total = TEAM_FUND_ENTRIES.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
-    const byMember = TEAM_FUND_ENTRIES.reduce((accumulator, entry) => {
+
+  const mapPaidScnsToEntries = (payments) =>
+    payments.map((payment) => {
+      const displayName = members.find((member) => member.uid === payment.accusedUserId)?.displayName;
+      return {
+        name: displayName || payment.accusedUserId || 'Unknown',
+        amountPence: Number(payment.amountPaidPence || payment.amountPence || 0),
+      };
+    });
+
+  const renderTeamFund = (paymentEntries = []) => {
+    const byMember = paymentEntries.reduce((accumulator, entry) => {
       const key = String(entry.name || 'Unknown');
-      const current = accumulator.get(key) || { name: key, total: 0, entries: [] };
-      current.total += Number(entry.amount || 0);
+      const current = accumulator.get(key) || { name: key, totalPence: 0, entries: [] };
+      const amountPence = Number(entry.amountPence || 0);
+      current.totalPence += amountPence;
       current.entries.push(entry);
       accumulator.set(key, current);
       return accumulator;
     }, new Map());
 
-    const memberRows = Array.from(byMember.values()).sort((left, right) => right.total - left.total);
-    const highestTotal = memberRows[0]?.total || 1;
-    const totalSafe = total || 1;
+    const memberRows = Array.from(byMember.values()).sort((left, right) => right.totalPence - left.totalPence);
+    const totalPence = memberRows.reduce((sum, member) => sum + member.totalPence, 0);
+    const highestTotal = memberRows[0]?.totalPence || 1;
+    const totalSafe = totalPence || 1;
 
     teamFundBreakdown.innerHTML = '';
     if (memberRows.length && !activeContributor) activeContributor = memberRows[0].name;
@@ -118,20 +123,21 @@ bootProtectedPage(async (ctx) => {
       row.tabIndex = 0;
       if (member.name === activeContributor) row.classList.add('is-active');
 
-      const percentage = Math.round((member.total / totalSafe) * 100);
-      const barWidth = Math.max(9, Math.round((member.total / highestTotal) * 100));
+      const percentage = Math.round((member.totalPence / totalSafe) * 100);
+      const barWidth = Math.max(9, Math.round((member.totalPence / highestTotal) * 100));
+      const totalPounds = (member.totalPence / 100).toFixed(2);
       row.innerHTML = `
         <div class="team-fund-person__head">
           <p>
             <span class="team-fund-person__dot" aria-hidden="true"></span>
             ${escapeHtml(member.name)}
           </p>
-          <strong>£${member.total} (${percentage}%)</strong>
+          <strong>£${totalPounds} (${percentage}%)</strong>
         </div>
         <div class="team-fund-person__bar" role="presentation">
           <span style="width: ${barWidth}%"></span>
         </div>
-        <p class="team-fund-person__meta">#${index + 1} contributor • ${member.entries.length} entr${member.entries.length === 1 ? 'y' : 'ies'}</p>
+        <p class="team-fund-person__meta">#${index + 1} contributor • ${member.entries.length} payment${member.entries.length === 1 ? '' : 's'}</p>
       `;
       row.addEventListener('mouseenter', () => updateActiveContributor(member.name));
       row.addEventListener('focus', () => updateActiveContributor(member.name));
@@ -142,7 +148,7 @@ bootProtectedPage(async (ctx) => {
     if (teamFundDonut) {
       buildDonutChart(
         teamFundDonut,
-        memberRows,
+        memberRows.map((member) => ({ ...member, total: member.totalPence })),
         colorMap,
         totalSafe,
         activeContributor,
@@ -154,17 +160,17 @@ bootProtectedPage(async (ctx) => {
 
     const topContributor = memberRows[0];
     if (teamFundTopContributor) {
-      teamFundTopContributor.textContent = `£${total} total`;
+      teamFundTopContributor.textContent = `£${(totalPence / 100).toFixed(2)} total`;
     }
     if (teamFundTopline) {
       teamFundTopline.textContent = topContributor
-        ? `Top contributor: ${topContributor.name} (£${topContributor.total})`
+        ? `Top contributor: ${topContributor.name} (£${(topContributor.totalPence / 100).toFixed(2)})`
         : 'Top contributor: —';
     }
 
-    teamFundMeta.textContent = `${TEAM_FUND_ENTRIES.length} manual entries recorded.`;
+    teamFundMeta.textContent = `${paymentEntries.length} payment${paymentEntries.length === 1 ? '' : 's'} recorded.`;
 
-    animateNumber(teamFundTotal, total, { duration: 1300, formatter: (value) => `£${value}` });
+    animateNumber(teamFundTotal, totalPence / 100, { duration: 1300, formatter: (value) => `£${Number(value).toFixed(2)}` });
   };
 
   const render = () => {
@@ -207,23 +213,35 @@ bootProtectedPage(async (ctx) => {
   };
 
   searchInput.addEventListener('input', render);
-  renderTeamFund();
 
   if (PREVIEW_MODE) {
     members = previewMembers();
     render();
+    renderTeamFund([
+      { name: 'Jamie', amountPence: 200 },
+      { name: 'Paul', amountPence: 300 },
+      { name: 'Chris', amountPence: 300 },
+      { name: 'Jamie', amountPence: 100 },
+    ]);
     return;
   }
 
-  const unsubscribe = subscribeMembers((nextMembers) => {
+  const unsubscribeMembers = subscribeMembers((nextMembers) => {
     members = nextMembers;
     render();
+    renderTeamFund(mapPaidScnsToEntries(paidScns));
+  });
+
+  const unsubscribePayments = subscribePaidContributions((payments) => {
+    paidScns = payments;
+    renderTeamFund(mapPaidScnsToEntries(paidScns));
   });
 
   window.addEventListener(
     'beforeunload',
     () => {
-      unsubscribe?.();
+      unsubscribeMembers?.();
+      unsubscribePayments?.();
     },
     { once: true }
   );
