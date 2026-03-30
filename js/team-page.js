@@ -68,6 +68,9 @@ bootProtectedPage(async (ctx) => {
   const teamFundTotal = document.getElementById('teamFundTotal');
   const teamFundBreakdown = document.getElementById('teamFundBreakdown');
   const teamFundMeta = document.getElementById('teamFundMeta');
+  const teamFundDonut = document.getElementById('teamFundDonut');
+  const teamFundLegend = document.getElementById('teamFundLegend');
+  const teamFundTopContributor = document.getElementById('teamFundTopContributor');
   let members = [];
 
   currentRole.textContent = formatRole(ctx.membership?.role);
@@ -86,8 +89,13 @@ bootProtectedPage(async (ctx) => {
 
     const memberRows = Array.from(byMember.values()).sort((left, right) => right.total - left.total);
     const highestTotal = memberRows[0]?.total || 1;
+    const totalSafe = total || 1;
 
     teamFundBreakdown.innerHTML = '';
+    if (teamFundLegend) teamFundLegend.innerHTML = '';
+
+    const chartStops = [];
+    let runningStart = 0;
     memberRows.forEach((member) => {
       const row = document.createElement('article');
       row.className = 'team-fund-person';
@@ -105,7 +113,39 @@ bootProtectedPage(async (ctx) => {
         <p class="team-fund-person__meta">${escapeHtml(reasons)}</p>
       `;
       teamFundBreakdown.appendChild(row);
+
+      const ratio = member.total / totalSafe;
+      const arc = Math.max(0.005, ratio);
+      const stopStart = Math.round(runningStart * 10000) / 100;
+      runningStart += arc;
+      const stopEnd = Math.round(Math.min(runningStart, 1) * 10000) / 100;
+      const color = memberColor(member.name);
+      chartStops.push(`${color} ${stopStart}% ${stopEnd}%`);
+
+      const legend = document.createElement('p');
+      legend.className = 'team-fund-legend__item';
+      legend.innerHTML = `
+        <span class="team-fund-legend__dot" style="background:${color}"></span>
+        <span>${escapeHtml(member.name)}</span>
+        <strong>${Math.round(ratio * 100)}%</strong>
+      `;
+      teamFundLegend?.appendChild(legend);
     });
+
+    const gradient = chartStops.length
+      ? `conic-gradient(from -90deg, ${chartStops.join(', ')})`
+      : 'conic-gradient(from -90deg, #4f5b85 0 100%)';
+    if (teamFundDonut) {
+      teamFundDonut.style.setProperty('--team-fund-donut-gradient', gradient);
+      teamFundDonut.classList.remove('is-animated');
+      requestAnimationFrame(() => teamFundDonut.classList.add('is-animated'));
+    }
+
+    if (teamFundTopContributor) {
+      teamFundTopContributor.textContent = memberRows[0]
+        ? `${memberRows[0].name} (£${memberRows[0].total})`
+        : '—';
+    }
 
     teamFundMeta.textContent = `${TEAM_FUND_ENTRIES.length} manual entries recorded.`;
 
@@ -194,4 +234,10 @@ function animateNumber(element, endValue, options = {}) {
   };
 
   requestAnimationFrame(tick);
+}
+
+function memberColor(name = '') {
+  const palette = ['#ff2bd1', '#4af2ff', '#ffb52b', '#8b5bff', '#42ff87', '#ff5a69'];
+  const seed = String(name).split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  return palette[seed % palette.length];
 }

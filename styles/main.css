@@ -2547,16 +2547,21 @@ h3,
 .team-fund-panel {
   position: relative;
   overflow: hidden;
+  border-color: rgba(165, 140, 255, 0.55);
+  box-shadow: 0 24px 60px rgba(7, 8, 28, 0.58), 0 0 0 1px rgba(95, 239, 255, 0.22) inset;
 }
 
 .team-fund-panel::before {
   content: "";
   position: absolute;
-  inset: -35% -10% auto;
-  height: 260px;
+  inset: -30% -5% auto;
+  height: 320px;
   pointer-events: none;
-  background: radial-gradient(circle at 50% 10%, rgba(108, 139, 255, 0.22), transparent 62%);
-  animation: teamFundGlow 5s ease-in-out infinite;
+  background:
+    radial-gradient(circle at 18% 5%, rgba(255, 48, 189, 0.42), transparent 52%),
+    radial-gradient(circle at 85% 10%, rgba(66, 236, 255, 0.3), transparent 48%),
+    radial-gradient(circle at 50% 8%, rgba(127, 94, 255, 0.3), transparent 55%);
+  animation: teamFundGlow 6s ease-in-out infinite;
 }
 
 .team-fund-panel__head {
@@ -2567,16 +2572,16 @@ h3,
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(220px, 0.85fr) minmax(280px, 1.25fr);
+  grid-template-columns: minmax(220px, 0.8fr) minmax(220px, 1fr) minmax(280px, 1.2fr);
   gap: 1rem;
 }
 
 .team-fund-total {
   padding: 1.05rem;
   border-radius: 16px;
-  border: 1px solid rgba(169, 190, 255, 0.28);
-  background: linear-gradient(165deg, rgba(53, 79, 170, 0.44), rgba(8, 16, 37, 0.92));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 16px 28px rgba(4, 7, 18, 0.3);
+  border: 1px solid rgba(67, 230, 255, 0.45);
+  background: linear-gradient(155deg, rgba(16, 42, 88, 0.86), rgba(22, 14, 56, 0.92));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 0 30px rgba(63, 226, 255, 0.2);
 }
 
 .team-fund-total__label {
@@ -2592,15 +2597,105 @@ h3,
   font-size: clamp(2rem, 5vw, 2.9rem);
   font-weight: 800;
   line-height: 1;
-  color: #f2f6ff;
-  text-shadow: 0 0 20px rgba(164, 190, 255, 0.28);
+  color: #ffffff;
+  text-shadow: 0 0 22px rgba(92, 242, 255, 0.45), 0 0 30px rgba(255, 45, 186, 0.35);
+}
+
+.team-fund-donut-panel {
+  padding: 1.05rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 77, 191, 0.42);
+  background: linear-gradient(160deg, rgba(29, 15, 58, 0.9), rgba(8, 15, 38, 0.88));
+  box-shadow: 0 0 30px rgba(255, 44, 184, 0.2);
+}
+
+.team-fund-donut-wrap {
+  position: relative;
+  width: min(220px, 100%);
+  aspect-ratio: 1;
+  margin: 0 auto 0.9rem;
+}
+
+.team-fund-donut {
+  --team-fund-donut-gradient: conic-gradient(from -90deg, #515e8f 0 100%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--team-fund-donut-gradient);
+  box-shadow: 0 0 45px rgba(82, 226, 255, 0.3), 0 0 50px rgba(255, 46, 186, 0.24);
+  transform: scale(0.92) rotate(-16deg);
+  opacity: 0.6;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+}
+
+.team-fund-donut::after {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  background: rgba(8, 12, 30, 0.95);
+  box-shadow: inset 0 0 20px rgba(129, 155, 255, 0.35);
+}
+
+.team-fund-donut.is-animated {
+  transform: scale(1) rotate(0deg);
+  opacity: 1;
+}
+
+.team-fund-donut__center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 0.2rem;
+  padding: 1.5rem;
+}
+
+.team-fund-donut__center p {
+  margin: 0;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #b9c5f5;
+}
+
+.team-fund-donut__center strong {
+  color: #f7f8ff;
+  text-shadow: 0 0 15px rgba(252, 74, 197, 0.45);
+  line-height: 1.25;
+}
+
+.team-fund-legend {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.team-fund-legend__item {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.88rem;
+}
+
+.team-fund-legend__item strong {
+  color: #e7edff;
+}
+
+.team-fund-legend__dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  box-shadow: 0 0 10px currentColor;
 }
 
 .team-fund-breakdown {
   padding: 1.05rem;
   border-radius: 16px;
-  border: 1px solid rgba(147, 170, 242, 0.22);
-  background: rgba(9, 15, 31, 0.84);
+  border: 1px solid rgba(147, 170, 242, 0.34);
+  background: rgba(9, 15, 31, 0.75);
 }
 
 .team-fund-breakdown h3 {
@@ -2614,10 +2709,11 @@ h3,
 }
 
 .team-fund-person {
-  border: 1px solid rgba(135, 158, 228, 0.22);
+  border: 1px solid rgba(135, 158, 228, 0.32);
   border-radius: 12px;
   padding: 0.75rem;
-  background: rgba(7, 14, 28, 0.7);
+  background: linear-gradient(115deg, rgba(18, 17, 47, 0.82), rgba(10, 22, 47, 0.82));
+  box-shadow: 0 0 24px rgba(85, 99, 173, 0.18);
 }
 
 .team-fund-person__head {
@@ -2649,9 +2745,9 @@ h3,
   height: 100%;
   width: 0;
   border-radius: inherit;
-  background: linear-gradient(90deg, rgba(163, 194, 255, 0.92), rgba(93, 132, 255, 0.95));
-  box-shadow: 0 0 14px rgba(125, 160, 255, 0.44);
-  animation: teamFundBarGrow 950ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  background: linear-gradient(90deg, #44f6ff, #ff33bc);
+  box-shadow: 0 0 14px rgba(88, 232, 255, 0.44), 0 0 18px rgba(255, 62, 189, 0.4);
+  animation: teamFundBarGrow 950ms cubic-bezier(0.22, 1, 0.36, 1) both, teamFundBarPulse 2.2s ease-in-out infinite;
 }
 
 .team-fund-person__meta {
@@ -2661,12 +2757,17 @@ h3,
 }
 
 @keyframes teamFundGlow {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.08); }
+  0%, 100% { opacity: 0.55; transform: scale(1) translateY(0); }
+  50% { opacity: 1; transform: scale(1.06) translateY(6px); }
 }
 
 @keyframes teamFundBarGrow {
   from { width: 0; }
+}
+
+@keyframes teamFundBarPulse {
+  0%, 100% { filter: saturate(0.9) brightness(0.95); }
+  50% { filter: saturate(1.2) brightness(1.08); }
 }
 
 .member-card--directory {
@@ -2705,6 +2806,14 @@ h3,
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .team-fund-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .team-fund-breakdown {
+    grid-column: 1 / -1;
+  }
+
   .dashboard-kpi-card--feature {
     grid-column: span 2;
   }
@@ -2723,12 +2832,18 @@ h3,
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .dashboard-quick-payment-grid {
+    grid-template-columns: repeat(3, minmax(100px, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
   .team-fund-layout {
     grid-template-columns: 1fr;
   }
 
-  .dashboard-quick-payment-grid {
-    grid-template-columns: repeat(3, minmax(100px, 1fr));
+  .team-fund-breakdown {
+    grid-column: auto;
   }
 }
 

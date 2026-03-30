@@ -37,6 +37,41 @@
 </header>
 
 <main class="site-shell with-fixed-header app-content">
+  <section class="card p-responsive team-fund-panel" aria-labelledby="teamFundTitle">
+    <div class="panel-header team-fund-panel__head">
+      <div>
+        <p class="eyebrow">Team fund</p>
+        <h2 class="section-header" id="teamFundTitle"><i data-lucide="wallet" class="icon"></i>Team Fund Tracker</h2>
+      </div>
+      <p class="muted" id="teamFundMeta">Manual entries until automated sync is ready.</p>
+    </div>
+
+    <div class="team-fund-layout">
+      <article class="team-fund-total" aria-live="polite">
+        <p class="team-fund-total__label">Current Pot</p>
+        <p class="team-fund-total__amount" id="teamFundTotal">£0</p>
+        <p class="muted">Animated total based on latest manual entries.</p>
+      </article>
+
+      <article class="team-fund-donut-panel" aria-labelledby="teamFundShareTitle">
+        <div class="team-fund-donut-wrap">
+          <div id="teamFundDonut" class="team-fund-donut" role="img" aria-label="Contribution share chart"></div>
+          <div class="team-fund-donut__center">
+            <p>Top contributor</p>
+            <strong id="teamFundTopContributor">—</strong>
+          </div>
+        </div>
+        <h3 id="teamFundShareTitle">Contribution share</h3>
+        <div id="teamFundLegend" class="team-fund-legend" aria-live="polite"></div>
+      </article>
+
+      <article class="team-fund-breakdown">
+        <h3>Who paid what</h3>
+        <div id="teamFundBreakdown" class="team-fund-breakdown__list"></div>
+      </article>
+    </div>
+  </section>
+
   <section class="card glass-panel fade-in p-responsive team-page-hero">
     <div class="team-page-hero__copy">
       <p class="eyebrow">Team directory</p>
@@ -72,29 +107,6 @@
       <p class="metric" id="teamCurrentRole">Member</p>
       <p class="muted" id="teamCurrentIdentity">Signed-in account</p>
     </article>
-  </section>
-
-  <section class="card p-responsive team-fund-panel" aria-labelledby="teamFundTitle">
-    <div class="panel-header team-fund-panel__head">
-      <div>
-        <p class="eyebrow">Team fund</p>
-        <h2 class="section-header" id="teamFundTitle"><i data-lucide="wallet" class="icon"></i>Team Fund Tracker</h2>
-      </div>
-      <p class="muted" id="teamFundMeta">Manual entries until automated sync is ready.</p>
-    </div>
-
-    <div class="team-fund-layout">
-      <article class="team-fund-total" aria-live="polite">
-        <p class="team-fund-total__label">Current Pot</p>
-        <p class="team-fund-total__amount" id="teamFundTotal">£0</p>
-        <p class="muted">Animated total based on latest manual entries.</p>
-      </article>
-
-      <article class="team-fund-breakdown">
-        <h3>Who paid what</h3>
-        <div id="teamFundBreakdown" class="team-fund-breakdown__list"></div>
-      </article>
-    </div>
   </section>
 
   <section class="card p-responsive">
