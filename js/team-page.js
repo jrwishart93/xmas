@@ -3,6 +3,13 @@ import { bootProtectedPage, initIcons } from '/js/app-common.js';
 import { PREVIEW_MODE } from '/js/config.js';
 import { subscribeMembers } from '/js/data.js';
 
+const TEAM_FUND_ENTRIES = [
+  { name: 'Jamie', amount: 1, reason: 'Amend rules' },
+  { name: 'Jamie', amount: 1, reason: 'Punctured tyre' },
+  { name: 'Paul', amount: 3, reason: 'Annual leave' },
+  { name: 'Chris', amount: 3, reason: 'Annual leave' },
+];
+
 function escapeHtml(value = '') {
   return String(value).replace(/[&<>"']/g, (character) => {
     const entities = {
@@ -58,10 +65,52 @@ bootProtectedPage(async (ctx) => {
   const visibleCount = document.getElementById('teamVisibleCount');
   const currentRole = document.getElementById('teamCurrentRole');
   const currentIdentity = document.getElementById('teamCurrentIdentity');
+  const teamFundTotal = document.getElementById('teamFundTotal');
+  const teamFundBreakdown = document.getElementById('teamFundBreakdown');
+  const teamFundMeta = document.getElementById('teamFundMeta');
   let members = [];
 
   currentRole.textContent = formatRole(ctx.membership?.role);
   currentIdentity.textContent = getUserDisplayName(ctx);
+
+  const renderTeamFund = () => {
+    const total = TEAM_FUND_ENTRIES.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+    const byMember = TEAM_FUND_ENTRIES.reduce((accumulator, entry) => {
+      const key = String(entry.name || 'Unknown');
+      const current = accumulator.get(key) || { name: key, total: 0, entries: [] };
+      current.total += Number(entry.amount || 0);
+      current.entries.push(entry);
+      accumulator.set(key, current);
+      return accumulator;
+    }, new Map());
+
+    const memberRows = Array.from(byMember.values()).sort((left, right) => right.total - left.total);
+    const highestTotal = memberRows[0]?.total || 1;
+
+    teamFundBreakdown.innerHTML = '';
+    memberRows.forEach((member) => {
+      const row = document.createElement('article');
+      row.className = 'team-fund-person';
+
+      const reasons = member.entries.map((entry) => `${entry.reason} (£${entry.amount})`).join(' • ');
+      const percentage = Math.max(14, Math.round((member.total / highestTotal) * 100));
+      row.innerHTML = `
+        <div class="team-fund-person__head">
+          <p>${escapeHtml(member.name)}</p>
+          <strong>£${member.total}</strong>
+        </div>
+        <div class="team-fund-person__bar" role="presentation">
+          <span style="width: ${percentage}%"></span>
+        </div>
+        <p class="team-fund-person__meta">${escapeHtml(reasons)}</p>
+      `;
+      teamFundBreakdown.appendChild(row);
+    });
+
+    teamFundMeta.textContent = `${TEAM_FUND_ENTRIES.length} manual entries recorded.`;
+
+    animateNumber(teamFundTotal, total, { duration: 1300, formatter: (value) => `£${value}` });
+  };
 
   const render = () => {
     const membersForDirectory = members.filter((member) => String(member.role || '').toLowerCase() !== 'admin');
@@ -103,6 +152,7 @@ bootProtectedPage(async (ctx) => {
   };
 
   searchInput.addEventListener('input', render);
+  renderTeamFund();
 
   if (PREVIEW_MODE) {
     members = previewMembers();
@@ -123,3 +173,25 @@ bootProtectedPage(async (ctx) => {
     { once: true }
   );
 });
+
+function animateNumber(element, endValue, options = {}) {
+  if (!element) return;
+  const duration = Number(options.duration || 1000);
+  const formatter = typeof options.formatter === 'function' ? options.formatter : (value) => String(value);
+  const startTime = performance.now();
+
+  const tick = (now) => {
+    const progress = Math.min((now - startTime) / duration, 1);
+    const easedProgress = 1 - Math.pow(1 - progress, 3);
+    const currentValue = Math.round(endValue * easedProgress);
+    element.textContent = formatter(currentValue);
+
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      element.textContent = formatter(endValue);
+    }
+  };
+
+  requestAnimationFrame(tick);
+}

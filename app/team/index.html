@@ -74,6 +74,29 @@
     </article>
   </section>
 
+  <section class="card p-responsive team-fund-panel" aria-labelledby="teamFundTitle">
+    <div class="panel-header team-fund-panel__head">
+      <div>
+        <p class="eyebrow">Team fund</p>
+        <h2 class="section-header" id="teamFundTitle"><i data-lucide="wallet" class="icon"></i>Team Fund Tracker</h2>
+      </div>
+      <p class="muted" id="teamFundMeta">Manual entries until automated sync is ready.</p>
+    </div>
+
+    <div class="team-fund-layout">
+      <article class="team-fund-total" aria-live="polite">
+        <p class="team-fund-total__label">Current Pot</p>
+        <p class="team-fund-total__amount" id="teamFundTotal">£0</p>
+        <p class="muted">Animated total based on latest manual entries.</p>
+      </article>
+
+      <article class="team-fund-breakdown">
+        <h3>Who paid what</h3>
+        <div id="teamFundBreakdown" class="team-fund-breakdown__list"></div>
+      </article>
+    </div>
+  </section>
+
   <section class="card p-responsive">
     <div class="panel-header">
       <div>

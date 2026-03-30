@@ -2544,6 +2544,131 @@ h3,
   font-size: clamp(1.65rem, 4vw, 2.2rem);
 }
 
+.team-fund-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.team-fund-panel::before {
+  content: "";
+  position: absolute;
+  inset: -35% -10% auto;
+  height: 260px;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 10%, rgba(108, 139, 255, 0.22), transparent 62%);
+  animation: teamFundGlow 5s ease-in-out infinite;
+}
+
+.team-fund-panel__head {
+  margin-bottom: 1.2rem;
+}
+
+.team-fund-layout {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(220px, 0.85fr) minmax(280px, 1.25fr);
+  gap: 1rem;
+}
+
+.team-fund-total {
+  padding: 1.05rem;
+  border-radius: 16px;
+  border: 1px solid rgba(169, 190, 255, 0.28);
+  background: linear-gradient(165deg, rgba(53, 79, 170, 0.44), rgba(8, 16, 37, 0.92));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 16px 28px rgba(4, 7, 18, 0.3);
+}
+
+.team-fund-total__label {
+  margin: 0;
+  color: #b8c9ff;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+}
+
+.team-fund-total__amount {
+  margin: 0.45rem 0 0.55rem;
+  font-size: clamp(2rem, 5vw, 2.9rem);
+  font-weight: 800;
+  line-height: 1;
+  color: #f2f6ff;
+  text-shadow: 0 0 20px rgba(164, 190, 255, 0.28);
+}
+
+.team-fund-breakdown {
+  padding: 1.05rem;
+  border-radius: 16px;
+  border: 1px solid rgba(147, 170, 242, 0.22);
+  background: rgba(9, 15, 31, 0.84);
+}
+
+.team-fund-breakdown h3 {
+  margin: 0 0 0.8rem;
+  font-size: 1rem;
+}
+
+.team-fund-breakdown__list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.team-fund-person {
+  border: 1px solid rgba(135, 158, 228, 0.22);
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: rgba(7, 14, 28, 0.7);
+}
+
+.team-fund-person__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.team-fund-person__head p {
+  margin: 0;
+  font-weight: 700;
+}
+
+.team-fund-person__head strong {
+  color: #dce7ff;
+}
+
+.team-fund-person__bar {
+  margin: 0.45rem 0 0.5rem;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(109, 131, 194, 0.28);
+  overflow: hidden;
+}
+
+.team-fund-person__bar span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(163, 194, 255, 0.92), rgba(93, 132, 255, 0.95));
+  box-shadow: 0 0 14px rgba(125, 160, 255, 0.44);
+  animation: teamFundBarGrow 950ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.team-fund-person__meta {
+  margin: 0;
+  color: #9fb0df;
+  font-size: 0.83rem;
+}
+
+@keyframes teamFundGlow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+@keyframes teamFundBarGrow {
+  from { width: 0; }
+}
+
 .member-card--directory {
   position: relative;
   overflow: hidden;
@@ -2596,6 +2721,10 @@ h3,
   .member-list-grid,
   .member-list-grid--compact {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .team-fund-layout {
+    grid-template-columns: 1fr;
   }
 
   .dashboard-quick-payment-grid {
