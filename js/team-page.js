@@ -60,6 +60,7 @@ bootProtectedPage(async (ctx) => {
   const currentRole = document.getElementById('teamCurrentRole');
   const currentIdentity = document.getElementById('teamCurrentIdentity');
   const teamFundTotal = document.getElementById('teamFundTotal');
+  const teamFundStripTotal = document.getElementById('teamFundStripTotal');
   const teamFundBreakdown = document.getElementById('teamFundBreakdown');
   const teamFundMeta = document.getElementById('teamFundMeta');
   const teamFundDonut = document.getElementById('teamFundDonut');
@@ -162,6 +163,9 @@ bootProtectedPage(async (ctx) => {
     teamFundMeta.textContent = `${memberRows.length} contributors listed with current paid amounts.`;
 
     animateNumber(teamFundTotal, totalPence / 100, { duration: 1300, formatter: (value) => `£${Number(value).toFixed(2)}` });
+    if (teamFundStripTotal) {
+      teamFundStripTotal.textContent = `£${(totalPence / 100).toFixed(2)}`;
+    }
   };
 
   const render = () => {
