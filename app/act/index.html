@@ -18,20 +18,41 @@
   <link rel="stylesheet" href="/styles/main.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body>
+<body class="act-page-public">
 <header class="site-header">
   <div class="site-shell header-row">
-    <h1 class="section-header"><i data-lucide="scroll-text" class="icon"></i>Act Reference</h1>
+    <p class="brand">Team Social Fund</p>
     <nav aria-label="App navigation" class="site-nav">
       <a href="/app/dashboard/" class="nav-link"><i data-lucide="bar-chart-3" class="icon"></i>Dashboard</a>
       <a href="/app/leaderboard/" class="nav-link"><i data-lucide="trophy" class="icon"></i>Leaderboard</a>
       <a href="/app/cases/" class="nav-link"><i data-lucide="gavel" class="icon"></i>Cases</a>
-      <a href="/act/" class="nav-link" aria-current="page"><i data-lucide="scroll-text" class="icon"></i>Act</a>
+      <a href="/app/act/" class="nav-link" aria-current="page"><i data-lucide="scroll-text" class="icon"></i>The Act</a>
       <a href="#" id="logoutLink" class="nav-link"><i data-lucide="x-circle" class="icon"></i>Logout</a>
     </nav>
   </div>
 </header>
-<main class="site-shell with-fixed-header"><section class="card p-responsive"><div id="actContainer"></div></section></main>
+<main class="site-shell with-fixed-header">
+  <section class="public-act-hero" aria-labelledby="actHeroTitle">
+    <img class="public-act-hero-image" src="/app/images/Open-book.png" alt="Open legal book on a wooden desk" />
+    <div class="public-act-hero-overlay"></div>
+
+    <div class="public-act-hero-content">
+      <p class="public-act-hero-kicker"><i data-lucide="sparkles" class="icon"></i>Act Reference</p>
+      <h1 id="actHeroTitle" class="section-header">The Summary Justice (Social Contributions) Act 2025</h1>
+      <p>
+        Review every part and clause in the Act, with the current structure and contribution amounts
+        presented in one place.
+      </p>
+      <div class="public-act-hero-actions">
+        <a class="btn secondary btn-responsive" href="#actContainer"><i data-lucide="book-open" class="icon icon-btn"></i>Read the Act</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="card p-responsive">
+    <div id="actContainer"></div>
+  </section>
+</main>
 <script type="module" src="/js/app-act-page.js"></script>
 </body>
 </html>
