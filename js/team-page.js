@@ -1,7 +1,8 @@
 import { TEAM } from '/archive/brewhemia-2025/team.js';
 import { bootProtectedPage, initIcons } from '/js/app-common.js';
 import { PREVIEW_MODE } from '/js/config.js';
-import { subscribeMembers, subscribePaidContributions } from '/js/data.js';
+import { subscribeMembers } from '/js/data.js';
+import { getSortedTeamFunds } from '/js/team-funds.js';
 
 function escapeHtml(value = '') {
   return String(value).replace(/[&<>"']/g, (character) => {
@@ -66,7 +67,6 @@ bootProtectedPage(async (ctx) => {
   const teamFundTopline = document.getElementById('teamFundTopline');
   let activeContributor = '';
   let members = [];
-  let paidScns = [];
 
   currentRole.textContent = formatRole(ctx.membership?.role);
   currentIdentity.textContent = getUserDisplayName(ctx);
@@ -80,15 +80,6 @@ bootProtectedPage(async (ctx) => {
     }
   };
 
-
-  const mapPaidScnsToEntries = (payments) =>
-    payments.map((payment) => {
-      const displayName = members.find((member) => member.uid === payment.accusedUserId)?.displayName;
-      return {
-        name: displayName || payment.accusedUserId || 'Unknown',
-        amountPence: Number(payment.amountPaidPence || payment.amountPence || 0),
-      };
-    });
 
   const renderTeamFund = (paymentEntries = []) => {
     const byMember = paymentEntries.reduce((accumulator, entry) => {
@@ -168,7 +159,7 @@ bootProtectedPage(async (ctx) => {
         : 'Top contributor: —';
     }
 
-    teamFundMeta.textContent = `${paymentEntries.length} payment${paymentEntries.length === 1 ? '' : 's'} recorded.`;
+    teamFundMeta.textContent = `${memberRows.length} contributors listed with current paid amounts.`;
 
     animateNumber(teamFundTotal, totalPence / 100, { duration: 1300, formatter: (value) => `£${Number(value).toFixed(2)}` });
   };
@@ -214,34 +205,30 @@ bootProtectedPage(async (ctx) => {
 
   searchInput.addEventListener('input', render);
 
+  const fundEntries = getSortedTeamFunds().map((member) => ({
+    name: member.nickname ? `${member.name} (${member.nickname})` : member.name,
+    amountPence: Number(member.amount || 0) * 100,
+  }));
+
   if (PREVIEW_MODE) {
     members = previewMembers();
     render();
-    renderTeamFund([
-      { name: 'Jamie', amountPence: 200 },
-      { name: 'Paul', amountPence: 300 },
-      { name: 'Chris', amountPence: 300 },
-      { name: 'Jamie', amountPence: 100 },
-    ]);
+    renderTeamFund(fundEntries);
     return;
   }
 
   const unsubscribeMembers = subscribeMembers((nextMembers) => {
     members = nextMembers;
     render();
-    renderTeamFund(mapPaidScnsToEntries(paidScns));
+    renderTeamFund(fundEntries);
   });
 
-  const unsubscribePayments = subscribePaidContributions((payments) => {
-    paidScns = payments;
-    renderTeamFund(mapPaidScnsToEntries(paidScns));
-  });
+  renderTeamFund(fundEntries);
 
   window.addEventListener(
     'beforeunload',
     () => {
       unsubscribeMembers?.();
-      unsubscribePayments?.();
     },
     { once: true }
   );

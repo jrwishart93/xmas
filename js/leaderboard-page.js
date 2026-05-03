@@ -1,46 +1,44 @@
-import { bootProtectedPage, initIcons, initPreviewGates } from '/js/app-common.js';
-import { subscribeLeaderboard, getMembers } from '/js/data.js';
-import { money } from '/js/constants.js';
-import { PREVIEW_MODE } from '/js/config.js';
-import { getPreviewLeaderboardFromArchive } from '/js/preview-data.js';
+import { bootProtectedPage, initIcons } from '/js/app-common.js';
+import {
+  formatFunds,
+  getRankAtIndex,
+  getSortedTeamFunds,
+  getTeamFundsSummary,
+} from '/js/team-funds.js';
 
 bootProtectedPage(async () => {
   const container = document.getElementById('rows');
+  const totalAmount = document.getElementById('leaderboardTotalFunds');
+  const memberCount = document.getElementById('leaderboardMemberCount');
+  const paidCount = document.getElementById('leaderboardPaidCount');
+  const summaryTotal = document.getElementById('leaderboardSummaryTotal');
+
+  const sortedFunds = getSortedTeamFunds();
+  const summary = getTeamFundsSummary();
+
+  totalAmount.textContent = formatFunds(summary.total);
+  memberCount.textContent = String(summary.memberCount);
+  paidCount.textContent = String(summary.paidCount);
+  summaryTotal.textContent = formatFunds(summary.total);
+
   container.innerHTML = '';
 
-  if (PREVIEW_MODE) {
-    getPreviewLeaderboardFromArchive().forEach((row, index) => {
-      const card = document.createElement('article');
-      card.className = 'card leaderboard-card p-responsive';
-      card.setAttribute('data-preview-gate', 'leaderboard-detail');
-      card.innerHTML = `
-        <h2 class="section-header"><i data-lucide="user" class="icon"></i>${row.name}</h2>
-        <p class="metric">${row.amount}</p>
-        <p class="muted">Rank #${index + 1}</p>
-      `;
-      container.appendChild(card);
-    });
+  sortedFunds.forEach((member, index) => {
+    const card = document.createElement('article');
+    card.className = 'leaderboard-row';
+    const rank = getRankAtIndex(sortedFunds, index);
+    const displayName = member.nickname ? `${member.name} (${member.nickname})` : member.name;
 
-    initPreviewGates(container);
-    initIcons();
-    return;
-  }
-
-  const members = await getMembers();
-
-  subscribeLeaderboard((rows) => {
-    container.innerHTML = '';
-    rows.forEach((row, index) => {
-      const card = document.createElement('article');
-      card.className = 'card leaderboard-card p-responsive';
-      card.innerHTML = `
-        <h2 class="section-header"><i data-lucide="user" class="icon"></i>${members.get(row.uid)?.displayName || row.uid}</h2>
-        <p class="metric">${money(row.totalPence)}</p>
-        <p class="muted">Rank #${index + 1}</p>
-      `;
-      container.appendChild(card);
-    });
-
-    initIcons();
+    card.innerHTML = `
+      <span class="rank-badge">${rank}</span>
+      <span class="member-initials" aria-hidden="true">${member.initials}</span>
+      <div class="leaderboard-member-meta">
+        <h2>${displayName}</h2>
+      </div>
+      <strong class="leaderboard-item-value">${formatFunds(member.amount)}</strong>
+    `;
+    container.appendChild(card);
   });
+
+  initIcons();
 });

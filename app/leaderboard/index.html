@@ -21,7 +21,7 @@
 <body>
 <header class="site-header">
   <div class="site-shell header-row">
-    <h1 class="section-header"><i data-lucide="trophy" class="icon"></i>90-Day Contribution Summary</h1>
+    <h1 class="section-header"><i data-lucide="trophy" class="icon"></i>Team Leaderboard</h1>
     <nav aria-label="App navigation" class="site-nav">
       <a href="/app/dashboard/" class="nav-link"><i data-lucide="bar-chart-3" class="icon"></i>Dashboard</a>
       <a href="/app/leaderboard/" class="nav-link" aria-current="page"><i data-lucide="trophy" class="icon"></i>Leaderboard</a>
@@ -34,8 +34,16 @@
   </div>
 </header>
 <main class="site-shell with-fixed-header">
-  <section class="card p-responsive">
-    <div class="leaderboard-cards content-grid" id="rows"></div>
+  <section class="card p-responsive leaderboard-shell">
+    <p class="leaderboard-total-label">Total team funds: <strong id="leaderboardTotalFunds">£0.00</strong></p>
+
+    <article class="leaderboard-summary-card">
+      <p><strong id="leaderboardMemberCount">0</strong> team members</p>
+      <p><strong id="leaderboardPaidCount">0</strong> paid</p>
+      <p><strong id="leaderboardSummaryTotal">£0.00</strong> total funds</p>
+    </article>
+
+    <div class="leaderboard-cards" id="rows"></div>
   </section>
 </main>
 <script type="module" src="/js/leaderboard-page.js"></script>
