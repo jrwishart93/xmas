@@ -26,6 +26,10 @@ const hashString = (value = '') => {
 
 const makeAmountPence = (name: string) => 800 + (hashString(`preview-total-${name}`) % 2200);
 
+const MANUAL_PAYMENT_UPDATES = [
+  { name: 'Derek Niven', amountPence: 600, note: 'paid' },
+];
+
 export function getPreviewLeaderboardFromArchive() {
   return PREVIEW_NAMES.map((name) => {
     const amountPence = makeAmountPence(String(name));
@@ -38,7 +42,8 @@ export function getPreviewLeaderboardFromArchive() {
 export function getPreviewBalanceFromArchive() {
   const leaderboardTotal = getPreviewLeaderboardFromArchive().reduce((sum, row) => sum + row.amountPence, 0);
   const bufferPence = 5000 + (hashString('preview-buffer') % 15000);
-  const totalPence = leaderboardTotal + bufferPence;
+  const manualUpdateTotal = MANUAL_PAYMENT_UPDATES.reduce((sum, entry) => sum + entry.amountPence, 0);
+  const totalPence = leaderboardTotal + bufferPence + manualUpdateTotal;
 
   return {
     valuePence: totalPence,
@@ -49,10 +54,13 @@ export function getPreviewBalanceFromArchive() {
 export function getPreviewRecentActivityFromArchive() {
   const names = PREVIEW_NAMES.length ? PREVIEW_NAMES : ['Team Member'];
 
-  return Array.from({ length: 6 }, (_, index) => {
+  const generated = Array.from({ length: 5 }, (_, index) => {
     const name = String(names[index % names.length]);
     const clause = PREVIEW_SECTIONS[(hashString(`${name}-clause-${index}`) + index) % PREVIEW_SECTIONS.length];
     const amount = 1 + (hashString(`${name}-amount-${index}`) % 3);
     return `${name} – ${clause} – £${amount}`;
   });
+
+  const manualUpdates = MANUAL_PAYMENT_UPDATES.map((entry) => `${entry.name} – ${entry.note} £${(entry.amountPence / 100).toFixed(0)}`);
+  return [...manualUpdates, ...generated].slice(0, 6);
 }
