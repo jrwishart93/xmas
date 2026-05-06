@@ -2,7 +2,7 @@ export const teamFunds = [
   { name: 'Chris Beddows', initials: 'CB', amount: 3 },
   { name: 'Paul Ewing', initials: 'PE', amount: 3 },
   { name: 'Jamie Wishart', initials: 'JW', amount: 2 },
-  { name: 'Adam J', initials: 'AJ', amount: 1 },
+  { name: 'Adam J', initials: 'AJ', amount: 6 },
   { name: 'Steve Hancock', nickname: 'Santa', initials: 'SH', amount: 0 },
   { name: 'Lawrie MacKay', initials: 'LM', amount: 0 },
 ];
