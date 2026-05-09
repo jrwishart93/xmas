@@ -5,6 +5,7 @@ export const teamFunds = [
   { name: 'Adam J', initials: 'AJ', amount: 6 },
   { name: 'Steve Hancock', nickname: 'Santa', initials: 'SH', amount: 0 },
   { name: 'Lawrie MacKay', initials: 'LM', amount: 1 },
+  { name: 'Derek Niven', initials: 'DN', amount: 6 },
 ];
 
 export function formatFunds(amount) {
