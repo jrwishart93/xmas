@@ -1,5 +1,5 @@
 export const teamFunds = [
-  { name: 'Chris Beddows', initials: 'CB', amount: 3 },
+  { name: 'Chris Beddows', initials: 'CB', amount: 4 },
   { name: 'Paul Ewing', initials: 'PE', amount: 3 },
   { name: 'Jamie Wishart', initials: 'JW', amount: 2 },
   { name: 'Adam J', initials: 'AJ', amount: 6 },
