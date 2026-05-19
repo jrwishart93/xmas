@@ -3434,6 +3434,25 @@ textarea:focus {
   font-size: 1rem;
 }
 
+.leaderboard-row-link {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  gap: 0.7rem;
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+}
+
+.leaderboard-member-meta p {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.leaderboard-member-meta .progress-wrap {
+  margin-top: 0.4rem;
+}
+
 .team-page-content {
   padding-top: clamp(0.9rem, 2.5vw, 1.35rem);
 }
