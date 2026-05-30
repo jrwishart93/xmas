@@ -4,6 +4,7 @@ import {
   getRankAtIndex,
   getSortedTeamFunds,
   getTeamFundsSummary,
+  formatContributionPercentage,
 } from '/js/team-funds.js';
 
 bootProtectedPage(async () => {
@@ -27,7 +28,8 @@ bootProtectedPage(async () => {
     const card = document.createElement('article');
     card.className = 'leaderboard-row';
     const rank = getRankAtIndex(sortedFunds, index);
-    const percentage = Math.round((member.amount / (summary.total || 1)) * 100);
+    const percentageValue = (member.amount / (summary.total || 1)) * 100;
+    const percentage = formatContributionPercentage(percentageValue);
 
     card.innerHTML = `
       <a class="leaderboard-row-link" href="${member.profilePath}" aria-label="View ${member.name} in team directory">
@@ -36,7 +38,7 @@ bootProtectedPage(async () => {
         <div class="leaderboard-member-meta">
           <h2>${member.name}</h2>
           <p>${member.paymentCount} payment${member.paymentCount === 1 ? '' : 's'} • ${percentage}% contribution</p>
-          <span class="progress-wrap"><span class="progress-bar" style="width:${percentage}%"></span></span>
+          <span class="progress-wrap"><span class="progress-bar" style="width:${percentageValue}%"></span></span>
         </div>
         <strong class="leaderboard-item-value">${formatFunds(member.amount)}</strong>
       </a>

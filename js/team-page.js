@@ -2,7 +2,11 @@ import { TEAM } from '/archive/brewhemia-2025/team.js';
 import { bootProtectedPage, initIcons } from '/js/app-common.js';
 import { PREVIEW_MODE } from '/js/config.js';
 import { subscribeMembers } from '/js/data.js';
-import { getSortedTeamFunds } from '/js/team-funds.js';
+import {
+  formatContributionPercentage,
+  getTeamFundPaymentEntries,
+  getTeamFundsSummary,
+} from '/js/team-funds.js';
 
 function escapeHtml(value = '') {
   return String(value).replace(/[&<>"']/g, (character) => {
@@ -15,6 +19,15 @@ function escapeHtml(value = '') {
     };
     return entities[character] || character;
   });
+}
+
+
+function slugFromName(name = '') {
+  return String(name)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 function initialsFromName(name = '') {
@@ -82,7 +95,7 @@ bootProtectedPage(async (ctx) => {
   };
 
 
-  const renderTeamFund = (paymentEntries = []) => {
+  const renderTeamFund = (paymentEntries = [], fundTotalPence = 0) => {
     const byMember = paymentEntries.reduce((accumulator, entry) => {
       const key = String(entry.name || 'Unknown');
       const current = accumulator.get(key) || { name: key, totalPence: 0, entries: [] };
@@ -93,8 +106,14 @@ bootProtectedPage(async (ctx) => {
       return accumulator;
     }, new Map());
 
-    const memberRows = Array.from(byMember.values()).sort((left, right) => right.totalPence - left.totalPence);
-    const totalPence = memberRows.reduce((sum, member) => sum + member.totalPence, 0);
+    const memberRows = Array.from(byMember.values()).sort(
+      (left, right) =>
+        right.totalPence - left.totalPence ||
+        right.entries.length - left.entries.length ||
+        left.name.localeCompare(right.name)
+    );
+    const contributionPence = memberRows.reduce((sum, member) => sum + member.totalPence, 0);
+    const totalPence = fundTotalPence || contributionPence;
     const highestTotal = memberRows[0]?.totalPence || 1;
     const totalSafe = totalPence || 1;
 
@@ -115,7 +134,8 @@ bootProtectedPage(async (ctx) => {
       row.tabIndex = 0;
       if (member.name === activeContributor) row.classList.add('is-active');
 
-      const percentage = Math.round((member.totalPence / totalSafe) * 100);
+      const percentageValue = (member.totalPence / totalSafe) * 100;
+      const percentage = formatContributionPercentage(percentageValue);
       const barWidth = Math.max(9, Math.round((member.totalPence / highestTotal) * 100));
       const totalPounds = (member.totalPence / 100).toFixed(2);
       row.innerHTML = `
@@ -192,6 +212,7 @@ bootProtectedPage(async (ctx) => {
       const displayName = member.displayName || 'Team Member';
       const card = document.createElement('article');
       card.className = 'member-card member-card--directory';
+      card.id = slugFromName(displayName);
       card.innerHTML = `
         <div class="member-card__head">
           <span class="member-card__avatar" aria-hidden="true">${escapeHtml(initialsFromName(displayName))}</span>
@@ -209,25 +230,23 @@ bootProtectedPage(async (ctx) => {
 
   searchInput.addEventListener('input', render);
 
-  const fundEntries = getSortedTeamFunds().map((member) => ({
-    name: member.nickname ? `${member.name} (${member.nickname})` : member.name,
-    amountPence: Number(member.amount || 0) * 100,
-  }));
+  const fundEntries = getTeamFundPaymentEntries();
+  const fundTotalPence = Number(getTeamFundsSummary().total || 0) * 100;
 
   if (PREVIEW_MODE) {
     members = previewMembers();
     render();
-    renderTeamFund(fundEntries);
+    renderTeamFund(fundEntries, fundTotalPence);
     return;
   }
 
   const unsubscribeMembers = subscribeMembers((nextMembers) => {
     members = nextMembers;
     render();
-    renderTeamFund(fundEntries);
+    renderTeamFund(fundEntries, fundTotalPence);
   });
 
-  renderTeamFund(fundEntries);
+  renderTeamFund(fundEntries, fundTotalPence);
 
   window.addEventListener(
     'beforeunload',
