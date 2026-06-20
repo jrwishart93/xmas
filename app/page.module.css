@@ -221,6 +221,10 @@
     min-height: auto;
   }
 
+  .heroContent {
+    order: -1;
+  }
+
   .heroMedia {
     min-height: 320px;
   }
