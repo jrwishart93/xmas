@@ -71,12 +71,14 @@ export async function POST(request: Request, { params }: Params) {
     if (!decoded) return NextResponse.json({ error: 'Invalid ID token.' }, { status: 401 });
 
     const { scnId } = (await request.json().catch(() => ({}))) as { scnId?: string };
-    if (!scnId) return NextResponse.json({ error: 'Missing scnId.' }, { status: 400 });
+    if (!scnId || typeof scnId !== 'string' || scnId.includes('/')) {
+      return NextResponse.json({ error: 'Missing scnId.' }, { status: 400 });
+    }
 
     const teamId = process.env.TEAM_ID || 'rpu-social-fund';
     const memberRef = adminDb.doc(`teams/${teamId}/members/${decoded.uid}`);
     const memberSnap = await memberRef.get();
-    if (!memberSnap.exists || memberSnap.data()?.role !== 'admin') {
+    if (!memberSnap.exists || memberSnap.data()?.role !== 'admin' || memberSnap.data()?.disabled === true) {
       return NextResponse.json({ error: 'Admin access required.' }, { status: 403 });
     }
 

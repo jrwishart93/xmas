@@ -315,7 +315,8 @@ export async function consumeOAuthCallback(params: {
   });
 
   const memberSnapshot = await adminDb.doc(`teams/${stateRecord.teamId}/members/${stateRecord.uid}`).get();
-  if (!memberSnapshot.exists || memberSnapshot.data()?.role !== 'admin') {
+  const memberData = memberSnapshot.data();
+  if (!memberSnapshot.exists || memberData?.role !== 'admin' || memberData?.disabled === true) {
     throw new TrueLayerDataError('forbidden', 'Only admins can complete bank connection.', 403);
   }
 

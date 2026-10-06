@@ -43,27 +43,28 @@ export async function POST(request: Request) {
   const ledgerRef = adminDb.collection('fundLedger').doc();
 
   try {
-    await Promise.all([
-      teamRef.set(
-        {
-          confirmedBalancePence: FieldValue.increment(amountPence),
-          updatedAt: FieldValue.serverTimestamp(),
-        },
-        { merge: true }
-      ),
-      ledgerRef.set({
-        teamId: TEAM_ID,
-        type: 'payment',
-        amount: amountPence / 100,
-        amountPence,
-        userId: member.uid,
-        offenceCode: null,
-        note: 'Monzo quick payment (self-declared)',
-        createdBy: member.uid,
-        createdAt: FieldValue.serverTimestamp(),
+    const batch = adminDb.batch();
+    batch.set(
+      teamRef,
+      {
+        confirmedBalancePence: FieldValue.increment(amountPence),
         updatedAt: FieldValue.serverTimestamp(),
-      }),
-    ]);
+      },
+      { merge: true }
+    );
+    batch.set(ledgerRef, {
+      teamId: TEAM_ID,
+      type: 'payment',
+      amount: amountPence / 100,
+      amountPence,
+      userId: member.uid,
+      offenceCode: null,
+      note: 'Monzo quick payment (self-declared)',
+      createdBy: member.uid,
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+    await batch.commit();
   } catch {
     return NextResponse.json({ error: 'Failed to record payment.' }, { status: 500 });
   }

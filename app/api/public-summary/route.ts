@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getAdminDb } from '../_lib/firebaseAdmin';
 import { getScnAmountPence } from '../_lib/scnAmount';
-
-const TEAM_ID = 'rpu-social-fund';
-
-const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+import { TEAM_ID } from '../../../lib/team';
 
 export async function GET() {
+  const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
   const adminDb = getAdminDb();
   const scnSnap = await adminDb.collection(`teams/${TEAM_ID}/scns`).where('stage', 'in', ['pleaded_guilty', 'court_convicted']).get();
 
