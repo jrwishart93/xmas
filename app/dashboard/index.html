@@ -60,23 +60,18 @@
   </section>
 
   <section class="card p-responsive dashboard-quick-payment" aria-label="Quick payment">
-    <div class="panel-header">
-      <div>
-        <p class="eyebrow">Quick Payment</p>
-        <h2 class="section-header"><i data-lucide="banknote" class="icon"></i>Quick Monzo Payment</h2>
+    <div id="dashboardPayPanel">
+      <!-- Fallback if scripts fail; replaced by the pay panel on load. -->
+      <div class="dashboard-quick-payment-grid" role="list" aria-label="Quick payment amounts">
+        <a href="https://monzo.com/pay/r/team-funds_aRlKSNC7qhSOwp?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem" data-amount="1"><span class="amount">£1</span><span class="label">Contribution</span></a>
+        <a href="https://monzo.com/pay/r/team-funds_CPB94nTOohBqbA?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem" data-amount="2"><span class="amount">£2</span><span class="label">Contribution</span></a>
+        <a href="https://monzo.com/pay/r/team-funds_y4u0pUaquscHIr?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem" data-amount="3"><span class="amount">£3</span><span class="label">Contribution</span></a>
+        <a href="https://monzo.com/pay/r/team-funds_gULPWd7vCdIgI0?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem" data-amount="4"><span class="amount">£4</span><span class="label">Contribution</span></a>
+        <a href="https://monzo.com/pay/r/team-funds_ic1AXddsyKMpjz?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem" data-amount="5"><span class="amount">£5</span><span class="label">Contribution</span></a>
       </div>
+      <p class="dashboard-quick-payment-footer">Payments open securely in Monzo.</p>
     </div>
-    <p class="dashboard-quick-payment-copy">
-      This is the only active dashboard payment flow at the moment.
-    </p>
-    <div class="dashboard-quick-payment-grid" role="list" aria-label="Quick payment amounts">
-      <a href="https://monzo.com/pay/r/team-funds_aRlKSNC7qhSOwp?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem" data-amount="1"><span class="amount">£1</span><span class="label">Contribution</span></a>
-      <a href="https://monzo.com/pay/r/team-funds_CPB94nTOohBqbA?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem" data-amount="2"><span class="amount">£2</span><span class="label">Contribution</span></a>
-      <a href="https://monzo.com/pay/r/team-funds_y4u0pUaquscHIr?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem" data-amount="3"><span class="amount">£3</span><span class="label">Contribution</span></a>
-      <a href="https://monzo.com/pay/r/team-funds_gULPWd7vCdIgI0?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem" data-amount="4"><span class="amount">£4</span><span class="label">Contribution</span></a>
-      <a href="https://monzo.com/pay/r/team-funds_ic1AXddsyKMpjz?from_qr=true" target="_blank" rel="noopener noreferrer" class="dashboard-quick-payment-btn" role="listitem" data-amount="5"><span class="amount">£5</span><span class="label">Contribution</span></a>
-    </div>
-    <p class="dashboard-quick-payment-footer">Payments open securely in Monzo.</p>
+    <a class="pay-panel__history-link" href="/app/leaderboard/#historyTitle">See who’s paid what →</a>
 
     <div id="quickPayConfirm" class="dashboard-quick-payment-confirm" hidden>
       <p class="dashboard-quick-payment-confirm-label">

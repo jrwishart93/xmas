@@ -2,7 +2,7 @@
 // No imports. All offence data is embedded to avoid a runtime HTTP request.
 // This module is intentionally temporary while TrueLayer/Open Banking is integrated.
 
-const MONZO_LINKS = {
+export const MONZO_LINKS = {
   1: 'https://monzo.com/pay/r/team-funds_aRlKSNC7qhSOwp?from_qr=true',
   2: 'https://monzo.com/pay/r/team-funds_CPB94nTOohBqbA?from_qr=true',
   3: 'https://monzo.com/pay/r/team-funds_y4u0pUaquscHIr?from_qr=true',
@@ -11,7 +11,7 @@ const MONZO_LINKS = {
 };
 
 // Embedded from data/act.json — update if the Act is amended.
-const OFFENCES = [
+export const OFFENCES = [
   // Part 1 — Administrative & Attendance Breaches
   { code: '1.1',    title: 'Late for Duty',                           amountGBP: 1, partNumber: 1, partTitle: 'Administrative & Attendance Breaches' },
   { code: '1.2',    title: 'Attendance on Incorrect Day',             amountGBP: 2, partNumber: 1, partTitle: 'Administrative & Attendance Breaches' },

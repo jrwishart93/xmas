@@ -1,4 +1,5 @@
 import { bootProtectedPage, initIcons, initPreviewGates } from '/js/app-common.js';
+import { renderPayPanel } from '/js/pay-panel.js';
 
 function initialsFromName(name = '') {
   const parts = String(name)
@@ -74,7 +75,7 @@ function initQuickPayConfirmation(ctx) {
   const confirmBtn = document.getElementById('quickPayConfirmBtn');
   const statusEl = document.getElementById('quickPayConfirmStatus');
 
-  if (!confirmArea || !confirmBtn || !statusEl) return;
+  if (!confirmArea || !confirmBtn || !statusEl) return () => {};
 
   let pendingAmountPence = null;
 
@@ -84,17 +85,18 @@ function initQuickPayConfirmation(ctx) {
     statusEl.hidden = false;
   }
 
-  paymentButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const pounds = parseInt(btn.dataset.amount, 10);
-      if (!pounds) return;
+  const showConfirmFor = (pounds) => {
+    if (!pounds) return;
 
-      pendingAmountPence = pounds * 100;
-      confirmBtn.textContent = `Confirm £${pounds} payment sent`;
-      confirmBtn.disabled = false;
-      statusEl.hidden = true;
-      confirmArea.hidden = false;
-    });
+    pendingAmountPence = pounds * 100;
+    confirmBtn.textContent = `Confirm £${pounds} payment sent`;
+    confirmBtn.disabled = false;
+    statusEl.hidden = true;
+    confirmArea.hidden = false;
+  };
+
+  paymentButtons.forEach((btn) => {
+    btn.addEventListener('click', () => showConfirmFor(parseInt(btn.dataset.amount, 10)));
   });
 
   confirmBtn.addEventListener('click', async () => {
@@ -130,6 +132,8 @@ function initQuickPayConfirmation(ctx) {
       confirmBtn.textContent = 'Confirm payment sent';
     }
   });
+
+  return showConfirmFor;
 }
 
 bootProtectedPage(async (ctx) => {
@@ -138,7 +142,7 @@ bootProtectedPage(async (ctx) => {
   const email = ctx.user?.email || 'Signed-in account';
 
   setText('dashboardGreeting', `Welcome back, ${displayName}`);
-  setText('dashboardIdentity', 'Only Quick Monzo Payment is live right now. Everything else is coming soon.');
+  setText('dashboardIdentity', 'Pay into the team fund below, or see who’s paid on the leaderboard.');
   setText('dashboardStatusText', 'Secure session active');
   setText('dashboardUserName', displayName);
   setText('dashboardEmail', email);
@@ -150,6 +154,7 @@ bootProtectedPage(async (ctx) => {
 
   initPreviewGates();
   initBreachInfoModal();
-  initQuickPayConfirmation(ctx);
+  const showConfirmFor = initQuickPayConfirmation(ctx);
+  renderPayPanel(document.getElementById('dashboardPayPanel'), { onAmountChosen: showConfirmFor });
   initIcons();
 });

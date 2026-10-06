@@ -33,10 +33,20 @@
     </nav>
   </div>
 </header>
-<main class="site-shell with-fixed-header">
-  <section class="card p-responsive leaderboard-shell">
-    <p class="leaderboard-total-label">Total team funds: <strong id="leaderboardTotalFunds">£0.00</strong></p>
+<main class="site-shell with-fixed-header leaderboard-page">
+  <section class="card p-responsive fund-hero" aria-labelledby="fundHeroTitle">
+    <div class="fund-hero__copy">
+      <p class="eyebrow" id="fundHeroTitle">Team fund</p>
+      <p class="fund-hero__total"><strong id="leaderboardTotalFunds">£0.00</strong></p>
+      <p class="fund-hero__meta muted" id="fundHeroMeta">&nbsp;</p>
+    </div>
+    <div class="fund-chart" id="fundChart" role="img" aria-label="Team fund growth over time"></div>
+  </section>
 
+  <section class="card p-responsive" id="payPanel" aria-label="Pay into the team fund"></section>
+
+  <section class="card p-responsive leaderboard-shell" aria-labelledby="standingsTitle">
+    <h2 class="section-header" id="standingsTitle"><i data-lucide="trophy" class="icon"></i>Standings</h2>
     <article class="leaderboard-summary-card">
       <p><strong id="leaderboardSummaryTotal">£0.00</strong> collected</p>
       <p><strong id="leaderboardPaymentCount">0</strong> payments received</p>
@@ -44,6 +54,15 @@
     </article>
 
     <div class="leaderboard-cards" id="rows"></div>
+  </section>
+
+  <section class="card p-responsive payment-history" aria-labelledby="historyTitle">
+    <div class="payment-history__head">
+      <h2 class="section-header" id="historyTitle"><i data-lucide="receipt" class="icon"></i>Who paid what</h2>
+      <p class="muted payment-history__count" id="historyCount" aria-live="polite"></p>
+    </div>
+    <div class="payment-history__filters" id="historyFilters" role="group" aria-label="Filter by member"></div>
+    <ol class="payment-history__list" id="historyList"></ol>
   </section>
 </main>
 <script type="module" src="/js/leaderboard-page.js"></script>
