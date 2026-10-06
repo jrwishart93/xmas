@@ -1,13 +1,15 @@
 export const TEAM_ID = "rpu-social-fund";
 
-export const RESOLVED_STAGES = ["pleaded_guilty", "court_convicted"];
+export const RESOLVED_STAGES = ["pleaded_guilty", "court_convicted", "court_costs"];
 
 export const STAGE_LABELS = {
   awaiting_plea: "Awaiting Plea",
   pleaded_guilty: "Pleaded Guilty",
-  court_requested: "Kangaroo Court Requested",
-  court_convicted: "Court Convicted",
-  court_acquitted: "Court Acquitted",
+  court_requested: "Team Vote Open",
+  court_convicted: "Found Guilty",
+  court_acquitted: "Not Upheld",
+  court_costs: "Court Costs",
+  dismissed: "Dismissed",
 };
 
 export const ninetyDaysAgo = () =>

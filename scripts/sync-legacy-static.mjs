@@ -28,6 +28,7 @@ const copyJobs = [
   { from: "app/leaderboard", to: "public/legacy/app/leaderboard" },
   { from: "app/act", to: "public/legacy/app/act" },
   { from: "app/disbursements", to: "public/legacy/app/disbursements" },
+  { from: "app/settings", to: "public/legacy/app/settings" },
   { from: "app/scn/[scnId]", to: "public/legacy/app/scn" },
   { from: "styles", to: "public/styles" },
 ];

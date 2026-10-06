@@ -36,10 +36,10 @@
   <section class="card glass-panel fade-in p-responsive dashboard-hero dashboard-hero--compact">
     <div class="dashboard-hero-copy">
       <h1 id="dashboardGreeting">Welcome back, Team Member</h1>
-      <p id="dashboardIdentity" class="dashboard-lead">Only Quick Monzo Payment is live right now.</p>
+      <p id="dashboardIdentity" class="dashboard-lead">Pay into the team fund below, or see who’s paid on the leaderboard.</p>
       <div class="dashboard-status-strip">
         <span class="status-chip"><i data-lucide="shield-check" class="icon"></i><span id="dashboardStatusText">Secure session active</span></span>
-        <span class="status-chip"><i data-lucide="rocket" class="icon"></i><span>More features coming soon</span></span>
+        <a class="status-chip status-chip--link" href="/app/issue/" id="dashboardCasesChip" hidden><i data-lucide="bell-ring" class="icon"></i><span id="dashboardCasesChipText"></span></a>
       </div>
     </div>
 
@@ -54,7 +54,7 @@
       </div>
       <div class="dashboard-role-row">
         <span class="badge badge-strong" id="dashboardRoleBadge">Member</span>
-        <span class="muted">Quick payment available</span>
+        <span class="muted">Team member</span>
       </div>
     </aside>
   </section>
@@ -83,17 +83,19 @@
       <p id="quickPayConfirmStatus" class="dashboard-quick-payment-confirm-status" hidden></p>
     </div>
 
-    <section class="dashboard-whats-coming" aria-label="What's coming">
+    <section class="dashboard-whats-coming" aria-label="Breach reporting">
       <div class="dashboard-whats-coming-header">
-        <p class="eyebrow">What’s Coming</p>
-        <h3>Alleged Breach Reporting</h3>
+        <p class="eyebrow">Breach reporting</p>
+        <h3>Spotted a breach of the Act?</h3>
       </div>
       <p class="dashboard-whats-coming-copy">
-        A new feature will soon allow team members to formally report an alleged breach of the Social Contributions Act.
+        Report a team member, or own up yourself. Contested cases go to a team vote.
       </p>
-      <button type="button" class="btn btn-secondary dashboard-whats-coming-trigger" id="openBreachModal">
-        Read How It Works
-      </button>
+      <div class="dashboard-breach-actions">
+        <a class="btn" href="/app/issue/?mode=report">Report a breach</a>
+        <a class="btn btn-secondary" href="/app/issue/">Own up</a>
+        <button type="button" class="btn btn-secondary dashboard-whats-coming-trigger" id="openBreachModal">How it works</button>
+      </div>
     </section>
   </section>
 
@@ -105,29 +107,25 @@
       <button type="button" class="dashboard-info-modal__close" id="closeBreachModal" aria-label="Close details">
         <i data-lucide="x" class="icon"></i>
       </button>
-      <p class="eyebrow">What’s Coming</p>
+      <p class="eyebrow">How it works</p>
       <h2 id="breachModalTitle" class="section-header"><i data-lucide="shield-alert" class="icon"></i>Alleged Breach Reporting</h2>
-      <p>
-        A new feature is currently in development which will allow team members to formally report an alleged breach of the Social Contributions Act.
-      </p>
-      <p>When released, users will be able to:</p>
+      <p>On the Cases page any team member can:</p>
       <ul>
-        <li>Select the team member involved</li>
+        <li>Choose the team member involved</li>
         <li>Choose the relevant section of the Act</li>
-        <li>Add optional notes or circumstances</li>
-        <li>Submit the allegation for review</li>
+        <li>Add optional notes about what happened</li>
+        <li>Send the report</li>
       </ul>
       <p>
-        Once submitted, the accused team member will receive a notification and the matter will appear on the Outstanding Offences Board.
+        The accused sees it under “Needs you” on the Cases page and on their dashboard. They then have two options:
       </p>
-      <p>The accused will then have two options:</p>
-      <h3>Admit the offence</h3>
-      <p>The contribution can be paid immediately using the Quick Payment options above.</p>
-      <h3>Contest the allegation</h3>
-      <p>The matter will be placed before the team for a vote.</p>
-      <p>If the vote finds the accused guilty, the contribution amount will be doubled.</p>
+      <h3>Accept it</h3>
+      <p>They pay the amount for that section straight away in Monzo. If it isn’t paid within the time the Act allows, it doubles.</p>
+      <h3>Contest it</h3>
+      <p>The case goes to a 48-hour team vote. Everyone except the accused and the person who reported it can vote.</p>
+      <p>If more people vote guilty than not guilty, the amount is doubled.</p>
       <p>
-        If the vote finds the accused not guilty, the allegation will be dismissed and the reporting member will be required to pay £1 court costs to the team fund.
+        Otherwise (including a tie, or nobody voting) the case is not upheld and the person who reported it pays £1 court costs to the team fund.
       </p>
       <p class="dashboard-info-modal__note">
         This system is designed to provide a transparent and fair way of managing social contributions within the team.
@@ -136,28 +134,28 @@
   </dialog>
 
   <section class="dashboard-content-grid">
-    <article class="card p-responsive">
-      <p class="eyebrow">Bank Sync</p>
-      <h2 class="section-header"><i data-lucide="landmark" class="icon"></i>Feature coming soon</h2>
-      <p class="muted">Live account balance and syncing will be available soon.</p>
-    </article>
+    <a class="card p-responsive dashboard-tile" href="/app/issue/">
+      <p class="eyebrow">Your cases</p>
+      <h2 class="section-header"><i data-lucide="gavel" class="icon"></i><span id="tileCasesTitle">Loading…</span></h2>
+      <p class="muted" id="tileCasesText">&nbsp;</p>
+    </a>
 
-    <article class="card p-responsive">
-      <p class="eyebrow">Fines</p>
-      <h2 class="section-header"><i data-lucide="credit-card" class="icon"></i>Feature coming soon</h2>
-      <p class="muted">Fine tracking and in-app settlement will return soon.</p>
-    </article>
+    <a class="card p-responsive dashboard-tile" href="/app/disbursements/">
+      <p class="eyebrow">Fund</p>
+      <h2 class="section-header"><i data-lucide="wallet" class="icon"></i><span id="tileFundTitle">£0.00 left</span></h2>
+      <p class="muted" id="tileFundText">&nbsp;</p>
+    </a>
 
-    <article class="card p-responsive">
+    <a class="card p-responsive dashboard-tile" href="/app/team/">
       <p class="eyebrow">Team</p>
-      <h2 class="section-header"><i data-lucide="users" class="icon"></i>Feature coming soon</h2>
-      <p class="muted">Team member insights and standings are being rebuilt.</p>
-    </article>
+      <h2 class="section-header"><i data-lucide="users" class="icon"></i><span id="tileTeamTitle">Team</span></h2>
+      <p class="muted" id="tileTeamText">See who’s in the team and the contribution standings.</p>
+    </a>
 
-    <article class="card p-responsive">
-      <p class="eyebrow">Actions</p>
-      <h2 class="section-header"><i data-lucide="layout-grid" class="icon"></i>Feature coming soon</h2>
-      <p class="muted">Additional dashboard tools will appear here soon.</p>
+    <article class="card p-responsive dashboard-tile" aria-labelledby="tileNewsTitle">
+      <p class="eyebrow">Announcements</p>
+      <h2 class="section-header" id="tileNewsTitle"><i data-lucide="megaphone" class="icon"></i>Latest news</h2>
+      <div id="tileNews" class="dashboard-news"><p class="muted">No announcements yet.</p></div>
     </article>
   </section>
 </main>

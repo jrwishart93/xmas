@@ -27,9 +27,9 @@
         <a href="/app/dashboard/" class="nav-link"><i data-lucide="bar-chart-3" class="icon"></i>Dashboard</a>
         <a href="/app/leaderboard/" class="nav-link"><i data-lucide="trophy" class="icon"></i>Leaderboard</a>
         <a href="/app/issue/" class="nav-link" aria-current="page"><i data-lucide="gavel" class="icon"></i>Issue</a>
-        <a href="/app/disbursements/" class="nav-link" data-preview-route><i data-lucide="wallet" class="icon"></i>Disbursements</a>
+        <a href="/app/disbursements/" class="nav-link"><i data-lucide="wallet" class="icon"></i>Disbursements</a>
         <a href="/act/" class="nav-link"><i data-lucide="scroll-text" class="icon"></i>Act</a>
-        <a href="#" class="nav-link" data-preview-gate><i data-lucide="settings" class="icon"></i>Settings</a>
+        <a href="/app/settings/" class="nav-link"><i data-lucide="settings" class="icon"></i>Settings</a>
         <a href="#" id="logoutLink" class="nav-link"><i data-lucide="x-circle" class="icon"></i>Logout</a>
       </nav>
       <span class="avatar-dot" aria-hidden="true"></span>
@@ -37,51 +37,52 @@
   </div>
 </header>
 
-<main class="site-shell with-fixed-header">
-  <section class="card glass-panel">
-    <p class="eyebrow">Case management</p>
-    <h1>Manage SCNs</h1>
-    <p class="muted">Select the relevant clause and record the supporting details for each notice.</p>
+<main class="site-shell with-fixed-header cases-page">
+  <section class="card glass-panel p-responsive cases-hero">
+    <p class="eyebrow">Cases</p>
+    <h1>Cases &amp; the Kangaroo Court</h1>
+    <p class="muted">Own up to a breach, report one, and vote on contested cases. A contested case goes to a 48-hour team vote: if it’s upheld the amount doubles; if not, the person who reported it pays £1 court costs.</p>
+    <div class="cases-stats" id="casesStats" aria-live="polite"></div>
   </section>
 
-  <section class="form-grid content-grid">
-    <section class="card p-responsive">
-      <h2 class="section-header"><i data-lucide="scale" class="icon"></i>Record Your Own SCN</h2>
-      <form id="confessForm">
-        <label>Clause<select id="confessClause"></select></label>
-
-        <fieldset class="disposal-options">
-          <label class="disposal-option"><input type="radio" name="confessDisposal" checked /> Monetary (Preferred)</label>
-          <label class="disposal-option"><input type="radio" name="confessDisposal" /> Cakes (Alternative)</label>
-          <label class="disposal-option"><input type="radio" name="confessDisposal" /> Combined</label>
-        </fieldset>
-
-        <label>Summary<textarea id="confessBrief" placeholder="Provide a concise summary of the circumstances."></textarea></label>
-        <button type="submit" class="btn-responsive" data-preview-gate><i data-lucide="check-circle-2" class="icon icon-btn"></i>Issue SCN</button>
-      </form>
-    </section>
-
-    <section class="card p-responsive">
-      <h2 class="section-header"><i data-lucide="scroll-text" class="icon"></i>Issue an SCN to a Member</h2>
-      <form id="allegeForm">
-        <label>Member<select id="accusedUser"></select></label>
-        <label>Clause<select id="allegeClause"></select></label>
-
-        <fieldset class="disposal-options">
-          <label class="disposal-option"><input type="radio" name="allegeDisposal" checked /> Monetary (Preferred)</label>
-          <label class="disposal-option"><input type="radio" name="allegeDisposal" /> Cakes (Alternative)</label>
-          <label class="disposal-option"><input type="radio" name="allegeDisposal" /> Combined</label>
-        </fieldset>
-
-        <label>Summary<textarea id="allegeBrief" placeholder="Provide a concise summary of why this clause applies."></textarea></label>
-        <button type="submit" class="btn-responsive" data-preview-gate><i data-lucide="check-circle-2" class="icon icon-btn"></i>Issue SCN</button>
-      </form>
-    </section>
+  <section class="card p-responsive cases-needs" id="needsYouSection" hidden aria-labelledby="needsYouTitle">
+    <h2 class="section-header" id="needsYouTitle"><i data-lucide="bell-ring" class="icon"></i>Needs you</h2>
+    <div class="case-list" id="needsYouList"></div>
   </section>
 
-  <section class="card"><h2 class="section-header"><i data-lucide="alert-triangle" class="icon"></i>SCNs Assigned to Me</h2><div id="againstMe"></div></section>
-  <section class="card"><h2 class="section-header"><i data-lucide="user" class="icon"></i>SCNs I Issued</h2><div id="iRaised"></div></section>
-  <section class="card"><h2 class="section-header"><i data-lucide="check-circle-2" class="icon"></i>Resolved Cases</h2><div id="resolved"></div></section>
+  <section class="card p-responsive cases-form-card" aria-labelledby="caseFormTitle">
+    <h2 class="section-header" id="caseFormTitle"><i data-lucide="scale" class="icon"></i>Raise a case</h2>
+    <div class="case-mode" role="tablist" aria-label="Case type">
+      <button type="button" role="tab" class="case-mode__tab" data-mode="self" aria-selected="true">Own up</button>
+      <button type="button" role="tab" class="case-mode__tab" data-mode="other" aria-selected="false">Report someone</button>
+    </div>
+    <form id="caseForm" class="case-form" novalidate>
+      <label class="case-form__field" id="accusedField" hidden>Team member
+        <select id="caseAccused"></select>
+      </label>
+      <label class="case-form__field">Section of the Act
+        <select id="caseClause" required></select>
+      </label>
+      <label class="case-form__field">What happened? <span class="muted">(optional)</span>
+        <textarea id="caseBrief" maxlength="500" rows="3" placeholder="A short summary of the circumstances."></textarea>
+      </label>
+      <p class="case-form__preview" id="casePreview" aria-live="polite"></p>
+      <button type="submit" class="btn btn-responsive" id="caseSubmit"><i data-lucide="check-circle-2" class="icon icon-btn"></i><span>Own up</span></button>
+      <p class="case-form__status" id="caseFormStatus" role="status" hidden></p>
+    </form>
+  </section>
+
+  <section class="card p-responsive" aria-labelledby="allCasesTitle">
+    <h2 class="section-header" id="allCasesTitle"><i data-lucide="gavel" class="icon"></i>All cases</h2>
+    <div class="payment-history__filters" id="caseFilters" role="group" aria-label="Filter cases">
+      <button type="button" class="history-filter" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" class="history-filter" data-filter="open" aria-pressed="false">Open</button>
+      <button type="button" class="history-filter" data-filter="unpaid" aria-pressed="false">Unpaid</button>
+      <button type="button" class="history-filter" data-filter="mine" aria-pressed="false">Involving me</button>
+      <button type="button" class="history-filter" data-filter="closed" aria-pressed="false">Closed</button>
+    </div>
+    <div class="case-list" id="caseList"><p class="muted">Loading cases…</p></div>
+  </section>
 </main>
 
 <script type="module" src="/js/cases-page.js"></script>

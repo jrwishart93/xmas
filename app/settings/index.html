@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Settings | Team Social Fund</title>
+  <meta name="description" content="Your Team Social Fund account settings." />
+  <meta name="theme-color" content="#0b0f1d" />
+  <meta name="application-name" content="Team Social Fund" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Team Social Fund" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="icon" type="image/png" href="/app/images/icon-image-cake-on-scale.png" />
+  <link rel="apple-touch-icon" href="/app/images/icon-image-cake-on-scale.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="stylesheet" href="/styles/main.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="site-shell header-row">
+    <h1 class="section-header"><i data-lucide="settings" class="icon"></i>Settings</h1>
+    <nav aria-label="App navigation" class="site-nav">
+      <a href="/app/dashboard/" class="nav-link"><i data-lucide="bar-chart-3" class="icon"></i>Dashboard</a>
+      <a href="/app/leaderboard/" class="nav-link"><i data-lucide="trophy" class="icon"></i>Leaderboard</a>
+      <a href="/app/issue/" class="nav-link"><i data-lucide="gavel" class="icon"></i>Issue</a>
+      <a href="/app/disbursements/" class="nav-link"><i data-lucide="wallet" class="icon"></i>Disbursements</a>
+      <a href="/act/" class="nav-link"><i data-lucide="scroll-text" class="icon"></i>Act</a>
+      <a href="/app/settings/" class="nav-link" aria-current="page"><i data-lucide="settings" class="icon"></i>Settings</a>
+      <a href="#" id="logoutLink" class="nav-link"><i data-lucide="x-circle" class="icon"></i>Logout</a>
+    </nav>
+  </div>
+</header>
+<main class="site-shell with-fixed-header settings-page">
+  <section class="card p-responsive" aria-labelledby="profileTitle">
+    <h2 class="section-header" id="profileTitle"><i data-lucide="user" class="icon"></i>Your profile</h2>
+    <form id="profileForm" class="case-form" novalidate>
+      <label class="case-form__field">Display name
+        <input id="profileName" type="text" minlength="2" maxlength="60" autocomplete="name" required />
+      </label>
+      <p class="muted">This is the name the team sees on cases and votes.</p>
+      <button type="submit" class="btn btn-responsive" id="profileSubmit"><i data-lucide="save" class="icon icon-btn"></i>Save name</button>
+      <p class="case-form__status" id="profileStatus" role="status" hidden></p>
+    </form>
+  </section>
+
+  <section class="card p-responsive" aria-labelledby="accountTitle">
+    <h2 class="section-header" id="accountTitle"><i data-lucide="shield" class="icon"></i>Account</h2>
+    <dl class="settings-details">
+      <div><dt>Email</dt><dd id="accountEmail">—</dd></div>
+      <div><dt>Role</dt><dd id="accountRole">—</dd></div>
+    </dl>
+    <div class="case-card__actions">
+      <button type="button" class="btn secondary" id="resetPassword"><i data-lucide="key-round" class="icon icon-btn"></i>Email me a password reset link</button>
+      <button type="button" class="btn danger" id="settingsLogout"><i data-lucide="log-out" class="icon icon-btn"></i>Log out</button>
+    </div>
+    <p class="case-form__status" id="accountStatus" role="status" hidden></p>
+  </section>
+</main>
+<script type="module" src="/js/settings-page.js"></script>
+</body>
+</html>
