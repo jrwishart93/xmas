@@ -13,11 +13,7 @@ export type SignedSessionPayload = {
 };
 
 function getSessionSecret() {
-  const secret =
-    process.env.SESSION_COOKIE_SECRET ||
-    process.env.FIREBASE_PRIVATE_KEY ||
-    process.env.FIREBASE_CLIENT_EMAIL ||
-    "";
+  const secret = process.env.SESSION_COOKIE_SECRET || process.env.FIREBASE_PRIVATE_KEY || "";
 
   return secret.trim();
 }
@@ -48,7 +44,7 @@ function timingSafeEqual(left: string, right: string) {
 async function signValue(value: string) {
   const secret = getSessionSecret();
   if (!secret) {
-    throw new Error("Missing SESSION_COOKIE_SECRET or fallback secret for signed sessions.");
+    throw new Error("Missing SESSION_COOKIE_SECRET (or FIREBASE_PRIVATE_KEY fallback) for signed sessions.");
   }
 
   const key = await crypto.subtle.importKey(

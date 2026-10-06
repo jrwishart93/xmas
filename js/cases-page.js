@@ -11,16 +11,26 @@ let membership;
 let members;
 let clauses;
 
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[character]);
+}
+
 function fillClauses(select) {
   select.innerHTML = clauses
-    .map((c) => `<option value="${c.id}">${c.id} — ${c.title} (${money(c.amountPence)})</option>`)
+    .map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.id)} — ${escapeHtml(c.title)} (${money(c.amountPence)})</option>`)
     .join('');
 }
 
 function caseCard(item, canPlea, canCourt) {
   const div = document.createElement('div');
   div.className = 'card';
-  div.innerHTML = `<p><span class="badge">${STAGE_LABELS[item.stage] || item.stage}</span></p><p>Clause: ${item.clauseId}</p><p>Summary: ${item.brief || '—'}</p><p>Standard amount: ${money(item.baseAmountPence)} | Current amount: ${money(item.finalAmountPence || 0)}</p>`;
+  div.innerHTML = `<p><span class="badge">${escapeHtml(STAGE_LABELS[item.stage] || item.stage)}</span></p><p>Clause: ${escapeHtml(item.clauseId)}</p><p>Summary: ${escapeHtml(item.brief || '—')}</p><p>Standard amount: ${money(item.baseAmountPence)} | Current amount: ${money(item.finalAmountPence || 0)}</p>`;
 
   if (canPlea && item.stage === 'awaiting_plea') {
     const actions = document.createElement('div');
@@ -117,7 +127,7 @@ bootProtectedPage(async (ctx) => {
 
   if (PREVIEW_MODE) {
     const previewMembers = Object.values(TEAM).map((m) => ({ uid: m.id, displayName: m.name }));
-    accusedSelect.innerHTML = previewMembers.map((m) => `<option value="${m.uid}">${m.displayName}</option>`).join('');
+    accusedSelect.innerHTML = previewMembers.map((m) => `<option value="${escapeHtml(m.uid)}">${escapeHtml(m.displayName)}</option>`).join('');
 
     document.querySelectorAll('#confessForm button, #allegeForm button').forEach((button) => {
       button.setAttribute('data-preview-gate', 'issue-scn');
@@ -136,7 +146,7 @@ bootProtectedPage(async (ctx) => {
   }
 
   members = await getMembers();
-  accusedSelect.innerHTML = [...members.values()].map((m) => `<option value="${m.uid}">${m.displayName}</option>`).join('');
+  accusedSelect.innerHTML = [...members.values()].map((m) => `<option value="${escapeHtml(m.uid)}">${escapeHtml(m.displayName)}</option>`).join('');
 
   document.getElementById('confessForm').onsubmit = async (e) => {
     e.preventDefault();

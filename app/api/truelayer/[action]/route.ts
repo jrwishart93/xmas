@@ -64,7 +64,7 @@ export async function GET(request: Request, { params }: Params) {
 
   const teamId = process.env.TEAM_ID || 'rpu-social-fund';
   const memberSnap = await adminDb.doc(`teams/${teamId}/members/${decoded.uid}`).get();
-  if (!memberSnap.exists) {
+  if (!memberSnap.exists || memberSnap.data()?.disabled === true) {
     return NextResponse.json({ code: 'forbidden', error: 'Team membership required.' }, { status: 403 });
   }
 

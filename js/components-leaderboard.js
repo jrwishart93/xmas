@@ -1,3 +1,13 @@
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[character]);
+}
+
 export function renderLeaderboardSummary(container, { entries = [], totalFund = '£0.00' } = {}) {
   container.innerHTML = '';
 
@@ -7,7 +17,7 @@ export function renderLeaderboardSummary(container, { entries = [], totalFund = 
 
   const total = document.createElement('p');
   total.className = 'fund-amount';
-  total.innerHTML = `<strong id="fundAmount" data-value="${totalFund}">${totalFund}</strong>`;
+  total.innerHTML = `<strong id="fundAmount" data-value="${escapeHtml(totalFund)}">${escapeHtml(totalFund)}</strong>`;
 
   const title = document.createElement('h3');
   title.className = 'leaderboard-heading';
@@ -33,8 +43,8 @@ export function renderLeaderboardSummary(container, { entries = [], totalFund = 
 
       item.innerHTML = `
         <span class="rank-badge ${medalClass}">${index + 1}</span>
-        <span class="contributor-name">${name} ${status}</span>
-        <strong class="leaderboard-item-value">${amount}</strong>
+        <span class="contributor-name">${escapeHtml(name)} ${status}</span>
+        <strong class="leaderboard-item-value">${escapeHtml(amount)}</strong>
         <span class="progress-wrap"><span class="progress-bar" style="width:${percent}%"></span></span>
       `;
       list.appendChild(item);

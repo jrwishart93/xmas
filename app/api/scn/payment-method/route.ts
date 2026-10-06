@@ -26,7 +26,9 @@ export async function POST(request: Request) {
   if (!decoded) return NextResponse.json({ error: 'Invalid ID token.' }, { status: 401 });
 
   const { scnId, paymentMethod, bankReference } = (await request.json().catch(() => ({}))) as SetPaymentMethodBody;
-  if (!scnId) return NextResponse.json({ error: 'Missing scnId.' }, { status: 400 });
+  if (!scnId || typeof scnId !== 'string' || scnId.includes('/')) {
+    return NextResponse.json({ error: 'Missing scnId.' }, { status: 400 });
+  }
   if (paymentMethod !== 'bank_transfer') {
     return NextResponse.json({ error: 'Unsupported payment method.' }, { status: 400 });
   }
@@ -34,7 +36,9 @@ export async function POST(request: Request) {
   const teamId = process.env.TEAM_ID || 'rpu-social-fund';
   const memberRef = adminDb.doc(`teams/${teamId}/members/${decoded.uid}`);
   const memberSnap = await memberRef.get();
-  if (!memberSnap.exists) return NextResponse.json({ error: 'Unauthorised.' }, { status: 403 });
+  if (!memberSnap.exists || memberSnap.data()?.disabled === true) {
+    return NextResponse.json({ error: 'Unauthorised.' }, { status: 403 });
+  }
 
   const scnRef = adminDb.doc(`teams/${teamId}/scns/${scnId}`);
   const teamRef = adminDb.doc(`teams/${teamId}`);

@@ -6,6 +6,7 @@ import { getScnPaymentBreakdown } from '../_lib/scnAmount';
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+const STRIPE_SIGNATURE_TOLERANCE_SECONDS = 300;
 
 function verifySignature(payload: string, signatureHeader: string | null) {
   if (!signatureHeader || !STRIPE_WEBHOOK_SECRET) return false;
@@ -13,6 +14,7 @@ function verifySignature(payload: string, signatureHeader: string | null) {
   const timestamp = entries.t;
   const signature = entries.v1;
   if (!timestamp || !signature) return false;
+  if (!(Math.abs(Date.now() / 1000 - Number(timestamp)) <= STRIPE_SIGNATURE_TOLERANCE_SECONDS)) return false;
 
   const signedPayload = `${timestamp}.${payload}`;
   const expected = crypto.createHmac('sha256', STRIPE_WEBHOOK_SECRET).update(signedPayload).digest('hex');
