@@ -77,14 +77,43 @@ async function loadMembers(): Promise<Map<string, MemberSummary>> {
   return members;
 }
 
-function countEligibleVoters(members: Iterable<MemberSummary>, scn: ScnData) {
-  let eligible = 0;
+function eligibleVoterIds(members: Iterable<Pick<MemberSummary, 'uid' | 'disabled'>>, scn: ScnData) {
+  const eligible = new Set<string>();
   for (const member of members) {
     if (member.disabled) continue;
     if (member.uid === scn.accusedUserId || member.uid === scn.issuedByUserId) continue;
-    eligible += 1;
+    eligible.add(member.uid);
   }
   return eligible;
+}
+
+// Only votes from members who are still eligible count (a voter may be disabled or removed mid-vote).
+function tallyEligibleVotes(votes: Map<string, Vote>, eligible: Set<string>) {
+  let guilty = 0;
+  let notGuilty = 0;
+  votes.forEach((vote, uid) => {
+    if (!eligible.has(uid)) return;
+    if (vote === 'guilty') guilty += 1;
+    else notGuilty += 1;
+  });
+  return { guilty, notGuilty, cast: guilty + notGuilty };
+}
+
+// Cases reserved by the older bank-transfer/TrueLayer flow hold an amount in pendingBalancePence.
+// Any terminal update (paid, dismissed) must release that reservation.
+function releasePendingReservation(tx: Transaction, scn: ScnData, update: Record<string, unknown>) {
+  if (!scn.pendingBalanceReserved) return;
+  const reservedPence = Math.round(
+    Number(scn.amountPence || getScnPaymentBreakdown(scn, { statusOverride: 'awaiting_payment' }).originalAmountPence || 0)
+  );
+  update.pendingBalanceReserved = false;
+  if (reservedPence > 0) {
+    tx.set(
+      getAdminDb().doc(`teams/${TEAM_ID}`),
+      { pendingBalancePence: FieldValue.increment(-reservedPence) },
+      { merge: true }
+    );
+  }
 }
 
 async function readVotes(tx: Transaction | null, scnRef: DocumentReference) {
@@ -113,30 +142,30 @@ export async function resolveVoteIfDue(scnId: string, options: { force?: boolean
     const scn = snapshot.data() as ScnData;
     if (scn.stage !== 'court_requested') return null;
 
+    const closesAt = toMs(scn.voteClosesAt);
+
+    // Contested cases from before team voting have no deadline. Start their vote window now
+    // instead of treating the missing deadline as already passed.
+    if (closesAt === null && !options.force) {
+      tx.update(scnRef, {
+        voteClosesAt: Timestamp.fromMillis(now + VOTE_WINDOW_MS),
+        ...(scn.courtRequestedAt ? {} : { courtRequestedAt: FieldValue.serverTimestamp() }),
+      });
+      return null;
+    }
+
     const membersSnapshot = await tx.get(membersCollection());
-    const members = membersSnapshot.docs.map((doc) => ({
-      uid: doc.id,
-      displayName: '',
-      disabled: doc.data().disabled === true,
-      role: '',
-    }));
+    const members = membersSnapshot.docs.map((doc) => ({ uid: doc.id, disabled: doc.data().disabled === true }));
     const votes = await readVotes(tx, scnRef);
-    const eligible = countEligibleVoters(members, scn);
-    const closesAt = toMs(scn.voteClosesAt) ?? 0;
-    const everyoneVoted = eligible > 0 && votes.size >= eligible;
+    const eligibleIds = eligibleVoterIds(members, scn);
+    const { guilty, notGuilty, cast } = tallyEligibleVotes(votes, eligibleIds);
+    const everyoneVoted = eligibleIds.size > 0 && cast >= eligibleIds.size;
 
-    if (!options.force && now < closesAt && !everyoneVoted) return null;
-
-    let guilty = 0;
-    let notGuilty = 0;
-    votes.forEach((vote) => {
-      if (vote === 'guilty') guilty += 1;
-      else notGuilty += 1;
-    });
+    if (!options.force && now < (closesAt ?? 0) && !everyoneVoted) return null;
 
     const convicted = guilty > notGuilty;
     const baseAmountPence = Math.round(Number(scn.baseAmountPence || 0));
-    const verdictVotes = { guilty, notGuilty, eligible };
+    const verdictVotes = { guilty, notGuilty, eligible: eligibleIds.size };
 
     if (convicted) {
       tx.update(scnRef, {
@@ -184,7 +213,11 @@ export async function resolveVoteIfDue(scnId: string, options: { force?: boolean
 
 async function resolveExpiredVotes(now = Date.now()) {
   const snapshot = await scnsCollection().where('stage', '==', 'court_requested').get();
-  const due = snapshot.docs.filter((doc) => (toMs(doc.data().voteClosesAt) ?? 0) <= now);
+  // Includes cases with no deadline yet, which resolveVoteIfDue gives a fresh vote window.
+  const due = snapshot.docs.filter((doc) => {
+    const closesAt = toMs(doc.data().voteClosesAt);
+    return closesAt === null || closesAt <= now;
+  });
   await Promise.all(due.map((doc) => resolveVoteIfDue(doc.id, { now }).catch((error) => {
     console.error(`Unable to resolve vote for case ${doc.id}:`, error);
   })));
@@ -216,13 +249,11 @@ export async function listCases(member: RequestMemberContext) {
       };
       if (stage === 'court_requested') {
         const votes = await readVotes(null, doc.ref);
-        let guilty = 0;
-        votes.forEach((value) => { if (value === 'guilty') guilty += 1; });
+        const eligibleIds = eligibleVoterIds(members.values(), scn);
+        const tally = tallyEligibleVotes(votes, eligibleIds);
         vote = {
-          guilty,
-          notGuilty: votes.size - guilty,
-          cast: votes.size,
-          eligible: countEligibleVoters(members.values(), scn),
+          ...tally,
+          eligible: eligibleIds.size,
           myVote: votes.get(member.uid) || null,
           closesAt: toMs(scn.voteClosesAt),
         };
@@ -407,12 +438,14 @@ export async function dismissCase(member: RequestMemberContext, scnId: string) {
     if (!OPEN_STAGES.has(String(scn.stage || '')) && !isPayable(scn)) {
       throw new CaseError('This case is already closed.', 409);
     }
-    tx.update(ref, {
+    const update: Record<string, unknown> = {
       stage: 'dismissed',
       status: 'dismissed',
       resolvedAt: FieldValue.serverTimestamp(),
       dismissedBy: member.uid,
-    });
+    };
+    releasePendingReservation(tx, scn, update);
+    tx.update(ref, update);
   });
 }
 
@@ -435,14 +468,16 @@ export async function markCasePaid(member: RequestMemberContext, scnId: string) 
     paidPence = breakdown.currentAmountPence;
     if (paidPence <= 0) throw new CaseError('This case has no amount to pay.', 409);
 
-    tx.update(ref, {
+    const update: Record<string, unknown> = {
       status: 'paid',
       paymentMethod: 'monzo',
       amountPaidPence: paidPence,
       paidAt: FieldValue.serverTimestamp(),
       paymentRecordedBy: member.uid,
       ...(breakdown.shouldPersistLatePenalty ? { latePenaltyAppliedAt: FieldValue.serverTimestamp() } : {}),
-    });
+    };
+    releasePendingReservation(tx, scn, update);
+    tx.update(ref, update);
     tx.set(
       teamRef,
       { confirmedBalancePence: FieldValue.increment(paidPence), updatedAt: FieldValue.serverTimestamp() },
