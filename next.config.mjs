@@ -15,6 +15,8 @@ const legacyRouteRewrites = [
   { source: "/app/act/:path*", destination: "/legacy/app/act/index.html" },
   { source: "/app/disbursements", destination: "/legacy/app/disbursements/index.html" },
   { source: "/app/disbursements/:path*", destination: "/legacy/app/disbursements/index.html" },
+  { source: "/app/settings", destination: "/legacy/app/settings/index.html" },
+  { source: "/app/settings/:path*", destination: "/legacy/app/settings/index.html" },
   { source: "/app/scn/:scnId", destination: "/legacy/app/scn/index.html" },
   { source: "/app/scn/:scnId/:path*", destination: "/legacy/app/scn/index.html" },
 ];

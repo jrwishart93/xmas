@@ -6,7 +6,7 @@ import { TEAM_ID } from '../../../lib/team';
 export async function GET() {
   const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
   const adminDb = getAdminDb();
-  const scnSnap = await adminDb.collection(`teams/${TEAM_ID}/scns`).where('stage', 'in', ['pleaded_guilty', 'court_convicted']).get();
+  const scnSnap = await adminDb.collection(`teams/${TEAM_ID}/scns`).where('stage', 'in', ['pleaded_guilty', 'court_convicted', 'court_costs']).get();
 
   const memberSnap = await adminDb.collection(`teams/${TEAM_ID}/members`).get();
   const names = new Map<string, string>();

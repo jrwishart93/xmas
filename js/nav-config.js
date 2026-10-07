@@ -10,8 +10,8 @@ export const MEMBER_NAV_ITEMS = [
   { section: 'cases', href: '/app/issue/', label: 'Cases', icon: 'gavel', kind: 'primary' },
   { section: 'leaderboard', href: '/app/leaderboard/', label: 'Leaderboard', icon: 'trophy', kind: 'primary' },
   { section: 'admin', href: '/admin/', label: 'Admin', icon: 'shield', kind: 'secondary', adminOnly: true },
-  { section: 'disbursements', href: '/app/disbursements/', label: 'Disburse', icon: 'wallet', kind: 'secondary', previewRoute: true },
-  { section: 'settings', href: '/under-construction/', label: 'Settings', icon: 'settings', kind: 'secondary' },
+  { section: 'disbursements', href: '/app/disbursements/', label: 'Spending', icon: 'wallet', kind: 'secondary' },
+  { section: 'settings', href: '/app/settings/', label: 'Settings', icon: 'settings', kind: 'secondary' },
   { section: 'act', href: '/app/act/', label: 'Act', icon: 'scroll-text', kind: 'primary' },
 ];
 
@@ -56,6 +56,7 @@ export function getMemberActiveSection(pathname = '/') {
   }
   if (normalized.startsWith('/app/disbursements')) return 'disbursements';
   if (normalized.startsWith('/app/act')) return 'act';
+  if (normalized.startsWith('/app/settings')) return 'settings';
   if (normalized.startsWith('/app/dashboard')) return 'dashboard';
   return null;
 }

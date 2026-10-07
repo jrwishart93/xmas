@@ -26,33 +26,49 @@
       <a href="/app/dashboard/" class="nav-link"><i data-lucide="bar-chart-3" class="icon"></i>Dashboard</a>
       <a href="/app/leaderboard/" class="nav-link"><i data-lucide="trophy" class="icon"></i>Leaderboard</a>
       <a href="/app/issue/" class="nav-link"><i data-lucide="gavel" class="icon"></i>Issue</a>
-      <a href="/app/disbursements/" class="nav-link" aria-current="page" data-preview-route><i data-lucide="wallet" class="icon"></i>Disbursements</a>
+      <a href="/app/disbursements/" class="nav-link" aria-current="page"><i data-lucide="wallet" class="icon"></i>Disbursements</a>
       <a href="/act/" class="nav-link"><i data-lucide="scroll-text" class="icon"></i>Act</a>
-      <a href="#" class="nav-link" data-preview-gate><i data-lucide="settings" class="icon"></i>Settings</a>
+      <a href="/app/settings/" class="nav-link"><i data-lucide="settings" class="icon"></i>Settings</a>
       <a href="#" id="logoutLink" class="nav-link"><i data-lucide="x-circle" class="icon"></i>Logout</a>
     </nav>
   </div>
 </header>
 
-<main class="site-shell with-fixed-header">
-  <section class="card glass-panel p-responsive">
-    <p class="eyebrow">Fund administration</p>
-    <h2>Disbursements</h2>
-    <p class="muted">Manage approved reimbursements and fund transfers.</p>
+<main class="site-shell with-fixed-header disbursements-page">
+  <section class="card glass-panel p-responsive fund-hero">
+    <p class="eyebrow">Where the money goes</p>
+    <h2>Fund spending</h2>
+    <div class="spend-totals">
+      <p><span class="muted">Paid in</span><strong id="spendIn">£0.00</strong></p>
+      <p><span class="muted">Spent</span><strong id="spendOut">£0.00</strong></p>
+      <p><span class="muted">Left in the fund</span><strong id="spendLeft">£0.00</strong></p>
+    </div>
+    <div class="spend-meter" aria-hidden="true"><span id="spendMeter"></span></div>
+    <p class="muted spend-note">“Paid in” comes from the Monzo payment history on the leaderboard.</p>
   </section>
 
-  <section class="content-grid">
-    <article class="card p-responsive" data-preview-gate>
-      <h3 class="section-header"><i data-lucide="credit-card" class="icon"></i>Approve Monthly Settlement</h3>
-      <p class="muted">Release a scheduled allocation to an approved team activity.</p>
-      <button class="btn btn-responsive" data-preview-gate><i data-lucide="send" class="icon icon-btn"></i>Process Payment</button>
-    </article>
+  <section class="card p-responsive" id="spendFormCard" hidden aria-labelledby="spendFormTitle">
+    <h2 class="section-header" id="spendFormTitle"><i data-lucide="receipt" class="icon"></i>Record spending <span class="badge">Admin</span></h2>
+    <form id="spendForm" class="case-form" novalidate>
+      <label class="case-form__field">What was it for?
+        <input id="spendDescription" type="text" maxlength="140" placeholder="e.g. Christmas night deposit" required />
+      </label>
+      <div class="spend-form__row">
+        <label class="case-form__field">Amount (£)
+          <input id="spendAmount" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="25.00" required />
+        </label>
+        <label class="case-form__field">Date
+          <input id="spendDate" type="date" required />
+        </label>
+      </div>
+      <button type="submit" class="btn btn-responsive" id="spendSubmit"><i data-lucide="plus" class="icon icon-btn"></i>Add to the log</button>
+      <p class="case-form__status" id="spendStatus" role="status" hidden></p>
+    </form>
+  </section>
 
-    <article class="card p-responsive" data-preview-gate>
-      <h3 class="section-header"><i data-lucide="banknote" class="icon"></i>Prepare Cash Withdrawal</h3>
-      <p class="muted">Prepare cash for an approved in-person disbursement.</p>
-      <button class="secondary btn-responsive" data-preview-gate><i data-lucide="receipt-pound-sterling" class="icon icon-btn"></i>Request Withdrawal</button>
-    </article>
+  <section class="card p-responsive" aria-labelledby="spendListTitle">
+    <h2 class="section-header" id="spendListTitle"><i data-lucide="wallet" class="icon"></i>Spending log</h2>
+    <ol class="payment-history__list" id="spendList"><li class="muted">Loading…</li></ol>
   </section>
 </main>
 <script type="module" src="/js/disbursements-page.js"></script>

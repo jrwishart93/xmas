@@ -1,5 +1,8 @@
 import { bootProtectedPage, initIcons, initPreviewGates } from '/js/app-common.js';
 import { renderPayPanel } from '/js/pay-panel.js';
+import { createApi, escapeHtml, formatDate } from '/js/api.js';
+import { money } from '/js/constants.js';
+import { getTeamFundsSummary } from '/js/team-funds.js';
 
 function initialsFromName(name = '') {
   const parts = String(name)
@@ -136,6 +139,42 @@ function initQuickPayConfirmation(ctx) {
   return showConfirmFor;
 }
 
+async function loadMemberSummary(ctx) {
+  const summary = await createApi(ctx.user)('/api/member-summary');
+
+  const needs = [];
+  if (summary.awaitingMyPlea) needs.push(`${summary.awaitingMyPlea} case${summary.awaitingMyPlea === 1 ? '' : 's'} to answer`);
+  if (summary.casesOwedByMe) needs.push(`${money(summary.owedByMe)} to pay`);
+  if (summary.openVotes) needs.push(`${summary.openVotes} vote${summary.openVotes === 1 ? '' : 's'} waiting`);
+
+  setText('tileCasesTitle', needs.length ? needs[0].charAt(0).toUpperCase() + needs[0].slice(1) : 'All clear');
+  setText('tileCasesText', needs.length > 1
+    ? `Also: ${needs.slice(1).join(', ')}.`
+    : `${summary.openCases} open case${summary.openCases === 1 ? '' : 's'} across the team.`);
+
+  const chip = document.getElementById('dashboardCasesChip');
+  if (chip && needs.length) {
+    setText('dashboardCasesChipText', `You have ${needs.join(', ')}`);
+    chip.hidden = false;
+  }
+
+  const paidInPence = Math.round(Number(getTeamFundsSummary().total || 0) * 100);
+  setText('tileFundTitle', `${money(paidInPence - summary.totalSpentPence)} left`);
+  setText('tileFundText', `${money(paidInPence)} paid in, ${money(summary.totalSpentPence)} spent.`);
+  setText('tileTeamTitle', `${summary.memberCount} member${summary.memberCount === 1 ? '' : 's'}`);
+
+  const news = document.getElementById('tileNews');
+  if (news && summary.announcements.length) {
+    news.innerHTML = summary.announcements.map((item) => `
+      <article class="dashboard-news__item">
+        <strong>${escapeHtml(item.title)}</strong>
+        <p>${escapeHtml(item.message)}</p>
+        <span class="muted">${escapeHtml(formatDate(item.createdAt ? Date.parse(item.createdAt) : null))}</span>
+      </article>
+    `).join('');
+  }
+}
+
 bootProtectedPage(async (ctx) => {
   const displayName = getUserDisplayName(ctx);
   const roleLabel = formatRole(ctx.membership?.role);
@@ -157,4 +196,12 @@ bootProtectedPage(async (ctx) => {
   const showConfirmFor = initQuickPayConfirmation(ctx);
   renderPayPanel(document.getElementById('dashboardPayPanel'), { onAmountChosen: showConfirmFor });
   initIcons();
+
+  try {
+    await loadMemberSummary(ctx);
+  } catch (error) {
+    setText('tileCasesTitle', 'Open cases');
+    setText('tileCasesText', 'Unable to load your cases right now.');
+    console.error(error);
+  }
 });

@@ -18,7 +18,7 @@ export type AdminMemberRow = {
 
 export type LedgerEntryRow = {
   id: string;
-  type: "fine" | "payment" | "manual-adjustment";
+  type: "fine" | "payment" | "manual-adjustment" | "disbursement";
   amount: number;
   amountPence: number;
   userId: string | null;
@@ -105,7 +105,10 @@ function toLedgerEntry(id: string, data: Record<string, unknown>): LedgerEntryRo
 
   return {
     id,
-    type: data.type === "payment" || data.type === "manual-adjustment" ? (data.type as LedgerEntryRow["type"]) : "fine",
+    type:
+      data.type === "payment" || data.type === "manual-adjustment" || data.type === "disbursement"
+        ? (data.type as LedgerEntryRow["type"])
+        : "fine",
     amount: Number.isFinite(Number(data.amount)) ? Number(data.amount) : amountPence / 100,
     amountPence,
     userId: typeof data.userId === "string" ? data.userId : null,

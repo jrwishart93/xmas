@@ -73,7 +73,8 @@ export function getScnPaymentBreakdown(scn, { now = Date.now(), statusOverride }
     parsedLatePenaltyMultiplier ?? DEFAULT_LATE_PENALTY_MULTIPLIER;
   const latePenaltyAfterDays =
     parsedLatePenaltyAfterDays ?? DEFAULT_LATE_PENALTY_AFTER_DAYS;
-  const issuedAtMs = parseTimestampMs(scn?.createdAt);
+  // The payment clock starts when the case is decided, not when it was first raised.
+  const issuedAtMs = parseTimestampMs(scn?.resolvedAt) ?? parseTimestampMs(scn?.createdAt);
   const dueAtMs = issuedAtMs ? issuedAtMs + latePenaltyAfterDays * DAY_MS : null;
   const status = statusOverride || String(scn?.status || '');
   const storedCurrentAmount =
